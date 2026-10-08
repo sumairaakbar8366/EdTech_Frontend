@@ -1,0 +1,28 @@
+// Design system: generic, business-agnostic UI. Feature components compose these.
+export { Alert } from '@/components/ui/Alert/Alert';
+export { Badge } from '@/components/ui/Badge/Badge';
+export { Button, type ButtonVariant } from '@/components/ui/Button/Button';
+export { IconButton } from '@/components/ui/Button/IconButton';
+export { Card } from '@/components/ui/Card/Card';
+export { DataTable, type Column } from '@/components/ui/DataTable/DataTable';
+export { EmptyState } from '@/components/ui/EmptyState/EmptyState';
+export { Field, useFieldProps } from '@/components/ui/Field/Field';
+export { FilterBar, FilterSlot } from '@/components/ui/FilterBar/FilterBar';
+export { FormSection } from '@/components/ui/FormSection/FormSection';
+export { FullPageMessage } from '@/components/ui/FullPageMessage/FullPageMessage';
+export { IconTile } from '@/components/ui/IconTile/IconTile';
+export { InfoItem } from '@/components/ui/InfoItem/InfoItem';
+export { Input } from '@/components/ui/Input/Input';
+export { Spinner } from '@/components/ui/LoadingState/Spinner';
+export { ConfirmDialog } from '@/components/ui/Modal/ConfirmDialog';
+export { Modal } from '@/components/ui/Modal/Modal';
+export { PageHeader } from '@/components/ui/PageHeader/PageHeader';
+export { Pagination } from '@/components/ui/Pagination/Pagination';
+export { SearchInput } from '@/components/ui/SearchInput/SearchInput';
+export { Select } from '@/components/ui/Select/Select';
+export { StatCard } from '@/components/ui/StatCard/StatCard';
+export { StatusBadge } from '@/components/ui/StatusBadge/StatusBadge';
+export { Tabs } from '@/components/ui/Tabs/Tabs';
+export { TextArea } from '@/components/ui/TextArea/TextArea';
+export { Tilt } from '@/components/ui/Tilt/Tilt';
+export type { Tone } from '@/components/ui/tones';
