@@ -12,6 +12,7 @@ import { lmsService } from '@/features/lms/services/lmsService';
 import type { Material } from '@/features/lms/types/lms.types';
 import { fileSize, formatDateTime, studentQuery, workState } from '@/features/lms/utils/lms.utils';
 import { errorMessage } from '@/lib/errors';
+import { compactNumber } from '@/lib/format';
 
 /** One course: learning material (with discussion) and assignments. */
 export function CourseDetailPage({ isStudent }: { isStudent: boolean }) {
@@ -53,8 +54,8 @@ export function CourseDetailPage({ isStudent }: { isStudent: boolean }) {
 
       <Tabs
         tabs={[
-          { id: 'materials' as const, label: `Material (${c.materials.length})`, icon: FileText },
-          { id: 'assignments' as const, label: `Assignments (${c.assignments.length})`, icon: NotebookPen },
+          { id: 'materials' as const, label: `Material (${compactNumber(c.materials.length)})`, icon: FileText },
+          { id: 'assignments' as const, label: `Assignments (${compactNumber(c.assignments.length)})`, icon: NotebookPen },
         ]}
         value={tab}
         onChange={setTab}

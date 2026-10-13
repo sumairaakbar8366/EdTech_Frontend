@@ -1,6 +1,8 @@
 import { Plus } from 'lucide-react';
+import { CredentialsModal } from '@/features/users/components/CredentialsModal';
+import { handover, type LoginHandover } from '@/features/users/users';
 import { useState } from 'react';
-import { Button, ConfirmDialog, Field, Input, Modal } from '@/components/ui';
+import { Button, ConfirmDialog, Modal } from '@/components/ui';
 import { AddGuardianModal } from '@/features/students/components/detail/AddGuardianModal';
 import { GuardianCard } from '@/features/students/components/detail/GuardianCard';
 import { useStudentsAction } from '@/features/students/hooks/useStudents';
@@ -13,12 +15,13 @@ export function ParentsTab({ student, editable }: { student: StudentDetail; edit
   const [adding, setAdding] = useState(false);
   const [unlinking, setUnlinking] = useState<string | null>(null);
   const [loginFor, setLoginFor] = useState<string | null>(null);
-  const [password, setPassword] = useState('');
+  const [created, setCreated] = useState<LoginHandover | null>(null);
   const setPrimary = useStudentsAction((gid: string) => studentService.setPrimaryGuardian(student.id, gid), 'Primary contact updated');
   const unlink = useStudentsAction((gid: string) => studentService.unlinkGuardian(student.id, gid), 'Guardian removed', () => setUnlinking(null));
-  const login = useStudentsAction(() => studentService.createGuardianLogin(loginFor!, password), 'Parent login created', () => {
+  const login = useStudentsAction(() => studentService.createGuardianLogin(loginFor!), 'Parent login created', (r) => {
+    const g = student.guardians.find((l) => l.guardianId === loginFor)?.guardian;
     setLoginFor(null);
-    setPassword('');
+    setCreated(handover(g?.firstName ?? '', g?.lastName ?? '', 'Parent', r.credentials));
   });
 
   return (
@@ -54,10 +57,10 @@ export function ParentsTab({ student, editable }: { student: StudentDetail; edit
         footer={<><Button variant="secondary" onClick={() => setLoginFor(null)}>Cancel</Button><Button type="submit" form="parent-login" loading={login.isPending}>Create login</Button></>}
       >
         <form id="parent-login" onSubmit={onSubmit(() => login.mutate(undefined))} className="space-y-3">
-          <p className="text-base text-slate-600 dark:text-slate-300">The parent signs in with their email and sees all of their children.</p>
-          <Field label="Temporary password" hint="At least 12 characters"><Input type="password" autoComplete="new-password" required minLength={12} value={password} onChange={(e) => setPassword(e.target.value)} /></Field>
+          <p className="text-base text-slate-600 dark:text-slate-300">The parent gets a User ID (PAR-year-number) and a temporary password, shown once. They sign in with the User ID and see all of their children.</p>
         </form>
       </Modal>
+      <CredentialsModal title="Parent login created" credentials={created} onClose={() => setCreated(null)} />
     </div>
   );
 }

@@ -8,4 +8,4 @@ export interface DocumentRecord {
   createdAt: string;
 }
 
-export type DocumentOwnerType = 'student' | 'employee' | 'guardian' | 'admission_application' | 'school';
+export type DocumentOwnerType = 'student' | 'employee' | 'guardian' | 'admission_application' | 'school' | 'job_application';

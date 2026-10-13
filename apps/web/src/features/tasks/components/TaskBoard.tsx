@@ -1,6 +1,6 @@
 import { CalendarClock, CheckCircle2, Circle, CircleDot, Trash2 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Badge, IconButton } from '@/components/ui';
+import { Badge, CompactNumber, IconButton } from '@/components/ui';
 import { isOverdue, TASK_PRIORITY_TONE, TASK_STATUS_LABEL, TASK_STATUS_TONE, type StaffTask, type TaskStatus } from '@/features/tasks/tasks';
 import { formatDate } from '@/lib/format';
 
@@ -21,7 +21,7 @@ export function TaskBoard({ tasks, showAssignee = false, onMove, onDelete }: { t
         return (
           <section key={status} data-tone={TASK_STATUS_TONE[status]} className="surface tone-card rounded-xl p-3">
             <h2 className="mb-3 flex items-center gap-2 px-1 text-sm font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-              <Icon size={15} /> {TASK_STATUS_LABEL[status]} <span className="ml-auto tabular-nums text-slate-400">{col.length}</span>
+              <Icon size={15} /> {TASK_STATUS_LABEL[status]} <span className="ml-auto tabular-nums text-slate-400"><CompactNumber value={col.length} /></span>
             </h2>
             <ul className="space-y-2">
               <AnimatePresence initial={false}>

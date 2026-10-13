@@ -1,7 +1,6 @@
 import { Pencil, Users, Wallet } from 'lucide-react';
 import { useState } from 'react';
-import { Badge, Card, EmptyState, IconButton, Spinner } from '@/components/ui';
-import { money } from '@/features/fees/utils/fee.utils';
+import { Badge, Card, CompactNumber, EmptyState, IconButton, Spinner } from '@/components/ui';
 import { SalaryStructureModal } from '@/features/payroll/components/structures/SalaryStructureModal';
 import { useSalaryStructures } from '@/features/payroll/hooks/usePayroll';
 import type { StaffSalary } from '@/features/payroll/types/payroll.types';
@@ -37,8 +36,8 @@ export function SalaryStructuresTab({ canEdit }: { canEdit: boolean }) {
                     <div className="text-sm text-slate-500">{s.employeeNo}</div>
                   </td>
                   <td className="px-5 py-3 text-slate-600 dark:text-slate-300">{s.designation}</td>
-                  <td className="px-5 py-3 text-right tabular-nums">{s.structure ? money(s.structure.basicSalary) : <Badge tone="amber">not set</Badge>}</td>
-                  <td className="px-5 py-3 text-right font-semibold tabular-nums">{monthlyGross(s) !== null ? money(monthlyGross(s)!) : '—'}</td>
+                  <td className="px-5 py-3 text-right tabular-nums">{s.structure ? <CompactNumber value={s.structure.basicSalary} /> : <Badge tone="amber">not set</Badge>}</td>
+                  <td className="px-5 py-3 text-right font-semibold tabular-nums">{monthlyGross(s) !== null ? <CompactNumber value={monthlyGross(s)!} /> : '—'}</td>
                   <td className="px-5 py-3 text-sm text-slate-500">{s.structure ? formatDate(s.structure.effectiveFrom) : '—'}</td>
                   <td className="px-3 py-3">{canEdit && <IconButton icon={Pencil} label="Edit salary" onClick={() => setEditing(s)} />}</td>
                 </tr>

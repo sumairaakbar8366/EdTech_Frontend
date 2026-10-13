@@ -26,7 +26,7 @@ const SPECIALS: Special[] = [
   {
     key: 'website', icon: Globe, title: 'A website for every school, built automatically',
     text: 'The moment a school joins, it gets a public website made from its own data: classes, campuses, teachers, open jobs. The admin adds texts and photos; parents apply online.',
-    points: ['Online admission form → straight into Admissions', 'Careers page with online job applications', 'Photo gallery: campus, students, functions', 'Free subdomain; own domain on higher plans'],
+    points: ['Online admission form → straight into Admissions', 'Careers page with online job applications', 'Photo gallery: campus, students, functions', 'Free subdomain; own domain as a yearly add-on'],
     visual: () => (
       <Frame label="greenfield.schoolerp.pk">
         <div className="rounded-lg bg-[#2f3e52] p-4 text-white"><div className="text-xs uppercase tracking-widest text-orange-300">Welcome to</div><div className="text-xl font-extrabold">Greenfield School</div><div className="mt-2 inline-block rounded bg-orange-500 px-2.5 py-1 text-xs font-bold">Apply for admission</div></div>
@@ -79,7 +79,7 @@ const SPECIALS: Special[] = [
   },
   {
     key: 'access', icon: KeyRound, title: 'Secure access, handed out in a click',
-    text: 'The admin gives any staff member, parent or student a login. A strong temporary password is generated and shown once; the person sets their own at first sign-in.',
+    text: 'The admin gives any teacher, staff member, parent or student a login on their own email. They get their User ID and a temporary password by email, and set their own password at first sign-in.',
     points: ['Roles, status and filters in one place', 'Reset passwords and disable logins instantly', 'No passwords stored where anyone can read them'],
     visual: () => (
       <Frame label="Users & Access">

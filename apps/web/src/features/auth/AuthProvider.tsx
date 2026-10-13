@@ -1,16 +1,20 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createContext, useCallback, useContext, useMemo, type ReactNode } from 'react';
-import { api, changePassword as apiChangePassword, login as apiLogin, logout as apiLogout, refreshSession } from '@/services/api/http';
+import { api, changePassword as apiChangePassword, exchangeTicket, login as apiLogin, logout as apiLogout, refreshSession } from '@/services/api/http';
 import { type Me } from '@/types/session';
 
 interface AuthState {
   me: Me | null;
   isLoading: boolean;
   /** Signs in and returns the new user (so the caller can open their home page). */
-  login: (email: string, password: string, remember?: boolean) => Promise<Me>;
+  login: (identifier: string, password: string, remember?: boolean) => Promise<Me>;
   logout: () => Promise<void>;
   /** Replaces the password and reloads the user (clears the "must change" flag). */
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  /** Reloads the signed-in user (after verifying an email). */
+  reload: () => Promise<void>;
+  /** Signs in with a one-time ticket (after sign-up) and returns the user. */
+  loginWithTicket: (ticket: string) => Promise<Me>;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -31,8 +35,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const login = useCallback(
-    async (email: string, password: string, remember = false) => {
-      await apiLogin(email, password, remember);
+    async (identifier: string, password: string, remember = false) => {
+      await apiLogin(identifier, password, remember);
       const me = await api<Me>('/auth/me');
       queryClient.setQueryData(ME_KEY, me);
       return me;
@@ -55,9 +59,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [queryClient],
   );
 
+  const loginWithTicket = useCallback(
+    async (ticket: string) => {
+      await exchangeTicket(ticket);
+      const me = await api<Me>('/auth/me');
+      queryClient.setQueryData(ME_KEY, me);
+      return me;
+    },
+    [queryClient],
+  );
+
+  const reload = useCallback(async () => {
+    queryClient.setQueryData(ME_KEY, await api<Me>('/auth/me'));
+  }, [queryClient]);
+
   const value = useMemo(
-    () => ({ me: data ?? null, isLoading, login, logout, changePassword }),
-    [data, isLoading, login, logout, changePassword],
+    () => ({ me: data ?? null, isLoading, login, logout, changePassword, reload, loginWithTicket }),
+    [data, isLoading, login, logout, changePassword, reload, loginWithTicket],
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

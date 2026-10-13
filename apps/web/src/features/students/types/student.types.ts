@@ -108,10 +108,10 @@ export interface CreateStudentPayload {
   medical?: { allergies: string };
   guardians: (
     | { guardianId: string; relationship: Relation; isPrimary: true }
-    | { details: { firstName: string; lastName: string; phone: string; email: Nullable; occupation: Nullable }; relationship: Relation; isPrimary: true; login?: { password: string } }
+    | { details: { firstName: string; lastName: string; phone: string; email: Nullable; occupation: Nullable }; relationship: Relation; isPrimary: true; login?: Record<string, never> }
   )[];
   enrollment?: { sectionId: string; rollNo: number | null };
-  login?: { email: string; password: string };
+  login?: { email?: string };
 }
 
 export interface UpdateStudentPayload {

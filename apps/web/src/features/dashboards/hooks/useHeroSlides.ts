@@ -11,8 +11,9 @@ import { useMyAssignments } from '@/features/lms/hooks/useLms';
 import { usePayrollSummary } from '@/features/payroll/hooks/usePayroll';
 import { useMyTimetable, useTodaysClasses } from '@/features/timetable/hooks/useTimetable';
 import { isoWeekdayToday } from '@/features/timetable/utils/timetable.utils';
+import { compactNumber } from '@/lib/format';
 
-const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+const plural = (n: number, one: string, many = `${one}s`) => `${compactNumber(n)} ${n === 1 ? one : many}`;
 const nowMinute = () => new Date().getHours() * 60 + new Date().getMinutes();
 const keep = (slides: (HeroSlide | false | null | undefined)[]) => slides.filter(Boolean) as HeroSlide[];
 

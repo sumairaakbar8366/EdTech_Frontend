@@ -10,8 +10,8 @@ import { handover, type LoginHandover } from '@/features/users/users';
 import { onSubmit } from '@/lib/forms';
 
 /**
- * Selected → hired: creates the staff record and, optionally, a login. The login gets a school email by
- * role (e.g. "tehmina.aslam.teacher@…") and a temporary password shown once; the applicant's personal
+ * Selected → hired: creates the staff record and, optionally, a login. The login gets a User ID
+ * (e.g. "TCH-2026-0007") and a temporary password shown once; the applicant's personal
  * email stays on the staff record. Blocked once openings are filled.
  */
 export function HireForm({ app, post, hiredCount, onHired }: { app: JobApplication; post: JobPost; hiredCount: number; onHired: (login: LoginHandover | null) => void }) {
@@ -38,7 +38,7 @@ export function HireForm({ app, post, hiredCount, onHired }: { app: JobApplicati
           <input type="checkbox" className="mt-1 h-4 w-4 accent-primary-600" checked={hire.createLogin} onChange={(e) => setHire({ ...hire, createLogin: e.target.checked })} />
           <span>
             Create a {role === 'teacher' ? 'teacher' : 'staff'} login
-            <span className="block text-sm text-slate-500">School email by role (name.{role === 'teacher' ? 'teacher' : 'staff'}@…) and a temporary password, shown after hiring.</span>
+            <span className="block text-sm text-slate-500">A User ID ({role === 'teacher' ? 'TCH' : 'STF'}-year-number) and a temporary password, shown after hiring and emailed to {app.email}.</span>
           </span>
         </label>
       </div>

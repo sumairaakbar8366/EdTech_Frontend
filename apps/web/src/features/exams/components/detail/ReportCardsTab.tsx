@@ -5,6 +5,7 @@ import { ReportCardModal } from '@/features/exams/components/ReportCardModal';
 import { useExamsAction, useReportCards } from '@/features/exams/hooks/useExams';
 import { examService } from '@/features/exams/services/examService';
 import type { ExamDetail, ReportCardRow } from '@/features/exams/types/exam.types';
+import { compactNumber } from '@/lib/format';
 
 /** Generated report cards ranked per section, with remarks and the printable card. */
 export function ReportCardsTab({ exam, canEdit }: { exam: ExamDetail; canEdit: boolean }) {
@@ -22,7 +23,7 @@ export function ReportCardsTab({ exam, canEdit }: { exam: ExamDetail; canEdit: b
   return (
     <Card
       padded={false}
-      title={`${shown.length} report cards · ${passed} passed`}
+      title={`${compactNumber(shown.length)} report cards · ${compactNumber(passed)} passed`}
       icon={Award}
       tone="fuchsia"
       actions={

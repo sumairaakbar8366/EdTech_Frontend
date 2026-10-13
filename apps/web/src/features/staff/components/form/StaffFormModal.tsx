@@ -8,7 +8,7 @@ import { staffService } from '@/features/staff/services/staffService';
 import type { EmployeeDetail } from '@/features/staff/types/staff.types';
 import { toStaffForm, toStaffPayload, type StaffForm } from '@/features/staff/utils/staff.utils';
 import { CredentialsModal } from '@/features/users/components/CredentialsModal';
-import { handover, type LoginHandover } from '@/features/users/users';
+import { handover, type ApiCredentials, type LoginHandover } from '@/features/users/users';
 import { onSubmit } from '@/lib/forms';
 
 /** Add a staff member, or edit one (`employee` given). */
@@ -37,7 +37,7 @@ export function StaffFormModal({ open, employee, onClose }: { open: boolean; emp
     },
     editing ? 'Staff record updated' : 'Staff member added',
     (r) => {
-      const c = (r as { credentials?: { email: string; password: string } | null }).credentials;
+      const c = (r as { credentials?: ApiCredentials | null }).credentials;
       if (c) setLogin(handover(form.firstName, form.lastName, form.roles.map(roleLabel).join(', '), c));
       onClose();
     },

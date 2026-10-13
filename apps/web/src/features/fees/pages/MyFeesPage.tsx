@@ -1,10 +1,10 @@
 import { CircleDollarSign, CreditCard, Printer, Receipt, TrendingUp, Wallet } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Alert, Badge, Card, EmptyState, IconButton, PageHeader, Spinner, StatCard } from '@/components/ui';
+import { Alert, Badge, Card, CompactNumber, EmptyState, IconButton, PageHeader, Spinner, StatCard } from '@/components/ui';
 import { ReceiptModal } from '@/features/fees/components/payments/ReceiptModal';
 import { INVOICE_TONE, METHOD_LABEL } from '@/features/fees/constants';
 import { useMyFeeStudents, useStatement } from '@/features/fees/hooks/useFees';
-import { balanceOf, concessionValue, money, studentName } from '@/features/fees/utils/fee.utils';
+import { balanceOf, concessionValue, studentName } from '@/features/fees/utils/fee.utils';
 import { formatDate } from '@/lib/format';
 
 /** A student's own fees, or a parent's view of each child's fees and receipts (page 8). */
@@ -42,9 +42,9 @@ export function MyFeesPage({ focus = 'fees' }: { focus?: 'fees' | 'receipts' }) 
       {st && (
         <div className="space-y-4">
           <div className="stagger grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-            <StatCard label="Balance due" value={money(st.totals.balance)} icon={CircleDollarSign} tone={Number(st.totals.balance) > 0 ? 'rose' : 'emerald'} />
-            <StatCard label="Total billed" value={money(st.totals.billed)} icon={Receipt} tone="amber" />
-            <StatCard label="Total paid" value={money(st.totals.paid)} icon={TrendingUp} tone="emerald" />
+            <StatCard label="Balance due" value={Number(st.totals.balance)} icon={CircleDollarSign} tone={Number(st.totals.balance) > 0 ? 'rose' : 'emerald'} />
+            <StatCard label="Total billed" value={Number(st.totals.billed)} icon={Receipt} tone="amber" />
+            <StatCard label="Total paid" value={Number(st.totals.paid)} icon={TrendingUp} tone="emerald" />
             <StatCard label="Overdue" value={st.totals.overdue} icon={CreditCard} tone="orange" hint="invoices" />
           </div>
           {st.awards.length > 0 && (
@@ -66,8 +66,8 @@ export function MyFeesPage({ focus = 'fees' }: { focus?: 'fees' | 'receipts' }) 
                         <div className="text-sm text-slate-500">{i.invoiceNo} · due {formatDate(i.dueDate)} · {i.items.map((it) => it.description).join(', ')}</div>
                       </div>
                       <div className="text-right">
-                        <div className="font-display text-lg font-bold tabular-nums">{money(i.total)}</div>
-                        {['pending', 'partial', 'overdue'].includes(i.status) && <div className="text-sm text-rose-600 dark:text-rose-400">Due {money(balanceOf(i))}</div>}
+                        <div className="font-display text-lg font-bold tabular-nums"><CompactNumber value={i.total} /></div>
+                        {['pending', 'partial', 'overdue'].includes(i.status) && <div className="text-sm text-rose-600 dark:text-rose-400">Due <CompactNumber value={balanceOf(i)} /></div>}
                       </div>
                     </li>
                   ))}
@@ -83,7 +83,7 @@ export function MyFeesPage({ focus = 'fees' }: { focus?: 'fees' | 'receipts' }) 
                       <div className="font-semibold tabular-nums text-slate-800 dark:text-slate-100">{p.receipt?.receiptNo} {p.status === 'voided' && <Badge tone="rose">voided</Badge>}</div>
                       <div className="text-sm text-slate-500">{formatDate(p.paidAt)} · {METHOD_LABEL[p.method]}</div>
                     </div>
-                    <span className="font-semibold tabular-nums">{money(p.amount)}</span>
+                    <span className="font-semibold tabular-nums"><CompactNumber value={p.amount} /></span>
                     <IconButton icon={Printer} label="View receipt" onClick={() => setReceiptId(p.id)} />
                   </li>
                 ))}

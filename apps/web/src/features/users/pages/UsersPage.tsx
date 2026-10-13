@@ -1,5 +1,5 @@
 import type { SchoolRoleKey } from '@schoolerp/shared';
-import { KeyRound, ShieldCheck, ShieldOff, UserCheck, UserCog, UserPlus, Users, UserX } from 'lucide-react';
+import { BadgeCheck, KeyRound, Mail, ShieldCheck, ShieldOff, UserCheck, UserCog, UserPlus, UserX, Users } from 'lucide-react';
 import { useState } from 'react';
 import { Badge, Button, Card, ConfirmDialog, DataTable, EmptyState, FilterBar, FilterSlot, IconButton, PageHeader, Pagination, SearchInput, Select, Spinner, StatCard, type Column } from '@/components/ui';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -7,8 +7,10 @@ import { allPages, ExportMenu } from '@/components/shared/ExportMenu';
 import type { ExportColumn } from '@/lib/spreadsheet';
 import { CredentialsModal } from '@/features/users/components/CredentialsModal';
 import { EditRolesModal } from '@/features/users/components/EditRolesModal';
+import { EmailEditModal } from '@/features/users/components/EmailEditModal';
 import { GrantAccessModal } from '@/features/users/components/GrantAccessModal';
 import { loginStatus, PERSON_LABEL, usersService, useUsers, useUsersAction, useUsersSummary, type Credentials, type PersonType, type SchoolLogin, type UserStatusFilter } from '@/features/users/users';
+import { compactNumber } from '@/lib/format';
 
 const ROLE_FILTER: { key: SchoolRoleKey; label: string }[] = [
   { key: 'school_admin', label: 'School Admin' },
@@ -27,7 +29,9 @@ function when(iso: string | null): string {
 const USER_EXPORT: ExportColumn<SchoolLogin>[] = [
   { header: 'First name', value: (u) => u.firstName },
   { header: 'Last name', value: (u) => u.lastName },
-  { header: 'Email', value: (u) => u.email, width: 30 },
+  { header: 'User ID', value: (u) => u.loginId, width: 16 },
+  { header: 'Email', value: (u) => u.email ?? '', width: 30 },
+  { header: 'Email verified', value: (u) => (u.emailVerified ? 'Yes' : 'No') },
   { header: 'Roles', value: (u) => u.roles.map((r) => r.name).join(', ') },
   { header: 'Linked to', value: (u) => u.people.map((p) => `${PERSON_LABEL[p.type]}: ${p.detail}`).join('; '), width: 34 },
   { header: 'Status', value: (u) => loginStatus(u).label },
@@ -50,6 +54,7 @@ export function UsersPage() {
   const [granting, setGranting] = useState(false);
   const [credentials, setCredentials] = useState<{ c: Credentials; title: string } | null>(null);
   const [editing, setEditing] = useState<SchoolLogin | null>(null);
+  const [emailing, setEmailing] = useState<SchoolLogin | null>(null);
   const [resetting, setResetting] = useState<SchoolLogin | null>(null);
   const [toggling, setToggling] = useState<SchoolLogin | null>(null);
   const reset = useUsersAction(usersService.resetPassword, { onDone: (c) => { setResetting(null); setCredentials({ c, title: 'Password reset' }); } });
@@ -62,7 +67,11 @@ export function UsersPage() {
       cell: (u) => (
         <div className="min-w-0">
           <div className="font-semibold text-slate-900 dark:text-white">{u.firstName} {u.lastName}{u.id === myId && <span className="ml-1.5 text-xs font-normal text-slate-400">(you)</span>}</div>
-          <div className="text-sm text-slate-500">{u.email}</div>
+          <div className="font-mono text-sm font-semibold tracking-wide text-slate-700 dark:text-slate-200">{u.loginId}</div>
+          <div className="flex items-center gap-1.5 text-sm text-slate-500">
+            {u.email ?? 'No email'}
+            {u.email && (u.emailVerified ? <BadgeCheck size={14} className="text-emerald-600" aria-label="Verified" /> : <span className="text-xs text-amber-600">(not verified)</span>)}
+          </div>
         </div>
       ),
     },
@@ -76,6 +85,7 @@ export function UsersPage() {
       cell: (u) => (
         <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
           <IconButton icon={UserCog} label="Edit roles" onClick={() => setEditing(u)} />
+          <IconButton icon={Mail} label="Change email" onClick={() => setEmailing(u)} />
           <IconButton icon={KeyRound} label="Reset password" disabled={u.id === myId || u.status !== 'active'} onClick={() => setResetting(u)} />
           {u.status === 'active'
             ? <IconButton icon={UserX} tone="danger" label="Disable login" disabled={u.id === myId} onClick={() => setToggling(u)} />
@@ -98,11 +108,11 @@ export function UsersPage() {
 
       <Card padded={false}>
         <FilterBar>
-          <SearchInput value={q} onChange={set(setQ)} placeholder="Search name or email…" label="Search logins" />
+          <SearchInput value={q} onChange={set(setQ)} placeholder="Search name, User ID or email…" label="Search logins" />
           <FilterSlot width="w-48">
             <Select aria-label="Role" value={role} onChange={(e) => set(setRole)(e.target.value as SchoolRoleKey | '')}>
               <option value="">All roles</option>
-              {ROLE_FILTER.map((r) => <option key={r.key} value={r.key}>{r.label}{summary ? ` (${summary.byRole.find((b) => b.key === r.key)?.count ?? 0})` : ''}</option>)}
+              {ROLE_FILTER.map((r) => <option key={r.key} value={r.key}>{r.label}{summary ? ` (${compactNumber(summary.byRole.find((b) => b.key === r.key)?.count ?? 0)})` : ''}</option>)}
             </Select>
           </FilterSlot>
           <FilterSlot width="w-52">
@@ -129,6 +139,7 @@ export function UsersPage() {
       <GrantAccessModal open={granting} onClose={() => setGranting(false)} onCreated={(c) => setCredentials({ c, title: 'Login created' })} />
       <CredentialsModal credentials={credentials?.c ?? null} title={credentials?.title ?? ''} onClose={() => setCredentials(null)} />
       <EditRolesModal user={editing} onClose={() => setEditing(null)} />
+      <EmailEditModal user={emailing} onClose={() => setEmailing(null)} />
       <ConfirmDialog
         open={!!resetting}
         title="Reset password?"

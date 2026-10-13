@@ -20,9 +20,9 @@ export interface AddStudentForm {
   bloodGroup: string; nationalId: string; address: string; allergies: string;
   guardianMode: 'new' | 'existing'; guardianId: string; guardianLabel: string; relationship: Relation;
   gFirst: string; gLast: string; gPhone: string; gEmail: string; gOccupation: string;
-  parentLogin: boolean; parentPassword: string;
+  parentLogin: boolean;
   sectionId: string; rollNo: string;
-  studentLogin: boolean; studentEmail: string; studentPassword: string;
+  studentLogin: boolean; studentEmail: string;
 }
 
 export const emptyAddStudentForm = (): AddStudentForm => ({
@@ -30,9 +30,9 @@ export const emptyAddStudentForm = (): AddStudentForm => ({
   bloodGroup: '', nationalId: '', address: '', allergies: '',
   guardianMode: 'new', guardianId: '', guardianLabel: '', relationship: 'father',
   gFirst: '', gLast: '', gPhone: '', gEmail: '', gOccupation: '',
-  parentLogin: false, parentPassword: '',
+  parentLogin: false,
   sectionId: '', rollNo: '',
-  studentLogin: false, studentEmail: '', studentPassword: '',
+  studentLogin: false, studentEmail: '',
 });
 
 /** Admission in one step (page 5): student, profile, first guardian, optional class and logins. */
@@ -53,11 +53,11 @@ export function toCreatePayload(f: AddStudentForm): CreateStudentPayload {
             details: { firstName: f.gFirst, lastName: f.gLast, phone: f.gPhone, email: orNull(f.gEmail), occupation: orNull(f.gOccupation) },
             relationship: f.relationship,
             isPrimary: true,
-            ...(f.parentLogin && { login: { password: f.parentPassword } }),
+            ...(f.parentLogin && { login: {} }),
           },
     ],
     ...(f.sectionId && { enrollment: { sectionId: f.sectionId, rollNo: f.rollNo ? Number(f.rollNo) : null } }),
-    ...(f.studentLogin && { login: { email: f.studentEmail, password: f.studentPassword } }),
+    ...(f.studentLogin && { login: f.studentEmail.trim() ? { email: f.studentEmail.trim() } : {} }),
   };
 }
 

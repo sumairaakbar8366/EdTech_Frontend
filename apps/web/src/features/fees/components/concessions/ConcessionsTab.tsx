@@ -1,6 +1,6 @@
 import { Award as AwardIcon, Pencil, Percent, Plus, XCircle } from 'lucide-react';
 import { useState } from 'react';
-import { Badge, Button, Card, ConfirmDialog, EmptyState, IconButton, Spinner } from '@/components/ui';
+import { Badge, Button, Card, CompactNumber, ConfirmDialog, EmptyState, IconButton, Spinner } from '@/components/ui';
 import { AwardModal } from '@/features/fees/components/concessions/AwardModal';
 import { ConcessionModal } from '@/features/fees/components/concessions/ConcessionModal';
 import { CONCESSION_KIND_TONE } from '@/features/fees/constants';
@@ -33,7 +33,7 @@ export function ConcessionsTab({ canEdit, focus = 'all' }: { canEdit: boolean; f
                   {c.name} <Badge tone={CONCESSION_KIND_TONE[c.kind]}>{c.kind}</Badge> {!c.isActive && <Badge tone="slate">inactive</Badge>}
                 </div>
                 <div className="text-sm text-slate-500">
-                  {concessionValue(c)} off {c.category ? c.category.name : 'all fees'} · {c._count.awards} active award(s)
+                  {concessionValue(c)} off {c.category ? c.category.name : 'all fees'} · <CompactNumber value={c._count.awards} /> active award(s)
                 </div>
               </div>
               {canEdit && <IconButton icon={Pencil} label="Edit concession" onClick={() => setEditing(c)} />}

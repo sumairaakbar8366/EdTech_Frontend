@@ -46,7 +46,7 @@ export function areaRouteTree(area: AreaSlug, routes: AreaRoutes, me: SchoolMe, 
             subtitle={AREAS[area].label}
             nav={nav}
             userName={`${me.user.firstName} ${me.user.lastName}`}
-            userDetail={me.user.email}
+            userDetail={me.user.email ?? me.user.loginId}
             brandColor={brandColor}
             areas={areas}
             titleOffset={1}

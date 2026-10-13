@@ -4,13 +4,14 @@ import { AreaLink } from '@/app/router/area';
 import { ViewAll } from '@/features/dashboards/components/ViewAll';
 import { useMyAssignments } from '@/features/lms/hooks/useLms';
 import { formatDateTime, studentQuery, workState } from '@/features/lms/utils/lms.utils';
+import { compactNumber } from '@/lib/format';
 
 /** Work still to hand in, soonest due first (a parent passes the child's id). */
 export function AssignmentsDueWidget({ studentId, ready = true, to, className = '' }: { studentId?: string; ready?: boolean; to: string; className?: string }) {
   const list = useMyAssignments(studentId, ready);
   const todo = (list.data ?? []).filter((a) => !a.submissions?.length).sort((a, b) => a.dueAt.localeCompare(b.dueAt));
   return (
-    <Card title={`Assignments to do${todo.length ? ` · ${todo.length}` : ''}`} icon={NotebookPen} tone="amber" className={className} actions={<ViewAll to={to} />}>
+    <Card title={`Assignments to do${todo.length ? ` · ${compactNumber(todo.length)}` : ''}`} icon={NotebookPen} tone="amber" className={className} actions={<ViewAll to={to} />}>
       {list.isLoading && <Spinner />}
       {list.isSuccess && todo.length === 0 && <EmptyState icon={NotebookPen} title="All caught up" tone="amber">Nothing is waiting to be handed in.</EmptyState>}
       <ul className="space-y-2">

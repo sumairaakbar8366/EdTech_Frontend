@@ -6,6 +6,8 @@ import { StudentInfoFields } from '@/features/students/components/forms/StudentI
 import { useStudentsAction } from '@/features/students/hooks/useStudents';
 import { studentService } from '@/features/students/services/studentService';
 import { emptyAddStudentForm, toCreatePayload, type AddStudentForm } from '@/features/students/utils/student.utils';
+import { CredentialsModal } from '@/features/users/components/CredentialsModal';
+import { handoversOf, type LoginHandover } from '@/features/users/users';
 import { onSubmit } from '@/lib/forms';
 
 /** Add a student with their first guardian, optional class and logins (page 5). */
@@ -15,10 +17,13 @@ export function AddStudentModal({ open, onClose, onCreated }: { open: boolean; o
     if (open) setForm(emptyAddStudentForm());
   }, [open]);
   const set = (patch: Partial<AddStudentForm>) => setForm((f) => ({ ...f, ...patch }));
+  const [logins, setLogins] = useState<{ id: string; list: LoginHandover[] } | null>(null);
   const save = useStudentsAction(() => studentService.create(toCreatePayload(form)), 'Student added', (s) => {
     onClose();
-    onCreated(s.id);
+    if (s.credentials?.length) setLogins({ id: s.id, list: handoversOf(s.credentials) });
+    else onCreated(s.id);
   });
+  if (logins) return <CredentialsModal title="Student added · login details" credentials={logins.list} onClose={() => { setLogins(null); onCreated(logins.id); }} />;
   return (
     <Modal
       open={open}

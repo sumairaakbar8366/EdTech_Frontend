@@ -1,9 +1,10 @@
-import { Building2, Globe, Palette, ScrollText, Settings } from 'lucide-react';
+import { BellRing, Building2, Globe, Palette, ScrollText, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { Card, EmptyState, PageHeader, Spinner, Tabs } from '@/components/ui';
 import { AuditLogCard } from '@/features/audit/components/AuditLogCard';
 import { BrandingCard } from '@/features/settings/components/BrandingCard';
 import { DomainsCard } from '@/features/settings/components/DomainsCard';
+import { NotificationsCard } from '@/features/settings/components/NotificationsCard';
 import { useCan } from '@/features/auth/usePermissions';
 import { ACADEMICS_KEY } from '@/features/academics/hooks/useAcademics';
 import { AddCampusForm } from '@/features/campuses/components/AddCampusForm';
@@ -15,7 +16,7 @@ import { useAction } from '@/lib/hooks/useAction';
 /** School settings. First section: campuses (multi-campus, limited by the subscription tier). */
 export function SettingsPage() {
   const can = useCan();
-  const [tab, setTab] = useState<'campuses' | 'branding' | 'domains' | 'audit'>('campuses');
+  const [tab, setTab] = useState<'campuses' | 'notifications' | 'branding' | 'domains' | 'audit'>('campuses');
   const campuses = useCampuses();
   const toggle = useAction((c: { id: string; isActive: boolean }) => campusService.update(c.id, { isActive: !c.isActive }), {
     success: (c) => `${c.name} ${c.isActive ? 'activated' : 'deactivated'}`,
@@ -27,6 +28,7 @@ export function SettingsPage() {
       <Tabs
         tabs={[
           { id: 'campuses' as const, label: 'Campuses', icon: Building2 },
+          { id: 'notifications' as const, label: 'Notifications', icon: BellRing },
           { id: 'branding' as const, label: 'Branding', icon: Palette },
           { id: 'domains' as const, label: 'Domains', icon: Globe },
           ...(can('audit.view') ? [{ id: 'audit' as const, label: 'Audit log', icon: ScrollText }] : []),
@@ -34,6 +36,7 @@ export function SettingsPage() {
         value={tab}
         onChange={setTab}
       />
+      {tab === 'notifications' && <NotificationsCard />}
       {tab === 'branding' && <BrandingCard />}
       {tab === 'domains' && <DomainsCard />}
       {tab === 'audit' && <AuditLogCard />}

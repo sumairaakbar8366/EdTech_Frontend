@@ -4,6 +4,7 @@ import { Button, Card, EmptyState, Field, Input, Spinner, StatCard } from '@/com
 import { StaffCheckinTable } from '@/features/attendance/components/admin/StaffCheckinTable';
 import { useAttendanceAction, useStaffCheckins } from '@/features/attendance/hooks/useAttendance';
 import { attendanceService } from '@/features/attendance/services/attendanceService';
+import { compactNumber } from '@/lib/format';
 
 /** A day's staff check-ins (with totals), or the queue of check-ins awaiting review. */
 export function StaffCheckinsTab({ canReview }: { canReview: boolean }) {
@@ -20,7 +21,7 @@ export function StaffCheckinsTab({ canReview }: { canReview: boolean }) {
       </div>
       {!queue && (
         <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
-          <StatCard label="Checked in" value={t ? `${t.checkedIn}/${t.activeStaff}` : '–'} icon={UserCheck} tone="primary" />
+          <StatCard label="Checked in" value={t ? `${compactNumber(t.checkedIn)}/${compactNumber(t.activeStaff)}` : '–'} icon={UserCheck} tone="primary" />
           <StatCard label="Inside campus" value={t?.valid ?? '–'} icon={LocateFixed} tone="emerald" />
           <StatCard label="Outside campus" value={t?.flagged ?? '–'} icon={ShieldAlert} tone="rose" />
           <StatCard label="No GPS" value={t?.unknown ?? '–'} icon={Navigation} tone="slate" />

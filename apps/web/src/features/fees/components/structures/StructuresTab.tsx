@@ -1,13 +1,12 @@
 import { Layers, Pencil, Plus, UserPlus } from 'lucide-react';
 import { useState } from 'react';
-import { Badge, Button, Card, EmptyState, IconButton, Select, Spinner } from '@/components/ui';
+import { Badge, Button, Card, CompactNumber, EmptyState, IconButton, Select, Spinner } from '@/components/ui';
 import { useAcademicYears } from '@/features/academics/hooks/useAcademics';
 import { AssignStructureModal } from '@/features/fees/components/structures/AssignStructureModal';
 import { StructureModal } from '@/features/fees/components/structures/StructureModal';
 import { FREQUENCY_LABEL } from '@/features/fees/constants';
 import { useFeeStructures } from '@/features/fees/hooks/useFees';
 import type { FeeStructure } from '@/features/fees/types/fee.types';
-import { money } from '@/features/fees/utils/fee.utils';
 
 /** Fee structures per class and academic year, and assignment to students (page 8). */
 export function StructuresTab({ canEdit }: { canEdit: boolean }) {
@@ -53,18 +52,18 @@ export function StructuresTab({ canEdit }: { canEdit: boolean }) {
               <div className="mb-3 flex flex-wrap gap-2">
                 <Badge tone="magenta">{s.schoolClass.name}</Badge>
                 <Badge tone="slate">{s.academicYear.name}</Badge>
-                <Badge tone="teal">{s._count.assignments} student(s)</Badge>
+                <Badge tone="teal"><CompactNumber value={s._count.assignments} /> student(s)</Badge>
                 {!s.isActive && <Badge tone="rose">inactive</Badge>}
               </div>
               <ul className="divide-y divide-slate-200/70 dark:divide-white/5">
                 {s.items.map((i) => (
                   <li key={i.id} className="flex items-center justify-between py-1.5">
                     <span className="text-slate-700 dark:text-slate-200">{i.category.name} <span className="text-sm text-slate-500">· {FREQUENCY_LABEL[i.frequency]}</span></span>
-                    <span className="font-semibold tabular-nums">{money(i.amount)}</span>
+                    <span className="font-semibold tabular-nums"><CompactNumber value={i.amount} /></span>
                   </li>
                 ))}
               </ul>
-              {monthly > 0 && <div className="mt-2 text-right text-sm text-slate-500">Monthly total <strong className="tabular-nums text-slate-800 dark:text-slate-100">{money(monthly)}</strong></div>}
+              {monthly > 0 && <div className="mt-2 text-right text-sm text-slate-500">Monthly total <strong className="tabular-nums text-slate-800 dark:text-slate-100"><CompactNumber value={monthly} /></strong></div>}
             </Card>
           );
         })}

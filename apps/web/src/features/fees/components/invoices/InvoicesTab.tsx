@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight, FilePlus2, Receipt, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Alert, Badge, Button, Card, EmptyState, IconButton, Select, Spinner } from '@/components/ui';
+import { Alert, Badge, Button, Card, CompactNumber, EmptyState, IconButton, Select, Spinner } from '@/components/ui';
 import { allPages } from '@/components/shared/ExportMenu';
 import { SheetActions } from '@/components/shared/SheetActions';
 import { feeService } from '@/features/fees/services/feeService';
@@ -10,7 +10,7 @@ import { InvoiceDetailModal } from '@/features/fees/components/invoices/InvoiceD
 import { INVOICE_TONE } from '@/features/fees/constants';
 import { useInvoices } from '@/features/fees/hooks/useFees';
 import type { InvoiceStatus } from '@/features/fees/types/fee.types';
-import { balanceOf, money, studentName } from '@/features/fees/utils/fee.utils';
+import { balanceOf, studentName } from '@/features/fees/utils/fee.utils';
 import { formatDate } from '@/lib/format';
 
 const PAGE_SIZE = 25;
@@ -92,8 +92,8 @@ export function InvoicesTab({ canEdit, initialStatus = '' }: { canEdit: boolean;
                   </td>
                   <td className="px-5 py-3 text-slate-600 dark:text-slate-300">{i.periodLabel}</td>
                   <td className="px-5 py-3 text-slate-600 dark:text-slate-300">{formatDate(i.dueDate)}</td>
-                  <td className="px-5 py-3 text-right tabular-nums">{money(i.total)}</td>
-                  <td className="px-5 py-3 text-right font-semibold tabular-nums">{money(['waived', 'cancelled'].includes(i.status) ? 0 : balanceOf(i))}</td>
+                  <td className="px-5 py-3 text-right tabular-nums"><CompactNumber value={i.total} /></td>
+                  <td className="px-5 py-3 text-right font-semibold tabular-nums"><CompactNumber value={['waived', 'cancelled'].includes(i.status) ? 0 : balanceOf(i)} /></td>
                   <td className="px-5 py-3"><Badge tone={INVOICE_TONE[i.status]}>{i.status}</Badge></td>
                 </tr>
               ))}
@@ -103,7 +103,7 @@ export function InvoicesTab({ canEdit, initialStatus = '' }: { canEdit: boolean;
       )}
       {!!list.data && list.data.total > PAGE_SIZE && (
         <div className="flex items-center justify-between border-t border-slate-200 px-5 py-3 text-base text-slate-600 dark:border-white/5 dark:text-slate-300">
-          <span>{(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, list.data.total)} of {list.data.total}</span>
+          <span>{(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, list.data.total)} of <CompactNumber value={list.data.total} /></span>
           <div className="flex items-center gap-1">
             <IconButton icon={ChevronLeft} label="Previous page" disabled={page <= 1} onClick={() => setPage((p) => p - 1)} />
             <span className="px-2">Page {page} of {totalPages}</span>

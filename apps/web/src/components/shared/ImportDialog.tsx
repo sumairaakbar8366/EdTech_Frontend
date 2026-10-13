@@ -1,7 +1,7 @@
 import { useQueryClient, type QueryKey } from '@tanstack/react-query';
 import { AlertTriangle, CheckCircle2, FileSpreadsheet, FileText, Upload, XCircle } from 'lucide-react';
 import { useRef, useState } from 'react';
-import { Alert, Badge, Button, Modal } from '@/components/ui';
+import { Alert, Badge, Button, CompactNumber, Modal } from '@/components/ui';
 import { errorMessage } from '@/lib/errors';
 import { downloadTemplate, normalizeHeader, readSheet, saveCsv } from '@/lib/spreadsheet';
 import { useSubscription } from '@/features/billing/billing';
@@ -191,8 +191,8 @@ export function ImportDialog<P, C = undefined>({ spec, open, onClose }: { spec: 
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-2 text-sm">
             <span className="font-semibold">{fileName}</span>
-            <Badge tone="slate">{rows.length} rows</Badge>
-            {step === 'review' && <Badge tone="emerald">{valid.length} ready</Badge>}
+            <Badge tone="slate"><CompactNumber value={rows.length} /> rows</Badge>
+            {step === 'review' && <Badge tone="emerald"><CompactNumber value={valid.length} /> ready</Badge>}
             {invalid.length > 0 && <Badge tone="rose">{invalid.length} with problems</Badge>}
             {step === 'done' && <Badge tone="emerald">{imported} imported</Badge>}
             {step === 'done' && failed.length - invalid.length > 0 && <Badge tone="rose">{failed.length - invalid.length} rejected</Badge>}

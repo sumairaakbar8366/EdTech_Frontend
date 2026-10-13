@@ -1,5 +1,5 @@
 import { ClipboardList } from 'lucide-react';
-import { Badge, Card, EmptyState, Spinner } from '@/components/ui';
+import { Badge, Card, CompactNumber, EmptyState, Spinner } from '@/components/ui';
 import { ADMISSION_LABEL, ADMISSION_TONE } from '@/features/admissions/constants';
 import { useAdmissionSummary } from '@/features/admissions/hooks/useAdmissions';
 import type { AdmissionStatus } from '@/features/admissions/types/admission.types';
@@ -25,7 +25,7 @@ export function AdmissionsPipelineWidget({ className = '' }: { className?: strin
               <span className="h-2 overflow-hidden rounded-full bg-slate-500/10">
                 <span className="block h-full rounded-full bg-brand transition-all" style={{ width: `${((counts[s] ?? 0) / max) * 100}%` }} />
               </span>
-              <strong className="text-right tabular-nums text-slate-800 dark:text-slate-100">{counts[s]}</strong>
+              <strong className="text-right tabular-nums text-slate-800 dark:text-slate-100"><CompactNumber value={counts[s] ?? 0} /></strong>
             </li>
           ))}
         </ul>

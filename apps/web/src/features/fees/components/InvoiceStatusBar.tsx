@@ -1,4 +1,5 @@
 import type { InvoiceStatus } from '@/features/fees/types/fee.types';
+import { CompactNumber } from '@/components/ui';
 
 const BAR: Record<InvoiceStatus, string> = {
   pending: 'bg-amber-400', partial: 'bg-primary-500', paid: 'bg-emerald-500', overdue: 'bg-rose-500', waived: 'bg-slate-400', cancelled: 'bg-slate-300',
@@ -18,7 +19,7 @@ export function InvoiceStatusBar({ counts, framed = true, className = '' }: { co
         {present.map((st) => (
           <span key={st} className="inline-flex items-center gap-1.5">
             <span className={`h-2.5 w-2.5 rounded-full ${BAR[st]}`} />
-            <span className="capitalize">{st}</span> <strong className="tabular-nums">{counts[st]}</strong>
+            <span className="capitalize">{st}</span> <strong className="tabular-nums"><CompactNumber value={counts[st] ?? 0} /></strong>
           </span>
         ))}
       </div>

@@ -18,32 +18,58 @@ function CopyButton({ text, label }: { text: string; label: string }) {
   );
 }
 
-/** Shows a new or reset temporary password once, with copy actions to hand it over. */
-export function CredentialsModal({ credentials, title, onClose }: { credentials: LoginHandover | null; title: string; onClose: () => void }) {
-  const me = useSchoolUser();
-  if (!credentials) return null;
-  const message = loginMessage(credentials, me.school?.name ?? 'school');
+function LoginCard({ c, schoolName }: { c: LoginHandover; schoolName: string }) {
   return (
-    <Modal open title={title} onClose={onClose} footer={<><CopyButton text={message} label="Copy login details" /><Button onClick={onClose}>Done</Button></>}>
+    <dl className="divide-y divide-slate-200 rounded-lg border border-slate-200 dark:divide-white/10 dark:border-white/10">
+      <div className="flex items-center justify-between gap-3 px-4 py-3">
+        <div className="min-w-0"><dt className="text-xs font-bold uppercase tracking-wider text-slate-500">Name</dt><dd className="truncate font-semibold">{c.user.firstName} {c.user.lastName}</dd></div>
+        <dd className="text-sm text-slate-500">{c.user.roles.map((r) => r.name).join(', ')}</dd>
+      </div>
+      <div className="flex items-center justify-between gap-3 px-4 py-3">
+        <div className="min-w-0">
+          <dt className="text-xs font-bold uppercase tracking-wider text-slate-500">Signs in with</dt>
+          <dd className="truncate text-lg font-bold">{c.user.email ?? c.user.loginId}</dd>
+          <dd className="text-sm text-slate-500">User ID <span className="font-mono">{c.user.loginId}</span></dd>
+        </div>
+        <CopyButton text={c.user.email ?? c.user.loginId} label="Copy" />
+      </div>
+      <div className="flex items-center justify-between gap-3 px-4 py-3">
+        <div className="min-w-0"><dt className="text-xs font-bold uppercase tracking-wider text-slate-500">Temporary password</dt><dd className="select-all font-mono text-xl font-bold tracking-wider">{c.temporaryPassword}</dd></div>
+        <CopyButton text={c.temporaryPassword} label="Copy" />
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
+        <span className="min-w-0">
+          {!c.user.email
+            ? 'No email on file: they sign in with the User ID. Hand these details over in person.'
+            : c.user.emailVerified
+              ? <>Also emailed to <strong>{c.user.email}</strong> (verified), with the temporary password.</>
+              : <>The account details were emailed to <strong>{c.user.email}</strong>; they confirm that email with a code after first sign-in.</>}
+        </span>
+        <CopyButton text={loginMessage(c, schoolName)} label="Copy login details" />
+      </div>
+    </dl>
+  );
+}
+
+/**
+ * Shows new (or reset) logins once, with copy actions to hand them over: the User ID they sign in
+ * with and the temporary password they must replace at first sign-in.
+ */
+export function CredentialsModal({ credentials, title, onClose }: { credentials: LoginHandover | LoginHandover[] | null; title: string; onClose: () => void }) {
+  const me = useSchoolUser();
+  const list = credentials ? (Array.isArray(credentials) ? credentials : [credentials]) : [];
+  if (!list.length) return null;
+  const schoolName = me.school?.name ?? 'school';
+  return (
+    <Modal open size={list.length > 1 ? 'lg' : 'md'} title={title} onClose={onClose} footer={<Button onClick={onClose}>Done</Button>}>
       <div className="space-y-4">
         <Alert tone="info">
-          <span className="inline-flex items-start gap-2"><ShieldAlert size={16} className="mt-0.5 shrink-0" /> This password is shown only once. Share it with {credentials.user.firstName} now; they will choose their own password at first sign-in. If it is lost, use “Reset password”.</span>
+          <span className="inline-flex items-start gap-2">
+            <ShieldAlert size={16} className="mt-0.5 shrink-0" />
+            {list.length > 1 ? 'These passwords are' : 'This password is'} shown only once. Share {list.length > 1 ? 'them' : 'it'} now; each person chooses their own password at first sign-in. If one is lost, use “Reset password” in Users &amp; Access.
+          </span>
         </Alert>
-        <dl className="divide-y divide-slate-200 rounded-lg border border-slate-200 dark:divide-white/10 dark:border-white/10">
-          <div className="flex items-center justify-between gap-3 px-4 py-3">
-            <div className="min-w-0"><dt className="text-xs font-bold uppercase tracking-wider text-slate-500">Name</dt><dd className="truncate font-semibold">{credentials.user.firstName} {credentials.user.lastName}</dd></div>
-            <dd className="text-sm text-slate-500">{credentials.user.roles.map((r) => r.name).join(', ')}</dd>
-          </div>
-          <div className="flex items-center justify-between gap-3 px-4 py-3">
-            <div className="min-w-0"><dt className="text-xs font-bold uppercase tracking-wider text-slate-500">Email (sign-in)</dt><dd className="truncate font-mono text-base">{credentials.user.email}</dd></div>
-            <CopyButton text={credentials.user.email} label="Copy" />
-          </div>
-          <div className="flex items-center justify-between gap-3 px-4 py-3">
-            <div className="min-w-0"><dt className="text-xs font-bold uppercase tracking-wider text-slate-500">Temporary password</dt><dd className="select-all font-mono text-xl font-bold tracking-wider">{credentials.temporaryPassword}</dd></div>
-            <CopyButton text={credentials.temporaryPassword} label="Copy" />
-          </div>
-        </dl>
-        <pre className="whitespace-pre-wrap rounded-lg bg-slate-50 p-3 text-sm text-slate-600 dark:bg-white/5 dark:text-slate-300">{message}</pre>
+        {list.map((c) => <LoginCard key={c.user.loginId} c={c} schoolName={schoolName} />)}
       </div>
     </Modal>
   );

@@ -29,6 +29,7 @@ import {
   Presentation,
   Receipt,
   School,
+  Server,
   Send,
   Settings,
   ShieldCheck,
@@ -101,6 +102,7 @@ const MAP: Record<string, [LucideIcon, Tone]> = {
   Schools: [School, 'primary'],
   'Subscription Plans': [Building2, 'magenta'],
   Applications: [ClipboardList, 'teal'],
+  System: [Server, 'slate'],
 };
 
 export function navVisual(label: string): [LucideIcon, Tone] {

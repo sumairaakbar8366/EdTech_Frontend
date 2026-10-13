@@ -1,6 +1,6 @@
 import { CheckCircle2, Landmark, Pencil, XCircle } from 'lucide-react';
 import { useState } from 'react';
-import { Alert, Badge, Button, Card, DataTable, EmptyState, Field, IconButton, Modal, Spinner, TextArea, type Column } from '@/components/ui';
+import { Alert, Badge, Button, Card, type Column, CompactNumber, DataTable, EmptyState, Field, IconButton, Modal, Spinner, TextArea } from '@/components/ui';
 import { ExportMenu } from '@/components/shared/ExportMenu';
 import { bankService, EMPTY_BANK, useBankAction, useBankList, type BankAccount, type BankForm } from '@/features/payroll/bankAccounts';
 import { BankAccountForm } from '@/features/payroll/components/bank/BankAccountForm';
@@ -34,7 +34,7 @@ export function BankAccountsTab({ canEdit }: { canEdit: boolean }) {
 
   return (
     <div className="space-y-6">
-      <Card title="Requests waiting" icon={Landmark} actions={pending.data?.length ? <Badge tone="amber">{pending.data.length} to review</Badge> : undefined} padded={false}>
+      <Card title="Requests waiting" icon={Landmark} actions={pending.data?.length ? <Badge tone="amber"><CompactNumber value={pending.data.length} /> to review</Badge> : undefined} padded={false}>
         {pending.isLoading && <div className="p-6"><Spinner /></div>}
         {pending.data?.length === 0 && <EmptyState icon={CheckCircle2} title="No requests">New accounts and change requests from staff appear here.</EmptyState>}
         <ul className="divide-y divide-(--surface-border)">

@@ -1,5 +1,5 @@
 import { GraduationCap, Users } from 'lucide-react';
-import { Card } from '@/components/ui';
+import { Card, CompactNumber } from '@/components/ui';
 import { useCan } from '@/features/auth/usePermissions';
 import { ViewAll } from '@/features/dashboards/components/ViewAll';
 import { useStaffSummary } from '@/features/staff/hooks/useStaff';
@@ -14,7 +14,7 @@ function Split({ parts }: { parts: { label: string; value: number; cls: string }
       </div>
       <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-600 dark:text-slate-300">
         {parts.map((p) => (
-          <span key={p.label} className="inline-flex items-center gap-1.5"><span className={`h-2.5 w-2.5 rounded-full ${p.cls}`} /> {p.label} <strong className="tabular-nums">{p.value}</strong></span>
+          <span key={p.label} className="inline-flex items-center gap-1.5"><span className={`h-2.5 w-2.5 rounded-full ${p.cls}`} /> {p.label} <strong className="tabular-nums"><CompactNumber value={p.value} /></strong></span>
         ))}
       </div>
     </div>

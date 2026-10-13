@@ -125,8 +125,15 @@ export async function download(path: string, fileName: string): Promise<void> {
   setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }
 
-export async function login(email: string, password: string, remember = false): Promise<void> {
-  const tokens = await api<TokenResponse>('/auth/login', { method: 'POST', body: { email, password, remember } });
+/** `identifier`: the User ID on a school's site, the email on the platform console. */
+export async function login(identifier: string, password: string, remember = false): Promise<void> {
+  const tokens = await api<TokenResponse>('/auth/login', { method: 'POST', body: { identifier, password, remember } });
+  setAccessToken(tokens.accessToken);
+}
+
+/** Exchanges a one-time ticket (sign-up or support hand-over) for a session on this host. */
+export async function exchangeTicket(ticket: string): Promise<void> {
+  const tokens = await api<TokenResponse>('/auth/ticket', { method: 'POST', body: { ticket } });
   setAccessToken(tokens.accessToken);
 }
 

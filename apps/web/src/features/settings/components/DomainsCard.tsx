@@ -2,6 +2,8 @@ import { BadgeCheck, Copy, Globe, Plus, ShieldQuestion, Star, Trash2 } from 'luc
 import { useState } from 'react';
 import { Alert, Badge, Button, Card, EmptyState, IconButton, Input, Spinner } from '@/components/ui';
 import { useToast } from '@/components/ui/Toast/Toast';
+import { useSubscription } from '@/features/billing/billing';
+import { DomainAddon } from '@/features/billing/components/DomainAddon';
 import { useSchoolSettings, useSettingsAction } from '@/features/settings/hooks/useSettings';
 import { settingsService } from '@/features/settings/services/settingsService';
 import { errorMessage } from '@/lib/errors';
@@ -11,6 +13,8 @@ import { onSubmit } from '@/lib/forms';
 export function DomainsCard() {
   const toast = useToast();
   const view = useSchoolSettings();
+  // Your own domain is a paid add-on (or part of a plan that includes it); otherwise our free address is used.
+  const allowed = useSubscription().data?.features.includes('custom_domain') ?? false;
   const [hostname, setHostname] = useState('');
   const add = useSettingsAction(settingsService.addDomain, { success: 'Domain added; now add the DNS record', onDone: () => setHostname(''), toastErrors: false });
   const verify = useSettingsAction(settingsService.verifyDomain, { success: 'Domain verified; it works now', toastErrors: false });
@@ -22,10 +26,11 @@ export function DomainsCard() {
       <p className="mb-4 text-slate-600 dark:text-slate-300">
         Your school always works at <strong>{view.data?.school.address}</strong>. You can also use your own address, such as portal.yourschool.edu.
       </p>
-      <form onSubmit={onSubmit(() => add.mutate(hostname))} className="mb-4 flex flex-wrap gap-2">
+      {!allowed && <div className="mb-4"><DomainAddon /></div>}
+      {allowed && <form onSubmit={onSubmit(() => add.mutate(hostname))} className="mb-4 flex flex-wrap gap-2">
         <div className="min-w-[16rem] flex-1"><Input aria-label="Domain" required value={hostname} onChange={(e) => setHostname(e.target.value)} placeholder="portal.yourschool.edu" /></div>
         <Button type="submit" icon={Plus} loading={add.isPending}>Add domain</Button>
-      </form>
+      </form>}
       {add.error && <div className="mb-3"><Alert>{errorMessage(add.error)}</Alert></div>}
       {verify.error && <div className="mb-3"><Alert>{errorMessage(verify.error)}</Alert></div>}
       {view.isLoading && <Spinner />}

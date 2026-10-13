@@ -8,6 +8,7 @@ import { AnnouncementList } from '@/features/communication/components/Announceme
 import { useCommunicationAction, useNotifications } from '@/features/communication/hooks/useCommunication';
 import { communicationService } from '@/features/communication/services/communicationService';
 import { resolveNotificationLink, timeAgo } from '@/features/communication/utils/notificationLinks';
+import { compactNumber } from '@/lib/format';
 
 type Tab = 'inbox' | 'announcements';
 
@@ -27,7 +28,7 @@ export function NotificationsPage() {
     <div>
       <PageHeader
         title="Notifications"
-        sub={d ? `${d.unread} unread` : 'Updates from your school'}
+        sub={d ? `${compactNumber(d.unread)} unread` : 'Updates from your school'}
         icon={Bell}
         tone="rose"
         actions={tab === 'inbox' && !!d?.unread && <Button variant="secondary" icon={CheckCheck} onClick={() => markAll.mutate(undefined)} loading={markAll.isPending}>Mark all read</Button>}

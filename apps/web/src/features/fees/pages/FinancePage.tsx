@@ -9,7 +9,6 @@ import { PaymentsTab } from '@/features/fees/components/payments/PaymentsTab';
 import { StructuresTab } from '@/features/fees/components/structures/StructuresTab';
 import { useFeesSummary } from '@/features/fees/hooks/useFees';
 import type { InvoiceStatus } from '@/features/fees/types/fee.types';
-import { money } from '@/features/fees/utils/fee.utils';
 
 export type FinanceTab = 'invoices' | 'payments' | 'structures' | 'concessions' | 'categories';
 
@@ -51,8 +50,8 @@ export function FinancePage({
       <PageHeader title={title} sub={sub} icon={Wallet} tone="amber" />
 
       <div className="stagger mb-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <StatCard label="Outstanding" value={s ? money(s.outstanding) : '–'} icon={CircleDollarSign} tone="amber" hint={s?.currency} />
-        <StatCard label="Collected this month" value={s ? money(s.collectedThisMonth) : '–'} icon={TrendingUp} tone="emerald" hint={s?.currency} />
+        <StatCard label="Outstanding" value={s ? Number(s.outstanding) : '–'} icon={CircleDollarSign} tone="amber" hint={s?.currency} />
+        <StatCard label="Collected this month" value={s ? Number(s.collectedThisMonth) : '–'} icon={TrendingUp} tone="emerald" hint={s?.currency} />
         <StatCard label="Overdue invoices" value={s?.overdueInvoices ?? '–'} icon={CalendarClock} tone="rose" />
         <StatCard label="Invoices issued" value={s ? totalInvoices : '–'} icon={Receipt} tone="primary" />
       </div>

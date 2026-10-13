@@ -84,9 +84,9 @@ export function RunDetailPage({ canEdit, canApprove }: { canEdit: boolean; canAp
 
       <div className="stagger grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard label="Employees" value={r.items.length} icon={FileText} tone="sky" />
-        <StatCard label="Gross" value={money(r.totalGross)} icon={Wallet} tone="primary" />
-        <StatCard label="Deductions" value={money(r.totalDeductions)} icon={SlidersHorizontal} tone="rose" />
-        <StatCard label="Net payable" value={money(r.totalNet)} icon={Check} tone="emerald" hint={RUN_LABEL[r.status]} />
+        <StatCard label="Gross" value={Number(r.totalGross)} icon={Wallet} tone="primary" />
+        <StatCard label="Deductions" value={Number(r.totalDeductions)} icon={SlidersHorizontal} tone="rose" />
+        <StatCard label="Net payable" value={Number(r.totalNet)} icon={Check} tone="emerald" hint={RUN_LABEL[r.status]} />
       </div>
 
       <Card padded={false} title="Employees" icon={FileText} tone={RUN_TONE[r.status]}>

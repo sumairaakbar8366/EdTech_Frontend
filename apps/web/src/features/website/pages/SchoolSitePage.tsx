@@ -1,8 +1,9 @@
 import { ArrowRight, Briefcase, Building2, CheckCircle2, ClipboardList, GraduationCap, Images, LogIn, Mail, MapPin, Phone, Users, X } from 'lucide-react';
+import { JobApplyModal } from '@/features/website/components/JobApplyModal';
 import { motion } from 'motion/react';
 import { useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router';
-import { Alert, Button, Field, FullPageMessage, Input, Modal, Select, TextArea } from '@/components/ui';
+import { Alert, Button, CompactNumber, Field, FullPageMessage, Input, Select, TextArea } from '@/components/ui';
 import { useForcedLightTheme } from '@/app/providers/ThemeProvider';
 import { userAreas } from '@/app/router/SchoolRoutes';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -88,49 +89,6 @@ function AdmissionForm({ site }: { site: PublicSite }) {
   );
 }
 
-function JobApplyModal({ job, onClose }: { job: PublicSite['jobs'][number] | null; onClose: () => void }) {
-  const blank = { firstName: '', lastName: '', email: '', phone: '', education: '', experienceYears: '', experience: '', coverNote: '', website: '' };
-  const [f, setF] = useState(blank);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState(false);
-  const set = (k: keyof typeof f) => (e: { target: { value: string } }) => setF({ ...f, [k]: e.target.value });
-  const close = () => { setF(blank); setDone(false); setError(null); onClose(); };
-  if (!job) return null;
-  const submit = async () => {
-    setBusy(true);
-    setError(null);
-    try {
-      await websiteService.applyJob(job.id, { firstName: f.firstName, lastName: f.lastName, email: f.email, phone: f.phone || null, education: f.education || null, experienceYears: f.experienceYears ? Number(f.experienceYears) : null, experience: f.experience || null, coverNote: f.coverNote || null, website: f.website });
-      setDone(true);
-    } catch (e) {
-      setError(errorMessage(e, 'Could not send the application.'));
-    } finally {
-      setBusy(false);
-    }
-  };
-  return (
-    <Modal open size="lg" title={`Apply · ${job.title}`} onClose={close} footer={done ? <Button onClick={close}>Close</Button> : <><Button variant="secondary" onClick={close}>Cancel</Button><Button type="submit" form="job-apply" loading={busy}>Send application</Button></>}>
-      {done ? (
-        <div className="py-6 text-center"><CheckCircle2 size={40} className="mx-auto text-emerald-600" /><p className="mt-3 text-lg font-semibold">Thank you, your application was received.</p><p className="text-slate-500">If you are shortlisted, the school will contact you by email or phone.</p></div>
-      ) : (
-        <form id="job-apply" onSubmit={onSubmit(() => void submit())} className="grid gap-4 sm:grid-cols-2">
-          {error && <div className="sm:col-span-2"><Alert>{error}</Alert></div>}
-          <input type="text" tabIndex={-1} autoComplete="off" value={f.website} onChange={set('website')} className="hidden" aria-hidden />
-          <Field label="First name"><Input required maxLength={100} value={f.firstName} onChange={set('firstName')} /></Field>
-          <Field label="Last name"><Input required maxLength={100} value={f.lastName} onChange={set('lastName')} /></Field>
-          <Field label="Email"><Input required type="email" pattern="[^@\s]+@[^@\s]+\.[A-Za-z]{2,}" title="e.g. name@gmail.com" maxLength={254} value={f.email} onChange={set('email')} /></Field>
-          <Field label="Mobile number"><Input type="tel" maxLength={32} value={f.phone} onChange={set('phone')} /></Field>
-          <Field label="Highest qualification"><Input maxLength={2000} placeholder="e.g. MSc Physics, B.Ed" value={f.education} onChange={set('education')} /></Field>
-          <Field label="Years of experience"><Input type="number" min={0} max={60} value={f.experienceYears} onChange={set('experienceYears')} /></Field>
-          <div className="sm:col-span-2"><Field label="Experience (schools, subjects, classes)"><TextArea rows={3} maxLength={3000} value={f.experience} onChange={set('experience')} /></Field></div>
-          <div className="sm:col-span-2"><Field label="Why would you like to join us?"><TextArea rows={3} maxLength={3000} value={f.coverNote} onChange={set('coverNote')} /></Field></div>
-        </form>
-      )}
-    </Modal>
-  );
-}
-
 /** The school's public website, generated from its data; the portal sign-in is at /login. */
 export function SchoolSitePage() {
   // The website has its own light design; the portal's dark mode must not leak into its forms.
@@ -202,7 +160,7 @@ export function SchoolSitePage() {
               return (
                 <div key={label as string} className="rounded-xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur">
                   <I size={20} style={{ color: accent }} />
-                  <div className="mt-2 text-3xl font-extrabold tabular-nums">{n as number}</div>
+                  <div className="mt-2 text-3xl font-extrabold tabular-nums"><CompactNumber value={n as number} /></div>
                   <div className="text-sm text-slate-300">{label as string}</div>
                 </div>
               );

@@ -50,7 +50,7 @@ export const adminRoutes: AreaRoutes = (can) => [
   { path: 'lms', capability: 'lms.view', element: <CoursesPage /> },
   { path: 'lms/courses/:id', capability: 'lms.view', element: <CourseDetailPage isStudent={false} /> },
   { path: 'lms/assignments/:id', capability: 'assignment.view', element: <AssignmentDetailPage isStudent={false} /> },
-  { path: 'exams-and-results', capability: 'exams.view', element: <ExamsPage canEdit={can('exams.manage')} /> },
+  { path: 'exams-and-results', capability: 'exams.view', element: <ExamsPage canEdit={can('exams.manage')} canCorrect={can('results.publish')} /> },
   { path: 'exams/:id', capability: 'exams.view', element: <ExamDetailPage canEdit={can('exams.manage')} canEnter={can('results.enter')} canPublish={can('results.publish')} /> },
   { path: 'exams/:id/marks', capability: 'results.enter', element: <MarksheetPage /> },
   { path: 'website', capability: 'settings.manage', element: <WebsiteEditorPage /> },

@@ -1,5 +1,6 @@
 import type { EmployeeDetail, EmployeeListItem, EmployeeStatus, StaffSummary, StaffType } from '@/features/staff/types/staff.types';
 import type { StaffPayload } from '@/features/staff/utils/staff.utils';
+import type { ApiCredentials } from '@/features/users/users';
 import { api } from '@/services/api/http';
 import type { Paged } from '@/types/common';
 
@@ -28,7 +29,7 @@ export const staffService = {
   create: (body: StaffPayload & { employeeNo?: string; login?: { roles: string[] } }) => api<{ id: string; credentials: { email: string; password: string } | null }>('/staff', { method: 'POST', body }),
   update: (id: string, body: StaffPayload) => api(`/staff/${id}`, { method: 'PATCH', body }),
   setStatus: (id: string, status: EmployeeStatus, reason: string | null) => api(`/staff/${id}/status`, { method: 'POST', body: { status, reason } }),
-  createLogin: (id: string, roles: string[]) => api<{ credentials: { email: string; password: string } }>(`/staff/${id}/login`, { method: 'POST', body: { roles } }),
+  createLogin: (id: string, roles: string[]) => api<{ credentials: ApiCredentials }>(`/staff/${id}/login`, { method: 'POST', body: { roles } }),
   addQualification: (id: string, body: { degree: string; institution: string; yearCompleted: number | null; grade: string | null }) => api(`/staff/${id}/qualifications`, { method: 'POST', body }),
   removeQualification: (id: string, qid: string) => api(`/staff/${id}/qualifications/${qid}`, { method: 'DELETE' }),
   addExperience: (id: string, body: { organization: string; role: string; startDate: string; endDate: string | null }) => api(`/staff/${id}/experiences`, { method: 'POST', body }),

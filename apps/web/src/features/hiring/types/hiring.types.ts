@@ -44,8 +44,56 @@ export interface JobApplication {
   previousSchools: string | null;
   references: string | null;
   coverNote: string | null;
+  // Detailed application
+  fatherName: string | null;
+  gender: 'male' | 'female' | 'other' | null;
+  dateOfBirth: string | null;
+  cnic: string | null;
+  address: string | null;
+  city: string | null;
+  highestQualification: string | null;
+  institution: string | null;
+  graduationYear: number | null;
+  majorSubjects: string | null;
+  currentEmployer: string | null;
+  currentDesignation: string | null;
+  subjects: string | null;
+  expectedSalary: string | null;
+  noticePeriod: string | null;
+  availableFrom: string | null;
+  languages: string | null;
+  skills: string | null;
+  linkedinUrl: string | null;
+  source: 'office' | 'website';
   status: ApplicationStatus;
   employeeId: string | null;
   createdAt: string;
+  updatedAt: string;
   interviews: Interview[];
 }
+
+/** One line of an application's status log. */
+export interface StatusLog {
+  id: string;
+  fromStatus: ApplicationStatus | null;
+  toStatus: ApplicationStatus;
+  note: string | null;
+  changedByName: string | null;
+  createdAt: string;
+}
+
+/** A row of the applicants table (all posts). */
+export interface ApplicationRow extends Omit<JobApplication, 'interviews'> {
+  jobPost: { id: string; title: string; staffType: StaffType };
+  history: StatusLog[];
+  interviews: Pick<Interview, 'scheduledAt' | 'score' | 'recommendation'>[];
+}
+
+/** The full applicant profile. */
+export interface ApplicationDetail extends JobApplication {
+  jobPost: JobPost;
+  history: StatusLog[];
+  hiredCount: number;
+}
+
+export const QUALIFICATIONS = ['Matric', 'Intermediate', 'Diploma', 'Bachelor', 'Master', 'MPhil', 'PhD', 'Other'] as const;

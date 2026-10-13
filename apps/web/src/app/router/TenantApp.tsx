@@ -5,7 +5,11 @@ import { schoolRouteTree } from '@/app/router/SchoolRoutes';
 import { Backdrop } from '@/components/effects/Backdrop';
 import { FullPageMessage } from '@/components/ui';
 import { AuthProvider, useAuth } from '@/features/auth/AuthProvider';
+import { useState } from 'react';
 import { ChangePasswordPage } from '@/features/auth/pages/ChangePasswordPage';
+import { ForgotPasswordPage, ForgotUserIdPage, ResetPasswordPage, VerifyEmailPage } from '@/features/auth/pages/RecoveryPages';
+import { WelcomePage } from '@/features/auth/pages/WelcomePage';
+import { OpenLinkPage } from '@/features/auth/pages/OpenLinkPage';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { SchoolSitePage } from '@/features/website/pages/SchoolSitePage';
 import { useTenant } from '@/features/tenancy/useTenant';
@@ -40,8 +44,14 @@ export function TenantApp() {
   );
 }
 
+/** Students may postpone confirming an email (many young students have none); others may not. */
+const SKIP_KEY = 'schoolerp.skipEmailVerification';
+
 function SignedInRoutes({ tenant }: { tenant: Tenant }) {
   const { me, isLoading } = useAuth();
+  const [skipped, setSkipped] = useState(() => {
+    try { return sessionStorage.getItem(SKIP_KEY) === '1'; } catch { return false; }
+  });
   if (isLoading) return <><Backdrop /><FullPageMessage title="Loading…" /></>;
   const brandColor = tenant.kind === 'school' ? tenant.school.branding?.primaryColor ?? null : null;
   return (
@@ -50,6 +60,11 @@ function SignedInRoutes({ tenant }: { tenant: Tenant }) {
       {/* A school's own address is its public website; the platform console starts at sign-in. */}
       <Route path="/" element={tenant.kind === 'school' ? <SchoolSitePage /> : <LoginPage tenant={tenant} />} />
       <Route path="/login" element={<LoginPage tenant={tenant} />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage tenant={tenant} />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      {tenant.kind === 'school' && <Route path="/forgot-user-id" element={<ForgotUserIdPage />} />}
+      {tenant.kind === 'school' && <Route path="/welcome" element={<WelcomePage />} />}
+      {tenant.kind === 'school' && <Route path="/open" element={<OpenLinkPage />} />}
       {!me ? (
         <Route path="*" element={<Navigate to="/login" replace />} />
       ) : me.scope === 'platform' ? (
@@ -57,6 +72,20 @@ function SignedInRoutes({ tenant }: { tenant: Tenant }) {
       ) : me.user.mustChangePassword ? (
         // An administrator-issued password must be replaced before anything else (the API enforces it too).
         <Route path="*" element={<ChangePasswordPage />} />
+      ) : !me.user.emailVerified && !skipped && !me.support ? (
+        // Then they confirm their own email (OTP), which "forgot password" relies on.
+        <Route
+          path="*"
+          element={
+            <VerifyEmailPage
+              optional={me.roles.every((r) => r.key === 'student')}
+              onSkip={() => {
+                try { sessionStorage.setItem(SKIP_KEY, '1'); } catch { /* private mode */ }
+                setSkipped(true);
+              }}
+            />
+          }
+        />
       ) : (
         schoolRouteTree(me, brandColor)
       )}

@@ -15,7 +15,7 @@ export function PersonalSection({ form: f, set }: Props) {
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label="First name"><Input required maxLength={100} value={f.firstName} onChange={text(set, 'firstName')} /></Field>
         <Field label="Last name"><Input required maxLength={100} value={f.lastName} onChange={text(set, 'lastName')} /></Field>
-        <Field label={f.createLogin ? 'Email (used to sign in)' : 'Email'}><Input type="email" required={f.createLogin} maxLength={254} value={f.email} onChange={text(set, 'email')} /></Field>
+        <Field label={f.createLogin ? 'Personal email (gets the User ID)' : 'Email'}><Input type="email" required={f.createLogin} maxLength={254} value={f.email} onChange={text(set, 'email')} /></Field>
         <Field label="Phone"><Input type="tel" maxLength={32} value={f.phone} onChange={text(set, 'phone')} /></Field>
         <Field label="Gender">
           <Select value={f.gender} onChange={(e) => set({ gender: e.target.value as StaffForm['gender'] })}>
@@ -94,7 +94,7 @@ export function AccessSection({ form: f, set }: Props) {
             <span className="mb-1 block text-sm font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">Roles</span>
             <RolePicker value={f.roles} onChange={(roles) => set({ roles })} />
           </div>
-          <p className="text-sm text-slate-500 sm:pt-6">The login gets a school email by role (e.g. name.teacher@…) and a temporary password, shown once after saving. The personal email above stays as their contact.</p>
+          <p className="text-sm text-slate-500 sm:pt-6">The login gets a User ID (TCH- or STF-, joining year, number) and a temporary password, shown once after saving. The User ID is also emailed to the personal email above.</p>
         </div>
       )}
     </FormSection>

@@ -1,14 +1,14 @@
-import { GraduationCap, KeyRound, Mail, ShieldCheck, Sparkles } from 'lucide-react';
+import { GraduationCap, IdCard, KeyRound, Mail, ShieldCheck, Sparkles } from 'lucide-react';
 import { useEffect, useRef, useState, type FormEvent, type InputHTMLAttributes } from 'react';
 import type { CSSProperties } from 'react';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { motion } from 'motion/react';
 import { Backdrop } from '@/components/effects/Backdrop';
 import { SlideShow } from '@/components/motion/SlideShow';
 import { SplitText } from '@/components/motion/SplitText';
 import { Hero3D } from '@/components/effects/Hero3D';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
-import { Alert, Button, Field, Modal, useFieldProps } from '@/components/ui';
+import { Alert, Button, Field, useFieldProps } from '@/components/ui';
 import { ApiError } from '@/services/api/http';
 import { marketingOrigin, photo } from '@/config/site';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -55,12 +55,12 @@ function homePath(me: Me): string {
 export function LoginPage({ tenant }: { tenant: Tenant }) {
   const { me, login, logout } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const [params] = useSearchParams();
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [remember, setRemember] = useState(false);
-  const [forgot, setForgot] = useState(false);
 
   // The sign-in page always starts fresh (the school address and /login both open it): an earlier
   // session in this browser is signed out, so whoever signs in next lands on their own dashboard.
@@ -84,8 +84,10 @@ export function LoginPage({ tenant }: { tenant: Tenant }) {
     setSubmitting(true);
     try {
       justSignedIn.current = true;
-      const signedIn = await login(email, password, remember);
-      navigate(homePath(signedIn), { replace: true });
+      const signedIn = await login(identifier.trim(), password, remember);
+      // Came from a link in an email or notification: continue there.
+      const next = params.get('next');
+      navigate(next && next.startsWith('/open?') ? next : homePath(signedIn), { replace: true });
     } catch (err) {
       justSignedIn.current = false;
       setError(
@@ -169,9 +171,15 @@ export function LoginPage({ tenant }: { tenant: Tenant }) {
               <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Sign in to continue</p>
             </div>
             {error && <Alert>{error}</Alert>}
-            <Field label="Email">
-              <IconInput icon={Mail} type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@school.edu" />
-            </Field>
+            {isPlatform ? (
+              <Field label="Email">
+                <IconInput icon={Mail} type="email" autoComplete="username" required value={identifier} onChange={(e) => setIdentifier(e.target.value)} placeholder="you@company.com" />
+              </Field>
+            ) : (
+              <Field label="Email" hint="Your own email (e.g. Gmail). Students without an email: type your User ID, e.g. STU-2026-0142.">
+                <IconInput icon={identifier && !identifier.includes('@') && /^[a-z]{3}-/i.test(identifier) ? IdCard : Mail} type="text" inputMode="email" autoComplete="username" autoCapitalize="none" spellCheck={false} required value={identifier} onChange={(e) => setIdentifier(e.target.value)} placeholder="you@gmail.com" />
+              </Field>
+            )}
             <Field label="Password">
               <IconInput
                 icon={KeyRound}
@@ -188,19 +196,11 @@ export function LoginPage({ tenant }: { tenant: Tenant }) {
                 <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="h-4 w-4 accent-primary-600" />
                 Keep me signed in on this device
               </label>
-              <button type="button" onClick={() => setForgot(true)} className="text-sm font-semibold text-orange-700 hover:underline dark:text-orange-300">Forgot password?</button>
+              <span className="flex gap-3 text-sm font-semibold">
+                {!isPlatform && <Link to="/forgot-user-id" className="text-orange-700 hover:underline dark:text-orange-300">Forgot User ID?</Link>}
+                <Link to="/forgot-password" className="text-orange-700 hover:underline dark:text-orange-300">Forgot password?</Link>
+              </span>
             </div>
-            <Modal open={forgot} title="Forgot your password?" onClose={() => setForgot(false)} footer={<Button onClick={() => setForgot(false)}>OK</Button>}>
-              {isPlatform ? (
-                <p className="text-sm text-slate-600 dark:text-slate-300">On the server, run <code className="rounded bg-slate-100 px-1.5 py-0.5 dark:bg-white/10">npm run reset-platform-password -w @schoolerp/api -- your@email</code>. It prints a new password for the platform console.</p>
-              ) : (
-                <ul className="list-disc space-y-2 pl-5 text-sm text-slate-600 dark:text-slate-300">
-                  <li><strong>Parents, students and staff:</strong> ask the school office. The school admin can issue a new temporary password in a minute (Users &amp; Access → Reset password).</li>
-                  <li><strong>School admins:</strong> contact Anet Cyber Solutions support. After verifying you, we issue a temporary password for your account.</li>
-                  <li>You will choose your own password right after signing in with the temporary one.</li>
-                </ul>
-              )}
-            </Modal>
             <Button type="submit" className="w-full py-3" loading={submitting}>
               {submitting ? 'Signing in…' : 'Sign in'}
             </Button>

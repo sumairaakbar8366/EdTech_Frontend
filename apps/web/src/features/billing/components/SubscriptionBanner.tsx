@@ -3,8 +3,8 @@ import { AreaLink } from '@/app/router/area';
 import type { SubscriptionState } from '@/features/billing/billing';
 
 /**
- * Plan status above every page: a gentle reminder in the last week of the trial, a clear warning
- * during the grace period, and read-only mode after it. Admins get the button to pay.
+ * Plan status above every page: a gentle reminder in the last week of the trial, a countdown
+ * during the 3-day grace period, and the lock after it. Admins get the button to pay.
  */
 export function SubscriptionBanner({ state, isAdmin }: { state: SubscriptionState | undefined; isAdmin: boolean }) {
   if (!state) return null;
@@ -22,13 +22,13 @@ export function SubscriptionBanner({ state, isAdmin }: { state: SubscriptionStat
   } else if (state.phase === 'grace') {
     tone = 'border-rose-300 bg-rose-50 text-rose-900 dark:border-rose-400/30 dark:bg-rose-500/10 dark:text-rose-200';
     icon = AlertTriangle;
-    text = `Your ${state.status === 'trialing' ? 'free trial' : 'subscription'} has ended. Full access continues for ${plural(days)}; after that the portal becomes read-only until payment.`;
+    text = `Your ${state.status === 'trialing' ? 'free trial' : 'subscription'} has ended. Full access continues for ${plural(days)}; after that the school is locked until payment (nothing is deleted).`;
   } else if (state.phase === 'expired') {
     tone = 'border-rose-300 bg-rose-50 text-rose-900 dark:border-rose-400/30 dark:bg-rose-500/10 dark:text-rose-200';
     icon = Lock;
     text = isAdmin
-      ? 'Read-only mode: your data is safe and everyone can still sign in, view records and take attendance. Choose a plan to make changes again.'
-      : 'The school’s subscription is being renewed. You can view everything; some changes are paused for now.';
+      ? 'The school is locked: your data is safe. Choose a plan and pay to unlock it for everyone.'
+      : 'The school’s subscription has ended. Please contact your school office.';
   } else return null;
   const Icon = icon;
   return (

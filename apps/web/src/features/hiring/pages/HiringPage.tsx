@@ -1,7 +1,8 @@
-import { ArrowLeft, CalendarClock, Megaphone, Plus, UserPlus, Users } from 'lucide-react';
+import { ArrowLeft, CalendarClock, Columns3, Megaphone, Plus, Table2, UserPlus, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { AreaLink } from '@/app/router/area';
-import { Button, Card, EmptyState, PageHeader, Spinner, StatCard } from '@/components/ui';
+import { Button, Card, EmptyState, PageHeader, Spinner, StatCard, Tabs } from '@/components/ui';
+import { ApplicationsTable } from '@/features/hiring/components/ApplicationsTable';
 import { JobPostList } from '@/features/hiring/components/JobPostList';
 import { JobPostModal } from '@/features/hiring/components/JobPostModal';
 import { PipelineBoard } from '@/features/hiring/components/PipelineBoard';
@@ -12,6 +13,7 @@ import type { JobPost } from '@/features/hiring/types/hiring.types';
 export function HiringPage({ canEdit }: { canEdit: boolean }) {
   const [postId, setPostId] = useState<string | null>(null);
   const [postForm, setPostForm] = useState<JobPost | 'new' | null>(null);
+  const [view, setView] = useState<'table' | 'board'>('table');
   const posts = useJobPosts();
   const summary = useHiringSummary();
   useEffect(() => {
@@ -31,7 +33,9 @@ export function HiringPage({ canEdit }: { canEdit: boolean }) {
       </div>
       {posts.isLoading && <Spinner />}
       {posts.data?.length === 0 && <Card><EmptyState icon={Megaphone} title="No job posts yet" tone="teal">Create a vacancy to start collecting applications.</EmptyState></Card>}
-      {!!posts.data?.length && (
+      {!!posts.data?.length && <Tabs tabs={[{ id: 'table', label: 'Applicants table', icon: Table2 }, { id: 'board', label: 'Board by post', icon: Columns3 }]} value={view} onChange={setView} />}
+      {!!posts.data?.length && view === 'table' && <ApplicationsTable posts={posts.data} canEdit={canEdit} />}
+      {!!posts.data?.length && view === 'board' && (
         <div className="grid gap-6 xl:grid-cols-[20rem_1fr]">
           <JobPostList posts={posts.data} selectedId={postId} onSelect={setPostId} />
           {postId && <PipelineBoard postId={postId} canEdit={canEdit} onEditPost={setPostForm} />}

@@ -1,5 +1,6 @@
 import { useCan } from '@/features/auth/usePermissions';
 import { UpgradePopup } from '@/features/billing/components/UpgradePopup';
+import { AddonsStrip } from '@/features/billing/components/AddonsStrip';
 import { DashboardHero } from '@/features/dashboards/components/DashboardHero';
 import { useAdminHeroSlides } from '@/features/dashboards/hooks/useHeroSlides';
 import { QuickAccess } from '@/features/dashboards/components/QuickAccess';
@@ -36,6 +37,7 @@ export function AdminDashboard() {
           {can('staff.view') && <HiringWidget />}
         </div>
       </div>
+      <AddonsStrip />
       <UpgradePopup />
     </div>
   );

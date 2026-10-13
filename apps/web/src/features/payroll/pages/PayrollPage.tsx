@@ -4,10 +4,10 @@ import { BankAccountsTab } from '@/features/payroll/components/bank/BankAccounts
 import { PayslipRegisterTab } from '@/features/payroll/components/PayslipRegisterTab';
 import { useState } from 'react';
 import { PageHeader, StatCard, Tabs } from '@/components/ui';
-import { money } from '@/features/fees/utils/fee.utils';
 import { RunsTab } from '@/features/payroll/components/runs/RunsTab';
 import { SalaryStructuresTab } from '@/features/payroll/components/structures/SalaryStructuresTab';
 import { usePayrollSummary } from '@/features/payroll/hooks/usePayroll';
+import { compactNumber } from '@/lib/format';
 
 type Tab = 'runs' | 'structures' | 'payslips' | 'bank';
 
@@ -29,9 +29,9 @@ export function PayrollPage({ canEdit, initialTab = 'runs' }: { canEdit: boolean
       <PageHeader title={TITLES[tab][0]} sub={TITLES[tab][1]} icon={Banknote} tone="orange" />
       <div className="stagger mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard label="Current staff" value={s?.staff ?? '–'} icon={Users} tone="sky" />
-        <StatCard label="With salary set" value={s ? `${s.withStructure}/${s.staff}` : '–'} icon={Wallet} tone="primary" />
+        <StatCard label="With salary set" value={s ? `${compactNumber(s.withStructure)}/${compactNumber(s.staff)}` : '–'} icon={Wallet} tone="primary" />
         <StatCard label="Runs in progress" value={s?.pendingRuns ?? '–'} icon={CalendarRange} tone="amber" />
-        <StatCard label="Last paid" value={s?.lastPaid ? money(s.lastPaid.totalNet) : '–'} icon={CheckCircle2} tone="emerald" hint={s?.lastPaid?.period.name} />
+        <StatCard label="Last paid" value={s?.lastPaid ? Number(s.lastPaid.totalNet) : '–'} icon={CheckCircle2} tone="emerald" hint={s?.lastPaid?.period.name} />
       </div>
       <Tabs
         tabs={[

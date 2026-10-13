@@ -1,14 +1,16 @@
 import { Building2, CircleCheck, ClipboardList, Crown, Hourglass, School, Sun } from 'lucide-react';
-import { Badge, Card, EmptyState, IconTile, Spinner, StatCard } from '@/components/ui';
+import { Badge, Card, CompactNumber, EmptyState, IconTile, Spinner, StatCard } from '@/components/ui';
 import { AreaLink } from '@/app/router/area';
 import type { HeroSlide } from '@/components/motion/HeroSlides';
 import { HeroBanner } from '@/components/shared/HeroBanner';
 import { greeting, todayLabel } from '@/features/dashboards/utils/dashboard.utils';
 import { useSchoolApplications, useSchools, useTiers } from '@/features/platform/hooks/usePlatform';
-import { formatDate } from '@/lib/format';
+import { compactNumber, formatDate } from '@/lib/format';
+import { FinanceSection } from '@/features/platform/components/FinanceSection';
+import { GrowthSection } from '@/features/platform/components/GrowthSection';
 
 const DAY = 86_400_000;
-const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`;
+const plural = (n: number, one: string) => `${compactNumber(n)} ${one}${n === 1 ? '' : 's'}`;
 
 /** Platform owner's home: tenants, trials about to end, applications to review, plan mix. */
 export function PlatformDashboard({ adminName }: { adminName: string }) {
@@ -43,9 +45,11 @@ export function PlatformDashboard({ adminName }: { adminName: string }) {
       <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
         <StatCard label="Schools" value={schools.isLoading ? '–' : list.length} icon={School} tone="primary" />
         <StatCard label="Active" value={schools.isLoading ? '–' : list.filter((s) => s.status === 'active').length} icon={CircleCheck} tone="emerald" />
-        <StatCard label="On free trial" value={schools.isLoading ? '–' : trials.length} icon={Hourglass} tone="amber" hint={endingSoon.length ? `${endingSoon.length} ending this week` : undefined} />
+        <StatCard label="On free trial" value={schools.isLoading ? '–' : trials.length} icon={Hourglass} tone="amber" hint={endingSoon.length ? `${compactNumber(endingSoon.length)} ending this week` : undefined} />
         <StatCard label="Applications" value={applications.isLoading ? '–' : pending.length} icon={ClipboardList} tone="teal" hint="Waiting for review" />
       </div>
+      <GrowthSection />
+      <FinanceSection />
       <div className="grid gap-6 lg:grid-cols-3">
         <Card title="Applications to review" icon={ClipboardList} tone="teal" actions={<AreaLink to="/applications" className="text-sm font-semibold text-primary-600 hover:underline dark:text-primary-300">View all</AreaLink>}>
           {applications.isLoading && <Spinner />}
@@ -83,7 +87,7 @@ export function PlatformDashboard({ adminName }: { adminName: string }) {
               <li key={t.code}>
                 <div className="mb-1 flex items-center justify-between text-sm">
                   <span className="inline-flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-200"><IconTile icon={Building2} tone="magenta" size="sm" /> {t.name}</span>
-                  <strong className="tabular-nums">{byTier.get(t.code) ?? 0}</strong>
+                  <strong className="tabular-nums"><CompactNumber value={byTier.get(t.code) ?? 0} /></strong>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-slate-500/10">
                   <div className="h-full rounded-full bg-brand transition-all duration-700" style={{ width: `${((byTier.get(t.code) ?? 0) / maxTier) * 100}%` }} />

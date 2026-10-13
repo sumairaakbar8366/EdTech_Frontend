@@ -1,9 +1,9 @@
 import { CreditCard } from 'lucide-react';
-import { Badge, Card, EmptyState, Spinner } from '@/components/ui';
+import { Badge, Card, CompactNumber, EmptyState, Spinner } from '@/components/ui';
 import { ViewAll } from '@/features/dashboards/components/ViewAll';
 import { METHOD_LABEL } from '@/features/fees/constants';
 import { usePayments } from '@/features/fees/hooks/useFees';
-import { money, studentName } from '@/features/fees/utils/fee.utils';
+import { studentName } from '@/features/fees/utils/fee.utils';
 import { formatDate } from '@/lib/format';
 
 /** The last few fee payments received. */
@@ -22,7 +22,7 @@ export function RecentPaymentsWidget({ to, className = '' }: { to: string; class
               <div className="text-sm text-slate-500">{p.receipt?.receiptNo} · {formatDate(p.paidAt)} · {METHOD_LABEL[p.method]}</div>
             </div>
             {p.status === 'voided' && <Badge tone="rose">voided</Badge>}
-            <span className="font-semibold tabular-nums">{money(p.amount)}</span>
+            <span className="font-semibold tabular-nums"><CompactNumber value={p.amount} /></span>
           </li>
         ))}
       </ul>

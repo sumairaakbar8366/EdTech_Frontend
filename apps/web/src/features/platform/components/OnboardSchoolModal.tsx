@@ -37,7 +37,7 @@ export function OnboardSchoolModal({ form, setForm, tiers, onClose }: { form: Sc
         admin: { firstName: f.adminFirstName, lastName: f.adminLastName, email: f.adminEmail, password: f.adminPassword },
         applicationId: f.applicationId,
       }),
-    { success: (r) => `${r.school.name} created with a 1-month free trial`, invalidate: [SCHOOLS_KEY, APPLICATIONS_KEY], onDone: onClose },
+    { success: (r) => `${r.school.name} created with a 1-month free trial`, invalidate: [SCHOOLS_KEY, APPLICATIONS_KEY, ['platform', 'console']], onDone: onClose },
   );
   const set = (key: keyof typeof EMPTY_SCHOOL_FORM) => (e: { target: { value: string } }) => form && setForm({ ...form, [key]: e.target.value });
   function onSubmit(e: FormEvent) {

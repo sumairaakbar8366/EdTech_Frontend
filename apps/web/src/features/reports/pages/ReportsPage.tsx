@@ -1,11 +1,12 @@
 import { Award, CalendarCheck, ChartColumn, CircleDollarSign, Presentation, ShieldAlert, TrendingUp, UserCheck, Wallet } from 'lucide-react';
 import { useState } from 'react';
 import { BarChart, RateBars } from '@/components/charts/BarChart';
-import { Card, EmptyState, PageHeader, Select, Spinner, StatCard, Tabs } from '@/components/ui';
+import { Card, CompactNumber, EmptyState, PageHeader, Select, Spinner, StatCard, Tabs } from '@/components/ui';
 import { METHOD_LABEL } from '@/features/fees/constants';
 import type { PaymentMethod } from '@/features/fees/types/fee.types';
 import { money } from '@/features/fees/utils/fee.utils';
 import { useAcademicReport, useAttendanceReport, useFinanceReport } from '@/features/reports/hooks/useReports';
+import { compactNumber } from '@/lib/format';
 
 type Tab = 'finance' | 'attendance' | 'academics';
 
@@ -33,9 +34,9 @@ function FinanceTab() {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <StatCard label="Collected, 12 months" value={money(year)} icon={TrendingUp} tone="emerald" />
-        <StatCard label="This month" value={money(months[11]?.value ?? 0)} icon={CircleDollarSign} tone="primary" />
-        <StatCard label="Outstanding this year" value={money(outstanding)} icon={Wallet} tone="amber" />
+        <StatCard label="Collected, 12 months" value={Number(year)} icon={TrendingUp} tone="emerald" />
+        <StatCard label="This month" value={Number(months[11]?.value ?? 0)} icon={CircleDollarSign} tone="primary" />
+        <StatCard label="Outstanding this year" value={Number(outstanding)} icon={Wallet} tone="amber" />
         <StatCard label="Overdue invoices" value={d.byClass.reduce((t, c) => t + c.overdueInvoices, 0)} icon={ShieldAlert} tone="rose" />
       </div>
       <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">
@@ -50,7 +51,7 @@ function FinanceTab() {
                   <tr key={m.method}>
                     <td className="px-5 py-2.5 text-slate-700 dark:text-slate-200">{METHOD_LABEL[m.method as PaymentMethod] ?? m.method}</td>
                     <td className="px-5 py-2.5 text-right text-sm text-slate-500">{m.payments} payments</td>
-                    <td className="px-5 py-2.5 text-right font-semibold tabular-nums">{money(m.amount)}</td>
+                    <td className="px-5 py-2.5 text-right font-semibold tabular-nums"><CompactNumber value={m.amount} /></td>
                   </tr>
                 ))}
               </tbody>
@@ -78,9 +79,9 @@ function FinanceTab() {
                   return (
                     <tr key={c.className}>
                       <td className="px-5 py-2.5 font-semibold text-slate-800 dark:text-slate-100">{c.className}</td>
-                      <td className="px-5 py-2.5 text-right tabular-nums">{money(c.billed)}</td>
-                      <td className="px-5 py-2.5 text-right tabular-nums">{money(c.paid)}</td>
-                      <td className="px-5 py-2.5 text-right font-semibold tabular-nums">{money(c.outstanding)}</td>
+                      <td className="px-5 py-2.5 text-right tabular-nums"><CompactNumber value={c.billed} /></td>
+                      <td className="px-5 py-2.5 text-right tabular-nums"><CompactNumber value={c.paid} /></td>
+                      <td className="px-5 py-2.5 text-right font-semibold tabular-nums"><CompactNumber value={c.outstanding} /></td>
                       <td className="px-5 py-2.5">
                         <div className="flex items-center gap-2">
                           <span className="h-2 w-28 overflow-hidden rounded-full bg-slate-500/10"><span className="block h-full rounded-full bg-primary-500" style={{ width: `${pct}%` }} /></span>
@@ -115,14 +116,14 @@ function AttendanceTab() {
       {d && (
         <>
           <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-            <StatCard label="Classes completed" value={d.sessions.completed ?? 0} icon={Presentation} tone="primary" hint={d.sessions.cancelled ? `${d.sessions.cancelled} cancelled` : undefined} />
-            <StatCard label="Staff check-ins" value={d.staff.valid + d.staff.flagged + d.staff.unknown} icon={UserCheck} tone="teal" hint={`${d.staff.valid} inside the geofence`} />
+            <StatCard label="Classes completed" value={d.sessions.completed ?? 0} icon={Presentation} tone="primary" hint={d.sessions.cancelled ? `${compactNumber(d.sessions.cancelled)} cancelled` : undefined} />
+            <StatCard label="Staff check-ins" value={d.staff.valid + d.staff.flagged + d.staff.unknown} icon={UserCheck} tone="teal" hint={`${compactNumber(d.staff.valid)} inside the geofence`} />
             <StatCard label="Flagged GPS" value={d.staff.flagged} icon={ShieldAlert} tone="rose" hint="Outside the campus range" />
             <StatCard label="Awaiting review" value={d.staff.pendingReview} icon={CalendarCheck} tone="amber" />
           </div>
           <Card title="Student attendance by class" icon={CalendarCheck} tone="teal">
             {d.byClass.length === 0 ? <EmptyState icon={CalendarCheck} title="No attendance marked in this period" tone="teal" /> : (
-              <RateBars label="Attendance rate by class" rows={d.byClass.map((c) => ({ key: c.className, label: c.className, value: c.rate, detail: `${c.present} present · ${c.late} late · ${c.absent} absent · ${c.excused} excused` }))} />
+              <RateBars label="Attendance rate by class" rows={d.byClass.map((c) => ({ key: c.className, label: c.className, value: c.rate, detail: `${compactNumber(c.present)} present · ${compactNumber(c.late)} late · ${compactNumber(c.absent)} absent · ${compactNumber(c.excused)} excused` }))} />
             )}
             <p className="mt-3 text-xs text-slate-500">Rate = (present + late) ÷ (present + late + absent); excused absences are not counted against students.</p>
           </Card>
@@ -140,7 +141,7 @@ function AcademicsTab() {
     <div className="grid gap-4 lg:grid-cols-2">
       {r.data.map((e) => (
         <Card key={e.examId} title={e.name} icon={Award} tone="fuchsia">
-          <RateBars label={`${e.name} pass rate by class`} rows={e.classes.map((c) => ({ key: c.className, label: c.className, value: c.passRate, detail: `${c.students} students · average ${c.average}%` }))} />
+          <RateBars label={`${e.name} pass rate by class`} rows={e.classes.map((c) => ({ key: c.className, label: c.className, value: c.passRate, detail: `${compactNumber(c.students)} students · average ${c.average}%` }))} />
           <p className="mt-3 text-xs text-slate-500">Pass rate by class · averages: {e.classes.map((c) => `${c.className} ${c.average}%`).join(' · ')}</p>
         </Card>
       ))}

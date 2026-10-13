@@ -2,9 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { GraduationCap, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ExportMenu } from '@/components/shared/ExportMenu';
-import { Badge, Card, DataTable, EmptyState, FilterBar, PageHeader, SearchInput, Spinner, type Column, type Tone } from '@/components/ui';
+import { Badge, Card, type Column, CompactNumber, DataTable, EmptyState, FilterBar, PageHeader, SearchInput, Spinner, type Tone } from '@/components/ui';
 import { STUDENTS_KEY } from '@/features/students/hooks/useStudents';
 import { taughtStudents, type TaughtSection } from '@/features/students/services/studentService';
+import { compactNumber } from '@/lib/format';
 
 type Row = TaughtSection['students'][number];
 const rateTone = (r: number | null): Tone => (r === null ? 'slate' : r >= 90 ? 'emerald' : r >= 75 ? 'amber' : 'rose');
@@ -52,7 +53,7 @@ export function MyStudentsPage() {
 
   return (
     <div>
-      <PageHeader title="My Students" sub={`The classes you teach this year · ${total} students`} icon={Users} tone="emerald" />
+      <PageHeader title="My Students" sub={`The classes you teach this year · ${compactNumber(total)} students`} icon={Users} tone="emerald" />
       {sections.isLoading && <Spinner />}
       {sections.data?.length === 0 && <Card><EmptyState icon={Users} title="No classes assigned yet" tone="emerald">The administrator assigns teachers to sections under Academics.</EmptyState></Card>}
       {!!sections.data?.length && (
@@ -60,7 +61,7 @@ export function MyStudentsPage() {
           {sections.data.map((s) => (
             <button key={s.sectionId} role="tab" aria-selected={s.sectionId === active} onClick={() => { setActive(s.sectionId); setSearch(''); }}
               className={`focus-ring rounded-full px-4 py-1.5 text-sm font-semibold ring-1 transition-colors ${s.sectionId === active ? 'bg-(--ink) text-white ring-(--ink) dark:bg-white dark:text-slate-900' : 'bg-white text-slate-700 ring-slate-300 hover:bg-slate-50 dark:bg-white/5 dark:text-slate-200 dark:ring-white/15'}`}>
-              {s.name} · {s.students.length}
+              {s.name} · <CompactNumber value={s.students.length} />
             </button>
           ))}
         </div>

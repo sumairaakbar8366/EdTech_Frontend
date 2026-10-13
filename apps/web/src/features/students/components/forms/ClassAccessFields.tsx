@@ -14,8 +14,8 @@ export function ClassAccessFields({ form: f, set }: Props) {
         <label className="flex items-center gap-2 text-base"><input type="checkbox" className="h-4 w-4 accent-primary-600" checked={f.studentLogin} onChange={(e) => set({ studentLogin: e.target.checked })} /> Student login</label>
         {f.studentLogin && (
           <>
-            <Field label="Student email"><Input type="email" required value={f.studentEmail} onChange={(e) => set({ studentEmail: e.target.value })} /></Field>
-            <Field label="Temporary password"><Input type="password" autoComplete="new-password" required minLength={12} value={f.studentPassword} onChange={(e) => set({ studentPassword: e.target.value })} /></Field>
+            <Field label="Email (optional)" hint="The student's or a parent's. Gets the User ID."><Input type="email" value={f.studentEmail} onChange={(e) => set({ studentEmail: e.target.value })} /></Field>
+            <p className="text-sm text-slate-500 sm:pt-6">A User ID (STU-year-number) and a temporary password are generated and shown once after saving.</p>
           </>
         )}
       </div>

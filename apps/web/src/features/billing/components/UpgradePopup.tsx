@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { AreaLink } from '@/app/router/area';
 import { useSubscription } from '@/features/billing/billing';
+import { useAuth } from '@/features/auth/AuthProvider';
 
 const KEY = 'schoolerp-upgrade-popup';
 const SNOOZE_MS = 3 * 86_400_000;
@@ -23,22 +24,25 @@ function snoozed(): boolean {
  */
 export function UpgradePopup() {
   const sub = useSubscription().data;
+  const { me } = useAuth();
+  // Not for the platform owner's support session.
+  const support = me?.scope === 'school' && !!me.support;
   const [open, setOpen] = useState(false);
   const missing = sub ? PREMIUM.filter((f) => !sub.features.includes(f)) : [];
   const trialEnding = sub?.phase === 'trial' && (sub.daysLeft ?? 99) <= 14;
   const feature: PlanFeature | undefined = missing[new Date().getDate() % Math.max(1, missing.length)] ?? (trialEnding ? PREMIUM[new Date().getDate() % PREMIUM.length] : undefined);
 
   useEffect(() => {
-    if (!feature || snoozed()) return;
+    if (!feature || support || snoozed()) return;
     const t = setTimeout(() => setOpen(true), 1800);
     return () => clearTimeout(t);
-  }, [feature]);
+  }, [feature, support]);
 
   const close = () => {
     setOpen(false);
     try { localStorage.setItem(KEY, String(Date.now())); } catch { /* private mode */ }
   };
-  if (!feature || !sub) return null;
+  if (!feature || !sub || support) return null;
   const info = FEATURE_INFO[feature];
   const others = (missing.length ? missing : PLAN_FEATURES_LIST.filter((f) => f !== 'core')).filter((f) => f !== feature).slice(0, 3);
 

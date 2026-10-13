@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight, CreditCard, Plus, Printer, Undo2 } from 'lucide-react';
 import { useState } from 'react';
-import { Badge, Button, Card, EmptyState, Field, IconButton, Input, Spinner } from '@/components/ui';
+import { Badge, Button, Card, CompactNumber, EmptyState, Field, IconButton, Input, Spinner } from '@/components/ui';
 import { allPages } from '@/components/shared/ExportMenu';
 import { SheetActions } from '@/components/shared/SheetActions';
 import { feeService } from '@/features/fees/services/feeService';
@@ -11,7 +11,7 @@ import { VoidPaymentModal } from '@/features/fees/components/payments/VoidPaymen
 import { METHOD_LABEL } from '@/features/fees/constants';
 import { usePayments } from '@/features/fees/hooks/useFees';
 import type { Payment } from '@/features/fees/types/fee.types';
-import { money, studentName } from '@/features/fees/utils/fee.utils';
+import { studentName } from '@/features/fees/utils/fee.utils';
 import { formatDate } from '@/lib/format';
 
 const PAGE_SIZE = 25;
@@ -64,7 +64,7 @@ export function PaymentsTab({ canEdit }: { canEdit: boolean }) {
                   </td>
                   <td className="px-5 py-3 text-slate-600 dark:text-slate-300">{METHOD_LABEL[p.method]}{p.reference && <div className="text-sm text-slate-500">{p.reference}</div>}</td>
                   <td className="px-5 py-3 text-sm text-slate-600 dark:text-slate-300">{p.allocations.map((a) => a.invoice.invoiceNo).join(', ')}</td>
-                  <td className={`px-5 py-3 text-right font-semibold tabular-nums ${p.status === 'voided' ? 'line-through' : ''}`}>{money(p.amount)}</td>
+                  <td className={`px-5 py-3 text-right font-semibold tabular-nums ${p.status === 'voided' ? 'line-through' : ''}`}><CompactNumber value={p.amount} /></td>
                   <td className="px-3 py-3">
                     <div className="flex justify-end gap-1">
                       <IconButton icon={Printer} label="View receipt" onClick={() => setReceiptId(p.id)} />
@@ -79,7 +79,7 @@ export function PaymentsTab({ canEdit }: { canEdit: boolean }) {
       )}
       {!!list.data && list.data.total > PAGE_SIZE && (
         <div className="flex items-center justify-between border-t border-slate-200 px-5 py-3 text-base text-slate-600 dark:border-white/5 dark:text-slate-300">
-          <span>{(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, list.data.total)} of {list.data.total}</span>
+          <span>{(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, list.data.total)} of <CompactNumber value={list.data.total} /></span>
           <div className="flex items-center gap-1">
             <IconButton icon={ChevronLeft} label="Previous page" disabled={page <= 1} onClick={() => setPage((p) => p - 1)} />
             <span className="px-2">Page {page} of {totalPages}</span>

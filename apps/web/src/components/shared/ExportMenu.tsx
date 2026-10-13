@@ -5,6 +5,7 @@ import { Button } from '@/components/ui';
 import { useToast } from '@/components/ui/Toast/Toast';
 import { errorMessage } from '@/lib/errors';
 import { exportSheet, type ExportColumn, type SheetFormat } from '@/lib/spreadsheet';
+import { compactNumber } from '@/lib/format';
 
 /**
  * "Export" button with an Excel / CSV choice. `rows` fetches everything to export (all pages,
@@ -37,7 +38,7 @@ export function ExportMenu<T>({ rows, columns, fileName, label = 'Export' }: { r
       const data = await rows();
       if (!data.length) { toast.error('Nothing to export with the current filters.'); return; }
       await exportSheet(data, columns, fileName, format);
-      toast.success(`Exported ${data.length} row${data.length === 1 ? '' : 's'}`);
+      toast.success(`Exported ${compactNumber(data.length)} row${data.length === 1 ? '' : 's'}`);
     } catch (e) {
       toast.error(errorMessage(e, 'Export failed. Please try again.'));
     } finally {

@@ -6,6 +6,8 @@ import { ApplicationsPage } from '@/features/platform/pages/ApplicationsPage';
 import { SchoolsPage } from '@/features/platform/pages/SchoolsPage';
 import { TiersPage } from '@/features/platform/pages/TiersPage';
 import { PaymentsPage } from '@/features/platform/pages/PaymentsPage';
+import { SystemPage } from '@/features/platform/pages/SystemPage';
+import { SchoolDetailPage } from '@/features/platform/pages/SchoolDetailPage';
 import { PaymentWatcher } from '@/features/platform/components/PaymentWatcher';
 import type { Me } from '@/types/session';
 
@@ -20,6 +22,8 @@ export function platformRouteTree(me: Extract<Me, { scope: 'platform' }>) {
       <Route path="applications" element={<ApplicationsPage />} />
       <Route path="tiers" element={<TiersPage />} />
       <Route path="payments" element={<PaymentsPage />} />
+      <Route path="system" element={<SystemPage />} />
+      <Route path="schools/:id" element={<SchoolDetailPage />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Route>
   );

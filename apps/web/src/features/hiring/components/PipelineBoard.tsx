@@ -1,6 +1,6 @@
 import { BriefcaseBusiness, CircleX, Pencil, Plus, Star } from 'lucide-react';
 import { useState } from 'react';
-import { Badge, Button, Card, Spinner } from '@/components/ui';
+import { Badge, Button, Card, CompactNumber, Spinner } from '@/components/ui';
 import { ApplicantModal } from '@/features/hiring/components/ApplicantModal';
 import { CandidateModal } from '@/features/hiring/components/candidate/CandidateModal';
 import { STAGES } from '@/features/hiring/constants';
@@ -15,8 +15,6 @@ export function PipelineBoard({ postId, canEdit, onEditPost }: { postId: string;
   const post = data.data?.post;
   const apps = data.data?.applications ?? [];
   const closed = apps.filter((a) => a.status === 'rejected' || a.status === 'withdrawn');
-  // Always show the freshest copy of the open candidate (it changes after each action).
-  const openApp = apps.find((a) => a.id === openId) ?? null;
 
   if (data.isLoading || !post) return <Spinner />;
   return (
@@ -42,7 +40,7 @@ export function PipelineBoard({ postId, canEdit, onEditPost }: { postId: string;
               <div key={stage.id} className="w-52 shrink-0 rounded-lg bg-slate-100 p-2 dark:bg-white/[0.03]">
                 <div className="mb-2 flex items-center justify-between px-1">
                   <span className="text-sm font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">{stage.label}</span>
-                  <Badge tone={stage.tone}>{items.length}</Badge>
+                  <Badge tone={stage.tone}><CompactNumber value={items.length} /></Badge>
                 </div>
                 <div className="space-y-2">
                   {items.map((a) => (
@@ -66,8 +64,8 @@ export function PipelineBoard({ postId, canEdit, onEditPost }: { postId: string;
           </div>
         )}
       </Card>
-      {canEdit && <ApplicantModal open={adding} postId={postId} onClose={() => setAdding(false)} />}
-      {openApp && <CandidateModal app={openApp} post={post} hiredCount={apps.filter((a) => a.status === 'hired').length} canEdit={canEdit} onClose={() => setOpenId(null)} />}
+      {canEdit && <ApplicantModal open={adding} postId={postId} teaching={post.staffType === 'teaching'} onClose={() => setAdding(false)} />}
+      {openId && <CandidateModal applicationId={openId} canEdit={canEdit} onClose={() => setOpenId(null)} />}
     </div>
   );
 }

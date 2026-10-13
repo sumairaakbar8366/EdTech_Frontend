@@ -8,7 +8,6 @@ import { PayrollStatusWidget } from '@/features/dashboards/widgets/PayrollStatus
 import { RecentPaymentsWidget } from '@/features/dashboards/widgets/RecentPaymentsWidget';
 import { InvoiceStatusBar } from '@/features/fees/components/InvoiceStatusBar';
 import { useFeesSummary } from '@/features/fees/hooks/useFees';
-import { money } from '@/features/fees/utils/fee.utils';
 
 /** Accounts: collections, dues and payroll (board page 4: Accounts dashboard). */
 export function AccountsDashboard() {
@@ -22,8 +21,8 @@ export function AccountsDashboard() {
       {can('fees.view') && (
         <>
           <div className="stagger grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
-            <StatCard label="Collected this month" value={s ? money(s.collectedThisMonth) : '–'} icon={TrendingUp} tone="emerald" hint={s?.currency} />
-            <StatCard label="Outstanding" value={s ? money(s.outstanding) : '–'} icon={CircleDollarSign} tone="amber" hint={s?.currency} />
+            <StatCard label="Collected this month" value={s ? Number(s.collectedThisMonth) : '–'} icon={TrendingUp} tone="emerald" hint={s?.currency} />
+            <StatCard label="Outstanding" value={s ? Number(s.outstanding) : '–'} icon={CircleDollarSign} tone="amber" hint={s?.currency} />
             <StatCard label="Overdue invoices" value={s?.overdueInvoices ?? '–'} icon={CalendarClock} tone="rose" />
             <StatCard label="Invoices issued" value={invoices ?? '–'} icon={Receipt} tone="primary" />
           </div>

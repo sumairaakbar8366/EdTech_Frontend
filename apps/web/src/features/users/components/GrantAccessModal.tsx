@@ -1,10 +1,11 @@
 import type { SchoolRoleKey } from '@schoolerp/shared';
 import { Check, UserPlus } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Alert, Button, EmptyState, Field, Input, Modal, SearchInput, Spinner } from '@/components/ui';
+import { Alert, Button, EmptyState, Modal, SearchInput, Spinner } from '@/components/ui';
+import { EmailProofField } from '@/features/users/components/EmailProofField';
 import { errorMessage } from '@/lib/errors';
 import { onSubmit } from '@/lib/forms';
-import { PERSON_LABEL, STAFF_ROLE_OPTIONS, useCandidates, usersService, useUsersAction, type Candidate, type Credentials, type PersonType } from '@/features/users/users';
+import { PERSON_LABEL, STAFF_ROLE_OPTIONS, useCandidates, usersService, useUsersAction, type Candidate, type Credentials, type EmailProof, type PersonType } from '@/features/users/users';
 
 /** Role checkboxes for a staff login (at least one). */
 export function StaffRolePicker({ value, onChange }: { value: SchoolRoleKey[]; onChange: (roles: SchoolRoleKey[]) => void }) {
@@ -35,6 +36,7 @@ export function GrantAccessModal({ open, onClose, onCreated }: { open: boolean; 
   const [search, setSearch] = useState('');
   const [picked, setPicked] = useState<Candidate | null>(null);
   const [email, setEmail] = useState('');
+  const [proof, setProof] = useState<EmailProof | null>(null);
   const [roles, setRoles] = useState<SchoolRoleKey[]>([]);
   const candidates = useCandidates(type, search.trim(), open);
   const grant = useUsersAction(usersService.grant, { success: 'Access granted', onDone: (c) => { onCreated(c); onClose(); }, toastErrors: false });
@@ -50,12 +52,13 @@ export function GrantAccessModal({ open, onClose, onCreated }: { open: boolean; 
 
   const pick = (c: Candidate) => {
     setPicked(c);
-    setEmail('');
+    setEmail(c.email ?? '');
+    setProof(null);
     setRoles(c.suggestedRoles);
   };
   const submit = () =>
     picked &&
-    grant.mutate({ personType: type, personId: picked.id, ...(email.trim() && { email: email.trim() }), ...(type === 'staff' && { roles }) });
+    grant.mutate({ personType: type, personId: picked.id, ...(email.trim() && { email: email.trim() }), ...(proof && { verification: proof }), ...(type === 'staff' && { roles }) });
 
   return (
     <Modal
@@ -66,7 +69,7 @@ export function GrantAccessModal({ open, onClose, onCreated }: { open: boolean; 
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>Cancel</Button>
-          <Button type="submit" form="grant-access" icon={UserPlus} loading={grant.isPending} disabled={!picked || (type === 'staff' && roles.length === 0)}>Create login</Button>
+          <Button type="submit" form="grant-access" icon={UserPlus} loading={grant.isPending} disabled={!picked || (type === 'staff' && roles.length === 0) || (type !== 'student' && !email.trim())}>Create login</Button>
         </>
       }
     >
@@ -110,9 +113,10 @@ export function GrantAccessModal({ open, onClose, onCreated }: { open: boolean; 
               </div>
               <Button type="button" variant="ghost" onClick={() => setPicked(null)}>Change</Button>
             </div>
-            <Field label="Sign-in email (optional)" hint="Leave empty to generate a school email by role, e.g. ali.raza.teacher@…, .parent or .student. Their personal email stays on their record.">
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Generated automatically" />
-            </Field>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              They sign in with <strong>their own email</strong>{type === 'student' ? ' (or, without one, their User ID)' : ''}. A permanent <strong>User ID</strong> ({type === 'staff' ? 'TCH- / STF- / ACC- / ADM-' : type === 'guardian' ? 'PAR-' : 'STU-'}year-number) is also issued as their record number.
+            </p>
+            <EmailProofField email={email} onEmailChange={setEmail} onProof={setProof} label={type === 'student' ? 'Email (optional: the student’s or a parent’s)' : 'Personal email'} />
             {type === 'staff' ? (
               <StaffRolePicker value={roles} onChange={setRoles} />
             ) : (

@@ -1,10 +1,10 @@
 import { Building2, Check, ClipboardList, Mail, Phone, X } from 'lucide-react';
 import { useNavigate } from 'react-router';
-import { Alert, Badge, Button, Card, EmptyState, PageHeader, Spinner } from '@/components/ui';
+import { Alert, Badge, Button, Card, CompactNumber, EmptyState, PageHeader, Spinner } from '@/components/ui';
 import { APPLICATIONS_KEY, useSchoolApplications } from '@/features/platform/hooks/usePlatform';
 import { platformService } from '@/features/platform/services/platformService';
 import { useAction } from '@/lib/hooks/useAction';
-import { formatDate } from '@/lib/format';
+import { compactNumber, formatDate } from '@/lib/format';
 
 /** Self-service school applications: approve or reject, then onboard approved ones from Schools. */
 export function ApplicationsPage() {
@@ -25,13 +25,13 @@ export function ApplicationsPage() {
           <div key={status} className="surface rounded-lg px-4 py-3">
             <div className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400">{status}</div>
             <div className="mt-1 font-display text-2xl font-bold tabular-nums text-slate-900 dark:text-white">
-              {applications.isLoading ? '–' : list.filter((application) => application.status === status).length}
+              {applications.isLoading ? '–' : <CompactNumber value={list.filter((application) => application.status === status).length} />}
             </div>
           </div>
         ))}
       </div>
 
-      <Card title={`Requests (${pending} pending)`} icon={ClipboardList} tone="teal" padded={false}>
+      <Card title={`Requests (${compactNumber(pending)} pending)`} icon={ClipboardList} tone="teal" padded={false}>
         {applications.isLoading && <div className="px-5"><Spinner /></div>}
         {applications.error && <div className="p-5"><Alert>Could not load school applications.</Alert></div>}
         {applications.data?.length === 0 && (

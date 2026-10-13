@@ -11,7 +11,11 @@ export type UserStatusFilter = 'active' | 'disabled' | 'pending';
 
 export interface SchoolLogin {
   id: string;
-  email: string;
+  /** Sign-in User ID, e.g. TCH-2026-0007 (never changes). */
+  loginId: string;
+  /** The person's own email; `emailVerified` once they proved it with a code. */
+  email: string | null;
+  emailVerified: boolean;
   firstName: string;
   lastName: string;
   phone: string | null;
@@ -46,14 +50,39 @@ export interface Credentials {
 
 /** What a credentials hand-over needs: a new login from hiring, staff, enrolment or Users & Access. */
 export interface LoginHandover {
-  user: Pick<SchoolLogin, 'firstName' | 'lastName' | 'email'> & { roles: { name: string }[] };
+  user: Pick<SchoolLogin, 'firstName' | 'lastName' | 'loginId' | 'email'> & { emailVerified?: boolean; roles: { name: string }[] };
   temporaryPassword: string;
 }
 
-export const handover = (firstName: string, lastName: string, role: string, c: { email: string; password: string }): LoginHandover => ({
-  user: { firstName, lastName, email: c.email, roles: [{ name: role }] },
+/** A new login as the API returns it (shown once). */
+export interface ApiCredentials {
+  name?: string;
+  role?: SchoolRoleKey;
+  loginId: string;
+  email: string | null;
+  emailVerified?: boolean;
+  password: string;
+}
+
+export const handover = (firstName: string, lastName: string, role: string, c: ApiCredentials): LoginHandover => ({
+  user: { firstName, lastName, loginId: c.loginId, email: c.email, emailVerified: c.emailVerified, roles: [{ name: role }] },
   temporaryPassword: c.password,
 });
+
+const ROLE_NAME: Record<SchoolRoleKey, string> = { school_admin: 'School Admin', accounts: 'Accounts', teacher: 'Teacher', non_teaching_staff: 'Staff', parent: 'Parent', student: 'Student' };
+
+/** API hand-overs (with name and role) → modal entries. */
+export const handoversOf = (list: ApiCredentials[]): LoginHandover[] =>
+  list.map((c) => {
+    const [firstName = '', ...rest] = (c.name ?? '').split(' ');
+    return handover(firstName, rest.join(' '), c.role ? ROLE_NAME[c.role] : '', c);
+  });
+
+/** Proof that a person owns an email: the code they received (POST /users/email-code). */
+export interface EmailProof {
+  verificationId: string;
+  code: string;
+}
 
 export interface UsersQuery {
   q?: string;
@@ -86,7 +115,10 @@ export const usersService = {
   list: (q: UsersQuery) => api<{ items: SchoolLogin[]; total: number; page: number; pageSize: number }>(`/users?${qs(q)}`),
   summary: () => api<UsersSummary>('/users/summary'),
   candidates: (type: PersonType, q: string) => api<Candidate[]>(`/users/candidates?type=${type}${q ? `&q=${encodeURIComponent(q)}` : ''}`),
-  grant: (body: { personType: PersonType; personId: string; email?: string; roles?: SchoolRoleKey[] }) => api<Credentials>('/users', { method: 'POST', body }),
+  grant: (body: { personType: PersonType; personId: string; email?: string; verification?: EmailProof; roles?: SchoolRoleKey[] }) => api<Credentials>('/users', { method: 'POST', body }),
+  /** Emails a 6-digit code to a person; they read it out to prove the address is theirs. */
+  emailCode: (email: string) => api<{ verificationId: string; email: string; resendInSeconds: number }>('/users/email-code', { method: 'POST', body: { email } }),
+  setEmail: ({ id, email, verification }: { id: string; email: string | null; verification?: EmailProof }) => api<SchoolLogin>(`/users/${id}/email`, { method: 'PATCH', body: { email, verification } }),
   setRoles: ({ id, roles }: { id: string; roles: SchoolRoleKey[] }) => api<SchoolLogin>(`/users/${id}/roles`, { method: 'PATCH', body: { roles } }),
   resetPassword: (id: string) => api<Credentials>(`/users/${id}/reset-password`, { method: 'POST' }),
   setStatus: ({ id, status }: { id: string; status: 'active' | 'disabled' }) => api<SchoolLogin>(`/users/${id}/status`, { method: 'POST', body: { status } }),
@@ -108,7 +140,8 @@ export function loginMessage(c: LoginHandover, schoolName: string): string {
     ``,
     `Your ${schoolName} account is ready.`,
     `Sign in at: ${window.location.origin}/login`,
-    `Email: ${c.user.email}`,
+    `Sign in with: ${c.user.email ?? c.user.loginId}`,
+    ...(c.user.email ? [`User ID: ${c.user.loginId}`] : []),
     `Temporary password: ${c.temporaryPassword}`,
     ``,
     `You will be asked to choose your own password when you first sign in.`,

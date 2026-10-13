@@ -1,5 +1,5 @@
 import { Banknote } from 'lucide-react';
-import { Card, EmptyState, Spinner } from '@/components/ui';
+import { Card, CompactNumber, EmptyState, Spinner } from '@/components/ui';
 import { ViewAll } from '@/features/dashboards/components/ViewAll';
 import { money } from '@/features/fees/utils/fee.utils';
 import { useMyPayslips } from '@/features/payroll/hooks/usePayroll';
@@ -25,7 +25,7 @@ export function LatestPayslipWidget({ to, className = '' }: { to: string; classN
               <div>Gross {money(last.gross)}</div>
               <div>Deductions {money(last.totalDeductions)}</div>
             </div>
-            <span className="font-display text-3xl font-bold tabular-nums text-emerald-600 dark:text-emerald-400">{money(last.net)}</span>
+            <span className="shrink-0 font-display text-3xl font-bold tabular-nums text-emerald-600 dark:text-emerald-400"><CompactNumber value={last.net} /></span>
           </div>
         </div>
       )}

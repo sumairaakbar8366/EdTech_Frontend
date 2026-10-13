@@ -5,7 +5,7 @@ import { useAction } from '@/lib/hooks/useAction';
 export const NOTIFICATIONS_KEY = ['notifications'] as const;
 export const COMMUNICATION_KEY = ['communication'] as const;
 
-export const useNotifications = (page: number) => useQuery({ queryKey: [...NOTIFICATIONS_KEY, 'list', page], queryFn: () => communicationService.notifications(page) });
+export const useNotifications = (page: number, enabled = true) => useQuery({ queryKey: [...NOTIFICATIONS_KEY, 'list', page], queryFn: () => communicationService.notifications(page), enabled });
 /** Unread badge in the header; checked every 15 s while the tab is open, and on focus. */
 export const useUnreadCount = (enabled = true) =>
   useQuery({ queryKey: [...NOTIFICATIONS_KEY, 'unread'], queryFn: communicationService.unreadCount, enabled, refetchInterval: 15_000, staleTime: 0 });

@@ -4,7 +4,7 @@ import { IconTile } from '@/components/ui/IconTile/IconTile';
 import type { Tone } from '@/components/ui/tones';
 
 /** Page title row: icon tile, title, subtitle and page actions. */
-export function PageHeader({ title, sub, icon, tone = 'primary', actions }: { title: string; sub?: string; icon?: LucideIcon; tone?: Tone; actions?: ReactNode }) {
+export function PageHeader({ title, sub, icon, tone = 'primary', actions }: { title: string; sub?: ReactNode; icon?: LucideIcon; tone?: Tone; actions?: ReactNode }) {
   return (
     <div className="mb-5 flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4 dark:border-white/10">
       <div className="flex min-w-0 items-center gap-3.5">

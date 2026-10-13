@@ -1,4 +1,5 @@
 import { Bell, CheckCheck } from 'lucide-react';
+import { useSubscription } from '@/features/billing/billing';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { AreaLink, useArea, useAreaNavigate } from '@/app/router/area';
@@ -10,18 +11,21 @@ import { EVENT_VISUAL } from '@/features/communication/components/eventVisual';
 import { NotificationWatcher } from '@/features/communication/components/NotificationWatcher';
 import type { AppNotification } from '@/features/communication/types/communication.types';
 import { resolveNotificationLink, timeAgo } from '@/features/communication/utils/notificationLinks';
+import { compactNumber } from '@/lib/format';
 
 /** Header bell: unread badge, and a drop-down of the latest notifications. */
 export function NotificationBell() {
   const can = useCan();
   const area = useArea();
   const navigate = useAreaNavigate();
-  const enabled = can('communication.any');
+  // A locked school (subscription ended) gets nothing but 402s: stop polling until it pays.
+  const locked = useSubscription().data?.locked ?? false;
+  const enabled = can('communication.any') && !locked;
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLDivElement>(null);
   const unreadQuery = useUnreadCount(enabled);
   const unread = unreadQuery.data?.unread ?? 0;
-  const latest = useNotifications(1);
+  const latest = useNotifications(1, enabled);
   const markRead = useCommunicationAction(communicationService.markRead, { toastErrors: false });
   const markAll = useCommunicationAction(communicationService.markAllRead);
 
@@ -57,7 +61,7 @@ export function NotificationBell() {
         <Bell size={20} className="block" />
         {unread > 0 && (
           <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-600 px-1 text-xs font-bold text-white">
-            {unread > 99 ? '99+' : unread}
+            {compactNumber(unread)}
           </span>
         )}
       </button>

@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { CredentialsModal } from '@/features/users/components/CredentialsModal';
+import { handover, type LoginHandover } from '@/features/users/users';
 import { Alert, Button, Field, Input, Modal, Select } from '@/components/ui';
 import { SectionPicker } from '@/features/academics/components/SectionPicker';
 import { STUDENT_STATUS_LABEL } from '@/features/students/constants';
@@ -42,13 +44,14 @@ export function MoveSectionModal({ open, student, currentSectionId, currentRoll,
 
 export function StudentLoginModal({ open, student, onClose }: Props) {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const save = useStudentsAction(() => studentService.createLogin(student.id, { email, password }), 'Student login created', onClose);
+  const [login, setLogin] = useState<LoginHandover | null>(null);
+  const save = useStudentsAction(() => studentService.createLogin(student.id, email.trim() ? { email: email.trim() } : {}), 'Student login created', (r) => setLogin(handover(student.firstName, student.lastName, 'Student', r.credentials)));
+  if (login) return <CredentialsModal title="Student login created" credentials={login} onClose={() => { setLogin(null); onClose(); }} />;
   return (
     <Modal open={open} title="Create student login" onClose={onClose} footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" form="stu-login" loading={save.isPending}>Create login</Button></>}>
       <form id="stu-login" onSubmit={onSubmit(() => save.mutate(undefined))} className="space-y-3">
-        <Field label="Email"><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></Field>
-        <Field label="Temporary password" hint="At least 12 characters"><Input type="password" autoComplete="new-password" required minLength={12} value={password} onChange={(e) => setPassword(e.target.value)} /></Field>
+        <p className="text-base text-slate-600 dark:text-slate-300">A User ID (STU-{student.admissionDate.slice(0, 4)}-…) and a temporary password are generated and shown once.</p>
+        <Field label="Email (optional)" hint="The student's or a parent's. The User ID is emailed there."><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></Field>
       </form>
     </Modal>
   );

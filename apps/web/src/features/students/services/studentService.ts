@@ -1,5 +1,6 @@
 import type { Child, CreateStudentPayload, GuardianHit, PromotionCandidate, UpdateStudentPayload } from '@/features/students/types/student.types';
 import type { StudentDetail, StudentListItem, StudentStatus, StudentSummary } from '@/features/students/types/student.types';
+import type { ApiCredentials } from '@/features/users/users';
 import { api } from '@/services/api/http';
 import type { Paged, Relation } from '@/types/common';
 
@@ -27,11 +28,12 @@ export const studentService = {
   summary: () => api<StudentSummary>('/students/summary'),
   /** Admin view (`/students/:id`), the student's own record, or a parent's child. */
   detail: (path: string) => api<StudentDetail>(path),
-  create: (body: CreateStudentPayload) => api<{ id: string }>('/students', { method: 'POST', body }),
+  create: (body: CreateStudentPayload) => api<{ id: string; credentials: ApiCredentials[] }>('/students', { method: 'POST', body }),
   update: (id: string, body: UpdateStudentPayload) => api(`/students/${id}`, { method: 'PATCH', body }),
   setStatus: (id: string, status: StudentStatus) => api(`/students/${id}/status`, { method: 'POST', body: { status } }),
   enroll: (id: string, body: { sectionId: string; rollNo: number | null }) => api(`/students/${id}/enrollment`, { method: 'POST', body }),
-  createLogin: (id: string, body: { email: string; password: string }) => api(`/students/${id}/login`, { method: 'POST', body }),
+  /** User ID + generated temporary password (shown once); the email (student's or a parent's) is optional. */
+  createLogin: (id: string, body: { email?: string }) => api<{ credentials: ApiCredentials }>(`/students/${id}/login`, { method: 'POST', body }),
 
   addEmergencyContact: (id: string, body: { name: string; relationship: string; phone: string }) => api(`/students/${id}/emergency-contacts`, { method: 'POST', body }),
   removeEmergencyContact: (id: string, contactId: string) => api(`/students/${id}/emergency-contacts/${contactId}`, { method: 'DELETE' }),
@@ -42,7 +44,7 @@ export const studentService = {
     api(`/students/${id}/guardians`, { method: 'POST', body }),
   setPrimaryGuardian: (id: string, guardianId: string) => api(`/students/${id}/guardians/${guardianId}/primary`, { method: 'POST' }),
   unlinkGuardian: (id: string, guardianId: string) => api(`/students/${id}/guardians/${guardianId}`, { method: 'DELETE' }),
-  createGuardianLogin: (guardianId: string, password: string) => api(`/guardians/${guardianId}/login`, { method: 'POST', body: { password } }),
+  createGuardianLogin: (guardianId: string) => api<{ credentials: ApiCredentials }>(`/guardians/${guardianId}/login`, { method: 'POST', body: {} }),
   searchGuardians: (q: string) => api<GuardianHit[]>(`/guardians?q=${encodeURIComponent(q)}`),
   /** Parents with exactly this phone number, whatever its formatting (sibling linking). */
   guardiansByPhone: (phone: string) => api<GuardianHit[]>(`/guardians?phone=${encodeURIComponent(phone)}`),

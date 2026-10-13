@@ -1,8 +1,8 @@
 import { Wallet } from 'lucide-react';
-import { Card, EmptyState, Spinner } from '@/components/ui';
+import { Card, CompactNumber, EmptyState, Spinner } from '@/components/ui';
 import { ViewAll } from '@/features/dashboards/components/ViewAll';
 import { useMyFeeStudents, useStatement } from '@/features/fees/hooks/useFees';
-import { money, studentName } from '@/features/fees/utils/fee.utils';
+import { studentName } from '@/features/fees/utils/fee.utils';
 
 function BalanceRow({ studentId, name }: { studentId: string; name?: string }) {
   const statement = useStatement(studentId);
@@ -10,13 +10,13 @@ function BalanceRow({ studentId, name }: { studentId: string; name?: string }) {
   const due = t ? Number(t.balance) : 0;
   return (
     <div className="flex items-center justify-between gap-3 rounded-xl bg-slate-500/5 px-3 py-2.5">
-      <div>
+      <div className="min-w-0">
         {name && <div className="font-semibold text-slate-800 dark:text-slate-100">{name}</div>}
         <div className="text-sm text-slate-500">{t ? (t.overdue ? `${t.overdue} overdue invoice(s)` : 'Nothing overdue') : 'Loading…'}</div>
       </div>
-      <div className="text-right">
+      <div className="shrink-0 text-right">
         <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Balance due</div>
-        <div className={`font-display text-2xl font-bold tabular-nums ${due > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>{t ? money(t.balance) : '–'}</div>
+        <div className={`font-display text-2xl font-bold tabular-nums ${due > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>{t ? <CompactNumber value={t.balance} /> : '–'}</div>
       </div>
     </div>
   );

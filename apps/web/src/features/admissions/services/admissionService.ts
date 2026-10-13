@@ -31,7 +31,8 @@ export interface EnrollPayload {
 export interface GeneratedLogin {
   who: 'parent' | 'student';
   name: string;
-  email: string;
+  loginId: string;
+  email: string | null;
   password: string;
 }
 
