@@ -53,7 +53,7 @@ export function EmploymentSection({ form: f, set, editing }: Props & { editing: 
         </Field>
         <Field label="Joining date"><Input type="date" required value={f.joinDate} onChange={text(set, 'joinDate')} /></Field>
         {!editing && (
-          <Field label="Employee no. (optional)" hint="Leave empty to auto-number (EMP-0001)"><Input pattern="[A-Za-z0-9-]{1,20}" value={f.employeeNo} onChange={text(set, 'employeeNo')} /></Field>
+          <Field label="Employee no. (optional)" hint="Leave empty to auto-number (EMP-0001)"><Input pattern="[A-Za-z0-9\-]{1,20}" value={f.employeeNo} onChange={text(set, 'employeeNo')} /></Field>
         )}
         {f.staffType === 'teaching' && (
           <Field label="Specialization" hint="e.g. Physics, Early years"><Input maxLength={120} value={f.specialization} onChange={text(set, 'specialization')} /></Field>

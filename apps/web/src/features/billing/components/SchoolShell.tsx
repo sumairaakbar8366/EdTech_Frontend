@@ -4,6 +4,7 @@ import { LockedFeature } from '@/features/billing/components/LockedFeature';
 import { SubscriptionEnded } from '@/features/billing/components/SubscriptionEnded';
 import { SubscriptionBanner } from '@/features/billing/components/SubscriptionBanner';
 import { AppShell } from '@/layouts/AppShell/AppShell';
+import { Spinner } from '@/components/ui';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { SupportBanner } from '@/features/billing/components/SupportBanner';
 import type { ComponentProps } from 'react';
@@ -14,7 +15,8 @@ import type { ComponentProps } from 'react';
  */
 export function SchoolShell({ area, isAdmin, ...props }: ComponentProps<typeof AppShell> & { area: string; isAdmin: boolean }) {
   const { pathname } = useLocation();
-  const sub = useSubscription().data;
+  const subscription = useSubscription();
+  const sub = subscription.data;
   const { me } = useAuth();
   const support = me?.scope === 'school' ? me.support ?? null : null;
   const has = (feature: string | undefined) => !feature || !sub || sub.features.includes(feature as never);
@@ -24,7 +26,8 @@ export function SchoolShell({ area, isAdmin, ...props }: ComponentProps<typeof A
   // A locked school (trial/plan and grace over) shows the paywall everywhere except the billing page.
   // The owner's support session may work in a locked school.
   const ended = sub?.locked && !support && !(isAdmin && segment === 'billing');
-  const locked = ended ? <SubscriptionEnded state={sub} isAdmin={isAdmin} /> : feature && !has(feature) ? <LockedFeature feature={feature} isAdmin={isAdmin} /> : undefined;
+  // Until the plan is known, pages wait: a locked school would otherwise flash a page whose every request is refused.
+  const locked = subscription.isLoading ? <Spinner /> : ended ? <SubscriptionEnded state={sub} isAdmin={isAdmin} /> : feature && !has(feature) ? <LockedFeature feature={feature} isAdmin={isAdmin} /> : undefined;
   void area;
   // The school's theme colour is a plan feature; without it the standard colours apply.
   const brandColor = sub?.features.includes('theme') ? props.brandColor : null;

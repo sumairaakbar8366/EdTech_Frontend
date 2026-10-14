@@ -1,13 +1,12 @@
-import { ArrowRight, Building2, GraduationCap, LogIn, UserPlus } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
-import { Link, useSearchParams } from 'react-router';
+import { GraduationCap, LogIn, UserPlus } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { motion } from 'motion/react';
 import { Backdrop } from '@/components/effects/Backdrop';
 import { StorySlides, type Story } from '@/components/motion/StorySlides';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
-import { Alert, Button, Field, Input } from '@/components/ui';
-import { SignupForm } from '@/features/marketing/components/SignupForm';
-import { BASE_DOMAIN, normalizeSchoolSlug, platformOrigin, schoolOrigin } from '@/config/site';
+import { Alert } from '@/components/ui';
+import { QuickSignup } from '@/features/marketing/components/QuickSignup';
 
 type Mode = 'login' | 'signup';
 
@@ -19,23 +18,19 @@ const STORIES: Story[] = [
 
 export function AccessPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const mode: Mode = searchParams.get('mode') === 'signup' ? 'signup' : 'login';
-  const [school, setSchool] = useState('');
   const [error, setError] = useState<string | null>(null);
+  // /access?mode=login (old links): the single sign-in page.
+  useEffect(() => {
+    if (mode === 'login') navigate('/login', { replace: true });
+  }, [mode, navigate]);
 
   function chooseMode(next: Mode) {
     setError(null);
+    // Signing in happens on the single /login page.
+    if (next === 'login') return navigate('/login');
     setSearchParams({ mode: next });
-  }
-
-  function signIn(e: FormEvent) {
-    e.preventDefault();
-    const slug = normalizeSchoolSlug(school);
-    if (!slug) {
-      setError('Enter your school address, such as greenfield.');
-      return;
-    }
-    window.location.assign(`${schoolOrigin(slug)}/login`);
   }
 
   return (
@@ -79,23 +74,7 @@ export function AccessPage() {
             </div>
 
             {error && <div className="mt-5"><Alert>{error}</Alert></div>}
-            {mode === 'login' ? (
-              <form onSubmit={signIn} className="mt-5 space-y-4">
-                <p className="text-sm text-slate-600 dark:text-slate-300">Enter your school subdomain. You’ll continue to its existing secure sign-in page.</p>
-                <Field label="School address" hint={`For example: greenfield.${BASE_DOMAIN}`}>
-                  <div className="flex overflow-hidden rounded-lg border border-slate-300 bg-white dark:border-white/10 dark:bg-[#0e1626]">
-                    <Input required aria-label="School subdomain" value={school} onChange={(e) => setSchool(e.target.value)} placeholder="greenfield" className="min-w-0 flex-1 rounded-none border-0 shadow-none focus:ring-0" />
-                    <span className="flex items-center border-l border-slate-200 bg-slate-50 px-3 text-sm text-slate-500 dark:border-white/10 dark:bg-white/5">.{window.location.host}</span>
-                  </div>
-                </Field>
-                <Button type="submit" icon={ArrowRight} className="w-full">Continue to school</Button>
-                <a href={`${platformOrigin()}/login`} className="flex items-center justify-center gap-2 py-2 text-sm font-semibold text-primary-700 hover:underline dark:text-primary-300">
-                  <Building2 size={15} /> Company administrator sign in
-                </a>
-              </form>
-            ) : (
-              <SignupForm />
-            )}
+            <div className="mt-5"><QuickSignup /></div>
           </motion.div>
         </div>
       </section>

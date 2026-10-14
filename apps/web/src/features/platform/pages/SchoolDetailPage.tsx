@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router';
 import { Alert, Badge, Button, Card, CompactNumber, DataTable, PageHeader, Spinner, StatCard, type Column } from '@/components/ui';
 import { methodText, type PaymentMethod } from '@/features/billing/billing';
 import { ManagePlanModal, PHASE_LABEL, PHASE_TONE, openAsAdmin, type PlanTarget } from '@/features/platform/components/SchoolActions';
+import { SchoolLogins } from '@/features/platform/components/SchoolLogins';
 import { SchoolPeople } from '@/features/platform/components/SchoolPeople';
 import { useConsoleSchool } from '@/features/platform/hooks/useConsole';
 import type { SchoolDetail } from '@/features/platform/types/console.types';
@@ -49,7 +50,7 @@ export function SchoolDetailPage() {
 
   const payCols: Column<SchoolDetail['payments'][number]>[] = [
     { header: 'Date', cell: (p) => <span className="text-sm">{formatDate(p.paidAt ?? p.createdAt)}</span> },
-    { header: 'Plan', cell: (p) => <span className="text-sm">{p.tier.name} · {p.billingCycle === 'annual' ? 'yearly' : 'monthly'}</span> },
+    { header: 'Plan', cell: (p) => <span className="text-sm">{p.tier ? `${p.tier.name} · ${p.billingCycle === 'annual' ? 'yearly' : 'monthly'}` : p.purpose === 'domain' ? 'Own domain add-on (1 year)' : '—'}</span> },
     { header: 'Method', cell: (p) => <span className="text-sm">{methodText({ method: p.method as PaymentMethod, cardBrand: p.cardBrand, cardLast4: p.cardLast4 })}</span> },
     { header: 'Amount', align: 'right', cell: (p) => <span className="font-semibold tabular-nums"><CompactNumber value={p.amount} prefix="PKR " /></span> },
     { header: 'Status', cell: (p) => <div><Badge tone={p.status === 'confirmed' ? 'emerald' : p.status === 'pending' || p.status === 'initiated' ? 'amber' : 'rose'}>{p.status === 'confirmed' ? 'Paid' : p.status}</Badge>{p.periodEnd && p.status === 'confirmed' && <div className="text-xs text-slate-500">until {formatDate(p.periodEnd)}</div>}</div> },
@@ -112,6 +113,12 @@ export function SchoolDetailPage() {
           ))}
         </ul>
       </Card>
+
+      <div>
+        <h2 className="mb-1 text-lg font-bold text-slate-900 dark:text-white">User IDs</h2>
+        <p className="mb-3 text-sm text-slate-500">Every login at this school and who it is assigned to.</p>
+        <SchoolLogins schoolId={s.id} />
+      </div>
 
       <div>
         <h2 className="mb-3 text-lg font-bold text-slate-900 dark:text-white">People</h2>

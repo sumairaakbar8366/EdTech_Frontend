@@ -37,7 +37,7 @@ export interface SchoolDetail {
   settings: { timezone: string; currency: string } | null;
   fees: { outstanding: number; openInvoices: number };
   admins: { id: string; firstName: string; lastName: string; email: string | null; loginId: string; phone: string | null; status: string; lastLoginAt: string | null }[];
-  payments: { id: string; amount: string; currency: string; method: string; cardBrand: string | null; cardLast4: string | null; status: string; billingCycle: string; paidAt: string | null; createdAt: string; periodEnd: string | null; failureReason: string | null; tier: { name: string } }[];
+  payments: { id: string; amount: string; currency: string; method: string; cardBrand: string | null; cardLast4: string | null; status: string; billingCycle: string; paidAt: string | null; createdAt: string; periodEnd: string | null; failureReason: string | null; /** "plan", or "domain" (the own-domain add-on, which has no tier). */ purpose: string; tier: { name: string } | null }[];
   logins: { id: string; name: string | null; identifier: string; roles: string | null; success: boolean; reason: string | null; method: string; createdAt: string }[];
 }
 
@@ -79,4 +79,22 @@ export interface Finance {
   byMonth: { month: string; amount: number }[];
   byMethod: { method: string; amount: number }[];
   endingSoon: { school: { id: string; name: string; slug: string }; plan: string; status: string; endsAt: string }[];
+}
+
+/** One login (User ID) of a school, as the owner console lists it. */
+export interface ConsoleLogin {
+  id: string;
+  loginId: string;
+  name: string;
+  roles: string[];
+  /** The record the login belongs to; null for logins with no staff, student or parent record (e.g. the admin). */
+  linkedTo: { kind: 'Teacher' | 'Staff' | 'Student' | 'Parent'; reference: string | null; detail: string } | null;
+  email: string | null;
+  emailVerified: boolean;
+  status: string;
+  mustChangePassword: boolean;
+  lastLoginAt: string | null;
+  /** password, google, ticket (sign-up link) or support. */
+  lastLoginMethod: string | null;
+  createdAt: string;
 }

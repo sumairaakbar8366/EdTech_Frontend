@@ -49,7 +49,8 @@ function RequestCard({ r, onCancel }: { r: DocumentRequest; onCancel: (r: Docume
 export function MyRequestsPage() {
   const me = useSchoolUser();
   const isParent = me.roles.some((r) => r.key === 'parent');
-  const children = useMyChildren();
+  // Only parents have children to choose from; a student requests for themselves.
+  const children = useMyChildren(isParent);
   const self = useStudentDetail('own', undefined, !isParent);
   const students = isParent
     ? (children.data ?? []).filter((c) => c.status === 'active').map((c) => ({ id: c.id, name: `${c.firstName} ${c.lastName}` }))

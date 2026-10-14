@@ -5,7 +5,7 @@ import { schoolRouteTree } from '@/app/router/SchoolRoutes';
 import { Backdrop } from '@/components/effects/Backdrop';
 import { FullPageMessage } from '@/components/ui';
 import { AuthProvider, useAuth } from '@/features/auth/AuthProvider';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChangePasswordPage } from '@/features/auth/pages/ChangePasswordPage';
 import { ForgotPasswordPage, ForgotUserIdPage, ResetPasswordPage, VerifyEmailPage } from '@/features/auth/pages/RecoveryPages';
 import { WelcomePage } from '@/features/auth/pages/WelcomePage';
@@ -14,10 +14,20 @@ import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { SchoolSitePage } from '@/features/website/pages/SchoolSitePage';
 import { useTenant } from '@/features/tenancy/useTenant';
 import { ApiError } from '@/services/api/http';
+import { marketingOrigin } from '@/config/site';
 import type { Tenant } from '@/types/session';
 
-/** A school's app or the platform console, depending on the host's tenant. */
-export function TenantApp() {
+/** The owner console has no sign-in page of its own: it uses the main /login. */
+function ToMainLogin() {
+  useEffect(() => window.location.replace(`${marketingOrigin()}/login`), []);
+  return <><Backdrop /><FullPageMessage title="Opening sign-in…" /></>;
+}
+
+/**
+ * A school's app or the platform console. On the main domain it lives under a path (`basename`:
+ * /<slug> or /console); on a school's own domain at the root.
+ */
+export function TenantApp({ basename }: { basename: string }) {
   const tenant = useTenant();
   if (tenant.isLoading) return <><Backdrop /><FullPageMessage title="Loading…" /></>;
   if (tenant.error || !tenant.data) {
@@ -37,7 +47,7 @@ export function TenantApp() {
   }
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={basename}>
         <SignedInRoutes tenant={tenant.data} />
       </BrowserRouter>
     </AuthProvider>
@@ -56,14 +66,14 @@ function SignedInRoutes({ tenant }: { tenant: Tenant }) {
   const brandColor = tenant.kind === 'school' ? tenant.school.branding?.primaryColor ?? null : null;
   return (
     <Routes>
-      {/* The school (or console) address itself is the sign-in page; dashboards live under their own paths. */}
-      {/* A school's own address is its public website; the platform console starts at sign-in. */}
-      <Route path="/" element={tenant.kind === 'school' ? <SchoolSitePage /> : <LoginPage tenant={tenant} />} />
-      <Route path="/login" element={<LoginPage tenant={tenant} />} />
+      {/* A school's address is its public website; the console opens its dashboard (or the main /login). */}
+      <Route path="/" element={tenant.kind === 'school' ? <SchoolSitePage /> : me ? <Navigate to="/dashboard" replace /> : <ToMainLogin />} />
+      <Route path="/login" element={tenant.kind === 'school' ? <LoginPage tenant={tenant} /> : me ? <Navigate to="/dashboard" replace /> : <ToMainLogin />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage tenant={tenant} />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       {tenant.kind === 'school' && <Route path="/forgot-user-id" element={<ForgotUserIdPage />} />}
-      {tenant.kind === 'school' && <Route path="/welcome" element={<WelcomePage />} />}
+      {/* A sign-in made on the main /login (or at sign-up) continues here with a one-time ticket. */}
+      <Route path="/welcome" element={<WelcomePage />} />
       {tenant.kind === 'school' && <Route path="/open" element={<OpenLinkPage />} />}
       {!me ? (
         <Route path="*" element={<Navigate to="/login" replace />} />

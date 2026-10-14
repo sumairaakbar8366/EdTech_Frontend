@@ -32,7 +32,7 @@ export function SubjectFormModal({ subject, onClose }: { subject: Subject | 'new
           </Field>
         </div>
         <Field label="Code">
-          <Input required pattern="[A-Za-z0-9-]{1,20}" title="1–20 letters, digits or hyphens" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} />
+          <Input required pattern="[A-Za-z0-9\-]{1,20}" title="1–20 letters, digits or hyphens" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} />
         </Field>
       </form>
     </Modal>

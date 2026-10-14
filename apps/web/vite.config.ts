@@ -19,7 +19,7 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
-    allowedHosts: ['.localhost'],
+    allowedHosts: ['.localhost', '.ed-tech.anetcybersolution.com'],
     proxy: {
       '/api': { target: 'http://localhost:3000', changeOrigin: false },
     },

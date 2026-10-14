@@ -1,4 +1,4 @@
-import type { ConsolePerson, Finance, Growth, Paged, Phase, PersonKind, SchoolDetail, SchoolsPage } from '@/features/platform/types/console.types';
+import type { ConsoleLogin, ConsolePerson, Finance, Growth, Paged, Phase, PersonKind, SchoolDetail, SchoolsPage } from '@/features/platform/types/console.types';
 import { api } from '@/services/api/http';
 
 const qs = (o: Record<string, string | number | boolean | undefined>) =>
@@ -9,6 +9,7 @@ export const consoleService = {
   schools: (q: { phase?: Phase | ''; source?: string; q?: string; page: number }) => api<SchoolsPage>(`/platform/console/schools?${qs(q)}`),
   school: (id: string) => api<SchoolDetail>(`/platform/console/schools/${id}`),
   people: (q: { type: PersonKind; schoolId: string; q?: string; page: number }) => api<Paged<ConsolePerson>>(`/platform/console/people?${qs(q)}`),
+  logins: (schoolId: string, q: { q?: string; page: number }) => api<Paged<ConsoleLogin>>(`/platform/console/schools/${schoolId}/logins?${qs(q)}`),
   growth: () => api<Growth>('/platform/console/growth'),
   finance: () => api<Finance>('/platform/console/finance'),
   /** A one-time link into the school as its hidden support admin (opens in a new tab). */

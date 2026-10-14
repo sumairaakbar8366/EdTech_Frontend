@@ -14,7 +14,7 @@ export function BankAccountForm({ value, onChange, askReason }: { value: BankFor
         <Input required maxLength={120} value={value.accountTitle} onChange={set('accountTitle')} />
       </Field>
       <Field label="Account number">
-        <Input required inputMode="numeric" pattern="[A-Za-z0-9 -]{6,40}" maxLength={40} value={value.accountNumber} onChange={set('accountNumber')} />
+        <Input required inputMode="numeric" pattern="[A-Za-z0-9 \-]{6,40}" maxLength={40} value={value.accountNumber} onChange={set('accountNumber')} />
       </Field>
       <Field label="IBAN (optional)" hint="PK followed by 22 characters">
         <Input maxLength={34} value={value.iban} onChange={set('iban')} placeholder="PK36SCBL0000001123456702" />

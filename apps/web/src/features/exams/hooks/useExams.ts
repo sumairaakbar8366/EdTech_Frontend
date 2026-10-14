@@ -9,7 +9,7 @@ export const useExam = (id: string | undefined) => useQuery({ queryKey: [...EXAM
 export const useGradingScale = (enabled = true) => useQuery({ queryKey: [...EXAMS_KEY, 'scale'], queryFn: examService.gradingScale, enabled });
 export const useMarksProgress = (examId: string) => useQuery({ queryKey: [...EXAMS_KEY, 'progress', examId], queryFn: () => examService.progress(examId) });
 export const useMarksheet = (examId: string | undefined, sectionId: string, subjectId: string) =>
-  useQuery({ queryKey: [...EXAMS_KEY, 'sheet', examId, sectionId, subjectId], queryFn: () => examService.marksheet(examId!, sectionId, subjectId), enabled: !!examId });
+  useQuery({ queryKey: [...EXAMS_KEY, 'sheet', examId, sectionId, subjectId], queryFn: () => examService.marksheet(examId!, sectionId, subjectId), enabled: !!examId && !!sectionId && !!subjectId });
 export const useReportCards = (examId: string) => useQuery({ queryKey: [...EXAMS_KEY, 'cards', examId], queryFn: () => examService.reportCards(examId) });
 export const useReportCard = (id: string | null) => useQuery({ queryKey: [...EXAMS_KEY, 'card', id], queryFn: () => examService.reportCard(id!), enabled: !!id });
 export const useResultChildren = () => useQuery({ queryKey: [...EXAMS_KEY, 'children'], queryFn: examService.children });

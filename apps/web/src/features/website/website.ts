@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAction } from '@/lib/hooks/useAction';
-import { api, upload } from '@/services/api/http';
+import { api, apiUrl, upload } from '@/services/api/http';
+import type { SiteTier } from '@/features/website/siteImagery';
 
 // School public website: types, service and hooks.
 
 export interface PublicSite {
-  school: { name: string; slug: string; logoUrl: string | null; primaryColor: string | null };
+  /** `siteTier`: richer imagery on the higher plans (the plan itself is not published). */
+  school: { name: string; slug: string; logoUrl: string | null; primaryColor: string | null; siteTier?: SiteTier };
   published: boolean;
   tagline: string;
   about: string;
@@ -44,7 +46,7 @@ export interface WebsiteSettings {
 
 export interface WebsiteMedia { id: string; category: MediaCategory; caption: string | null; fileName: string; createdAt: string }
 
-export const mediaUrl = (id: string) => `/api/public/media/${id}`;
+export const mediaUrl = (id: string) => apiUrl(`/public/media/${id}`);
 
 export const websiteService = {
   site: () => api<PublicSite>('/public/site'),

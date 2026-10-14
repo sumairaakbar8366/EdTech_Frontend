@@ -25,7 +25,7 @@ export function AddCampusForm() {
         <Field label="Code" hint="Short unique code, e.g. NORTH">
           <Input
             required
-            pattern="[A-Za-z0-9-]{1,20}"
+            pattern="[A-Za-z0-9\-]{1,20}"
             title="1–20 letters, digits or hyphens"
             value={form.code}
             onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}

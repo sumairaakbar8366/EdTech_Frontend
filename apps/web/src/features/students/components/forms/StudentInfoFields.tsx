@@ -19,7 +19,7 @@ export function StudentInfoFields({ form: f, set }: Props) {
         </Field>
         <Field label="Date of birth"><Input type="date" required max={f.admissionDate} value={f.dateOfBirth} onChange={text('dateOfBirth')} /></Field>
         <Field label="Admission date"><Input type="date" required value={f.admissionDate} onChange={text('admissionDate')} /></Field>
-        <Field label="Admission no. (optional)" hint="Empty = auto (ADM-0001)"><Input pattern="[A-Za-z0-9-]{1,20}" value={f.admissionNo} onChange={text('admissionNo')} /></Field>
+        <Field label="Admission no. (optional)" hint="Empty = auto (ADM-0001)"><Input pattern="[A-Za-z0-9\-]{1,20}" value={f.admissionNo} onChange={text('admissionNo')} /></Field>
         <Field label="B-Form / national ID"><Input maxLength={40} value={f.nationalId} onChange={text('nationalId')} /></Field>
         <Field label="Blood group">
           <Select value={f.bloodGroup} onChange={text('bloodGroup')}>

@@ -1,6 +1,7 @@
 import { MotionConfig } from 'motion/react';
 import { useState } from 'react';
 import { CONTACT_EMAIL, platformOrigin } from '@/config/site';
+import { Modal } from '@/components/ui';
 import { CtaSection } from '@/features/marketing/components/CtaSection';
 import { FeatureSlideshow } from '@/features/marketing/components/FeatureSlideshow';
 import { FindSchoolModal } from '@/features/marketing/components/FindSchoolModal';
@@ -9,6 +10,7 @@ import { LandingHeader } from '@/features/marketing/components/LandingHeader';
 import { MetricsSection } from '@/features/marketing/components/MetricsSection';
 import { ModulesSection } from '@/features/marketing/components/ModulesSection';
 import { PlansSection } from '@/features/marketing/components/PlansSection';
+import { QuickSignup } from '@/features/marketing/components/QuickSignup';
 import { RolesSection } from '@/features/marketing/components/RolesSection';
 import { SectionNav } from '@/features/marketing/components/SectionNav';
 import { SpecialFeaturesSection } from '@/features/marketing/components/SpecialFeaturesSection';
@@ -23,20 +25,22 @@ const DEMO_HREF = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('SchoolE
 export function LandingPage() {
   const [findOpen, setFindOpen] = useState(false);
   const openFind = () => setFindOpen(true);
+  const [trialOpen, setTrialOpen] = useState(false);
+  const openTrial = () => setTrialOpen(true);
   return (
     <MotionConfig reducedMotion="user">
       <div className="landing min-h-dvh bg-[var(--page-bg)] text-[#14213d] dark:text-[#e5e9f2]">
         <LandingHeader />
         <SectionNav />
         <main>
-          <HeroSection demoHref={DEMO_HREF} />
+          <HeroSection demoHref={DEMO_HREF} onStartTrial={openTrial} />
           <FeatureSlideshow />
           <RolesSection />
           <ModulesSection />
           <SpecialFeaturesSection />
           <MetricsSection />
-          <PlansSection demoHref={DEMO_HREF} />
-          <CtaSection demoHref={DEMO_HREF} onFindSchool={openFind} />
+          <PlansSection demoHref={DEMO_HREF} onStartTrial={openTrial} />
+          <CtaSection demoHref={DEMO_HREF} onFindSchool={openFind} onStartTrial={openTrial} />
         </main>
         <footer className="border-t border-slate-200 bg-white dark:border-white/5 dark:bg-[#0b1426]">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-6 text-sm text-slate-500 sm:px-8 dark:text-slate-400">
@@ -46,6 +50,9 @@ export function LandingPage() {
           </div>
         </footer>
         <FindSchoolModal open={findOpen} onClose={() => setFindOpen(false)} />
+        <Modal open={trialOpen} title="Start your free trial" onClose={() => setTrialOpen(false)}>
+          <QuickSignup />
+        </Modal>
       </div>
     </MotionConfig>
   );

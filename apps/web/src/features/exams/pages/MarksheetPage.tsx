@@ -13,8 +13,8 @@ type Entry = { marks: string; isAbsent: boolean; remarks: string };
 export function MarksheetPage() {
   const { id } = useParams();
   const [params] = useSearchParams();
-  const sectionId = params.get('sectionId')!;
-  const subjectId = params.get('subjectId')!;
+  const sectionId = params.get('sectionId') ?? '';
+  const subjectId = params.get('subjectId') ?? '';
   const sheet = useMarksheet(id, sectionId, subjectId);
   const [entries, setEntries] = useState<Record<string, Entry>>({});
   const [dirty, setDirty] = useState(false);
@@ -33,6 +33,8 @@ export function MarksheetPage() {
     { success: (r) => `${r.saved} marks saved`, onDone: () => setDirty(false) },
   );
 
+  // Opened without a paper (e.g. a bookmarked link): the exam's Marks tab is where a paper is chosen.
+  if (!sectionId || !subjectId) return <Alert>Choose a paper and section from the exam&apos;s Marks tab to enter marks.</Alert>;
   if (sheet.isLoading) return <Spinner />;
   if (!sheet.data) return <Alert>{sheet.error ? errorMessage(sheet.error, 'Marksheet not found.') : 'Marksheet not found.'}</Alert>;
   const s = sheet.data;

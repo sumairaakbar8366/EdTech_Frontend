@@ -1,8 +1,7 @@
-/** The school's own address, on the same port the console is served from. */
+import { schoolOrigin } from '@/config/site';
+/** The school's address on the main domain: https://ed-tech.example.com/<slug>. */
 export function schoolUrl(slug: string): string {
-  const { protocol, hostname, port } = window.location;
-  const base = hostname.split('.').slice(1).join('.') || hostname;
-  return `${protocol}//${slug}.${base}${port ? `:${port}` : ''}`;
+  return schoolOrigin(slug);
 }
 
 export const tierLimit = (n: number | null) => (n === null ? 'Unlimited' : n.toLocaleString());

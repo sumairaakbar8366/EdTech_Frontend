@@ -66,7 +66,7 @@ export function OnboardSchoolModal({ form, setForm, tiers, onClose }: { form: Sc
             <Field label="Subdomain" hint="3–63 lowercase letters, digits, hyphens">
               <Input
                 required
-                pattern="[a-z0-9][a-z0-9-]{1,61}[a-z0-9]"
+                pattern="[a-z0-9][a-z0-9\-]{1,61}[a-z0-9]"
                 value={form.slug}
                 onChange={(e) => setForm({ ...form, slug: e.target.value.toLowerCase() })}
               />
@@ -98,7 +98,7 @@ export function OnboardSchoolModal({ form, setForm, tiers, onClose }: { form: Sc
               <Input required value={form.campusName} onChange={set('campusName')} />
             </Field>
             <Field label="Campus code">
-              <Input required pattern="[A-Za-z0-9-]{1,20}" value={form.campusCode} onChange={(e) => setForm({ ...form, campusCode: e.target.value.toUpperCase() })} />
+              <Input required pattern="[A-Za-z0-9\-]{1,20}" value={form.campusCode} onChange={(e) => setForm({ ...form, campusCode: e.target.value.toUpperCase() })} />
             </Field>
           </div>
           <div className="border-t border-slate-200/70 pt-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:border-white/5 dark:text-slate-400">

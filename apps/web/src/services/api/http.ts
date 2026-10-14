@@ -1,6 +1,6 @@
 // HTTP client for the SchoolERP API.
 // The access token lives only in memory; the refresh token is an httpOnly cookie the
-// browser sends to /api/auth. A 401 triggers one silent refresh and a retry.
+// browser sends to <API base>/auth. A 401 triggers one silent refresh and a retry.
 
 export class ApiError extends Error {
   constructor(
@@ -13,6 +13,20 @@ export class ApiError extends Error {
 }
 
 let accessToken: string | null = null;
+
+/**
+ * Where this app's API lives: "/api/s/<slug>" for a school and "/api/console" for the platform
+ * console on the main domain, "/api" on the public site and on a school's own domain. Set once at
+ * start-up (app/App.tsx), before any request.
+ */
+let apiBase = '/api';
+export function setApiBase(base: string): void {
+  apiBase = base;
+}
+/** An API path as a URL for links and images, e.g. apiUrl('/public/media/1') → /api/s/demo/public/media/1. */
+export const apiUrl = (path: string) => `${apiBase}${path}`;
+/** A stored API link ("/api/tenant/logo/…") rewritten for this app's API base. */
+export const apiAsset = (url: string | null | undefined) => (url && url.startsWith('/api/') ? apiUrl(url.slice(4)) : url ?? undefined);
 let refreshInFlight: Promise<boolean> | null = null;
 
 export function setAccessToken(token: string | null): void {
@@ -29,7 +43,7 @@ async function send(path: string, init: RequestInit): Promise<Response> {
   headers.set('X-Requested-With', 'XMLHttpRequest');
   if (init.body !== undefined) headers.set('Content-Type', 'application/json');
   if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`);
-  return fetch(`/api${path}`, { ...init, headers, credentials: 'same-origin' });
+  return fetch(`${apiBase}${path}`, { ...init, headers, credentials: 'same-origin' });
 }
 
 async function parse<T>(res: Response): Promise<T> {
@@ -93,7 +107,7 @@ export async function upload<T>(path: string, form: FormData): Promise<T> {
   const doSend = () => {
     const headers = new Headers({ Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' });
     if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`);
-    return fetch(`/api${path}`, { method: 'POST', body: form, headers, credentials: 'same-origin' });
+    return fetch(`${apiBase}${path}`, { method: 'POST', body: form, headers, credentials: 'same-origin' });
   };
   let res = await doSend();
   if (res.status === 401 && accessToken && (await refreshSession())) res = await doSend();
@@ -105,7 +119,7 @@ export async function blobUrl(path: string): Promise<string> {
   const doSend = () => {
     const headers = new Headers({ 'X-Requested-With': 'XMLHttpRequest' });
     if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`);
-    return fetch(`/api${path}`, { headers, credentials: 'same-origin' });
+    return fetch(`${apiBase}${path}`, { headers, credentials: 'same-origin' });
   };
   let res = await doSend();
   if (res.status === 401 && accessToken && (await refreshSession())) res = await doSend();

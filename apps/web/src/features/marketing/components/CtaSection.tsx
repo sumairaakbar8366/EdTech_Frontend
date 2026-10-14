@@ -1,4 +1,4 @@
-import { ArrowRight, LogIn, Mail } from 'lucide-react';
+import { ArrowRight, LogIn, Mail, Rocket } from 'lucide-react';
 import { motion, useMotionTemplate, useMotionValue, useReducedMotion, useSpring } from 'motion/react';
 import type { PointerEvent, ReactNode } from 'react';
 
@@ -21,7 +21,7 @@ function Magnetic({ children }: { children: ReactNode }) {
 }
 
 /** Closing call to action: photo backdrop, pointer spotlight, magnetic buttons. */
-export function CtaSection({ demoHref, onFindSchool }: { demoHref: string; onFindSchool: () => void }) {
+export function CtaSection({ demoHref, onFindSchool, onStartTrial }: { demoHref: string; onFindSchool: () => void; onStartTrial: () => void }) {
   const mx = useMotionValue(50);
   const my = useMotionValue(50);
   const spotlight = useMotionTemplate`radial-gradient(500px circle at ${mx}% ${my}%, rgb(142 174 220 / 0.25), transparent 60%)`;
@@ -48,7 +48,12 @@ export function CtaSection({ demoHref, onFindSchool }: { demoHref: string; onFin
         <p className="mx-auto mt-3 max-w-2xl text-base leading-7 text-slate-600 dark:text-primary-100">Sign up with your own email and your school is ready in two minutes: a free one-month trial with every module and every role, no card needed.</p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
           <Magnetic>
-            <a href={demoHref} className="focus-ring group inline-flex items-center gap-2 border border-orange-500 bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:bg-magenta-600">
+            <button type="button" onClick={onStartTrial} className="focus-ring group inline-flex items-center gap-2 border border-orange-500 bg-magenta-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-magenta-600">
+              <Rocket size={18} /> Start free trial <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+            </button>
+          </Magnetic>
+          <Magnetic>
+            <a href={demoHref} className="focus-ring group inline-flex items-center gap-2 border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:border-primary-500 hover:text-primary-800 dark:border-white/20 dark:text-white">
               <Mail size={18} /> Book a demo <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
             </a>
           </Magnetic>

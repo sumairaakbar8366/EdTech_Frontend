@@ -7,6 +7,7 @@ import { useSchoolSettings, useSettingsAction } from '@/features/settings/hooks/
 import { settingsService } from '@/features/settings/services/settingsService';
 import { DAY_NAMES } from '@/lib/format';
 import { onSubmit } from '@/lib/forms';
+import { apiAsset } from '@/services/api/http';
 
 // The standard theme's colours, used for the preview and as the starting point for custom colours.
 const DEFAULT_PRIMARY = '#2f3e52';
@@ -44,7 +45,7 @@ export function BrandingCard() {
         <form onSubmit={onSubmit(() => save.mutate(undefined))} className="space-y-5">
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-slate-500/10 ring-1 ring-slate-500/10">
-              {s?.logoUrl ? <img src={s.logoUrl} alt="School logo" className="h-full w-full object-contain" /> : <ImagePlus className="text-slate-400" />}
+              {s?.logoUrl ? <img src={apiAsset(s.logoUrl)} alt="School logo" className="h-full w-full object-contain" /> : <ImagePlus className="text-slate-400" />}
             </div>
             <div className="flex flex-wrap gap-2">
               <input ref={fileInput} type="file" accept=".png,.jpg,.jpeg" className="hidden" onChange={(e) => e.target.files?.[0] && logo.mutate(e.target.files[0])} />
@@ -100,7 +101,7 @@ export function BrandingCard() {
         <motion.div key={`${shown.primaryColor}${shown.secondaryColor}`} initial={{ opacity: 0.6 }} animate={{ opacity: 1 }} className="overflow-hidden rounded-xl shadow-depth-3">
           <div className="p-5 text-white" style={{ background: `linear-gradient(135deg, ${shown.primaryColor}, ${shown.secondaryColor})` }}>
             <div className="flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-white/20">{s?.logoUrl && <img src={s.logoUrl} alt="" className="h-full w-full object-contain" />}</span>
+              <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-white/20">{s?.logoUrl && <img src={apiAsset(s.logoUrl)} alt="" className="h-full w-full object-contain" />}</span>
               <div>
                 <div className="font-display text-xl font-bold uppercase">{view.data?.school.name}</div>
                 <div className="text-sm text-white/80">{view.data?.school.address}</div>

@@ -5,6 +5,7 @@ import { Alert, Badge, Button, Card, ConfirmDialog, Field, Input, PageHeader, Se
 import { errorMessage } from '@/lib/errors';
 import { onSubmit } from '@/lib/forms';
 import { CATEGORY_LABEL, mediaUrl, useWebsiteAction, useWebsiteAdmin, websiteService, type MediaCategory, type WebsiteMedia, type WebsiteSettings } from '@/features/website/website';
+import { appRootUrl } from '@/config/site';
 
 const EMPTY: WebsiteSettings = { published: true, tagline: '', about: '', principalName: '', principalMessage: '', phone: '', email: '', address: '', mapUrl: '', facebookUrl: '', admissionsOpen: true, careersOpen: true, heroMediaId: null };
 
@@ -31,7 +32,8 @@ export function WebsiteEditorPage() {
   const setHero = useWebsiteAction((id: string) => websiteService.save({ heroMediaId: id }), 'Cover photo set');
 
   useEffect(() => {
-    if (data.data) setF({ ...EMPTY, ...Object.fromEntries(Object.entries(data.data.website).map(([k, v]) => [k, v ?? (typeof EMPTY[k as keyof WebsiteSettings] === 'string' ? '' : v)])) } as WebsiteSettings);
+    // Only the editable fields: the stored record also carries schoolId and timestamps, which the API rejects.
+    if (data.data) setF({ ...EMPTY, ...Object.fromEntries(Object.entries(data.data.website).filter(([k]) => k in EMPTY).map(([k, v]) => [k, v ?? (typeof EMPTY[k as keyof WebsiteSettings] === 'string' ? '' : v)])) } as WebsiteSettings);
   }, [data.data]);
 
   const text = (k: keyof WebsiteSettings) => (e: { target: { value: string } }) => setF({ ...f, [k]: e.target.value });
@@ -48,7 +50,7 @@ export function WebsiteEditorPage() {
         title="School website"
         sub="Your public site at this address: built from your school data, finished with your texts and photos"
         icon={Globe}
-        actions={<a href="/" target="_blank" rel="noreferrer" className="focus-ring inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-bold uppercase tracking-wide text-slate-700 ring-1 ring-slate-300 hover:bg-slate-50 dark:bg-white/5 dark:text-slate-200 dark:ring-white/10"><ExternalLink size={16} /> View website</a>}
+        actions={<a href={appRootUrl()} target="_blank" rel="noreferrer" className="focus-ring inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-bold uppercase tracking-wide text-slate-700 ring-1 ring-slate-300 hover:bg-slate-50 dark:bg-white/5 dark:text-slate-200 dark:ring-white/10"><ExternalLink size={16} /> View website</a>}
       />
       {data.isLoading && <Spinner />}
       {data.data && (

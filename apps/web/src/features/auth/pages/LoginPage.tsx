@@ -9,9 +9,11 @@ import { SplitText } from '@/components/motion/SplitText';
 import { Hero3D } from '@/components/effects/Hero3D';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { Alert, Button, Field, useFieldProps } from '@/components/ui';
-import { ApiError } from '@/services/api/http';
+import { ApiError, apiAsset } from '@/services/api/http';
 import { marketingOrigin, photo } from '@/config/site';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { OrDivider, SocialButtons } from '@/features/auth/components/SocialButtons';
+import { startSso } from '@/features/auth/sso';
 import { userAreas } from '@/app/router/SchoolRoutes';
 import { type Me, type Tenant } from '@/types/session';
 
@@ -80,11 +82,15 @@ export function LoginPage({ tenant }: { tenant: Tenant }) {
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    await signIn(() => login(identifier.trim(), password, remember));
+  }
+
+  async function signIn(attempt: () => Promise<Me>) {
     setError(null);
     setSubmitting(true);
     try {
       justSignedIn.current = true;
-      const signedIn = await login(identifier.trim(), password, remember);
+      const signedIn = await attempt();
       // Came from a link in an email or notification: continue there.
       const next = params.get('next');
       navigate(next && next.startsWith('/open?') ? next : homePath(signedIn), { replace: true });
@@ -164,20 +170,26 @@ export function LoginPage({ tenant }: { tenant: Tenant }) {
             <div className="relative z-10 space-y-5">
             <div className="text-center">
               {logo ? (
-                <img src={logo} alt="" className="mx-auto mb-4 h-14 w-14 rounded-2xl object-contain" />
+                <img src={apiAsset(logo)} alt="" className="mx-auto mb-4 h-14 w-14 rounded-2xl object-contain" />
               ) : null}
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-magenta-600 dark:text-magenta-300">{isPlatform ? 'Anet Cyber Solutions' : 'Welcome back'}</p>
               <h1 className="mt-1 text-3xl font-bold uppercase tracking-wide text-slate-900 dark:text-white">{heading}</h1>
               <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Sign in to continue</p>
             </div>
             {error && <Alert>{error}</Alert>}
+            {tenant.kind === 'school' && (
+              <>
+                <SocialButtons onProvider={(provider) => startSso({ provider, purpose: 'login', school: tenant.school.slug })} />
+                <OrDivider />
+              </>
+            )}
             {isPlatform ? (
               <Field label="Email">
                 <IconInput icon={Mail} type="email" autoComplete="username" required value={identifier} onChange={(e) => setIdentifier(e.target.value)} placeholder="you@company.com" />
               </Field>
             ) : (
-              <Field label="Email" hint="Your own email (e.g. Gmail). Students without an email: type your User ID, e.g. STU-2026-0142.">
-                <IconInput icon={identifier && !identifier.includes('@') && /^[a-z]{3}-/i.test(identifier) ? IdCard : Mail} type="text" inputMode="email" autoComplete="username" autoCapitalize="none" spellCheck={false} required value={identifier} onChange={(e) => setIdentifier(e.target.value)} placeholder="you@gmail.com" />
+              <Field label="Email or User ID" hint="Your email (e.g. Gmail) or your User ID, e.g. STU-2026-0142 or TCH-2026-0003.">
+                <IconInput icon={identifier && !identifier.includes('@') && /^[a-z]{3}-/i.test(identifier) ? IdCard : Mail} type="text" inputMode="email" autoComplete="username" autoCapitalize="none" spellCheck={false} required value={identifier} onChange={(e) => setIdentifier(e.target.value)} placeholder="you@gmail.com or STU-2026-0142" />
               </Field>
             )}
             <Field label="Password">

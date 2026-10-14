@@ -81,7 +81,7 @@ function PreviewCard({ x, y }: { x: MotionValue<number>; y: MotionValue<number> 
 }
 
 /** Full-screen hero: pointer spotlight, layered parallax depth, 3D scene and the main call to action. */
-export function HeroSection({ demoHref }: { demoHref: string }) {
+export function HeroSection({ demoHref, onStartTrial }: { demoHref: string; onStartTrial: () => void }) {
   const reduce = useReducedMotion();
   const { x, y } = usePointerParallax();
   const ref = useRef<HTMLElement>(null);
@@ -122,14 +122,15 @@ export function HeroSection({ demoHref }: { demoHref: string }) {
             administrator, accountant, teacher, student and parent.
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.5 }} className="mt-6 flex flex-wrap gap-3">
-            <motion.a
-              href={demoHref}
+            <motion.button
+              type="button"
+              onClick={onStartTrial}
               whileHover={{ y: -3, scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               className="focus-ring group inline-flex items-center gap-2 border border-orange-500 bg-magenta-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-magenta-600"
             >
               Start Free Month <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
-            </motion.a>
+            </motion.button>
             <motion.a
               whileHover={{ y: -3 }}
               whileTap={{ scale: 0.97 }}

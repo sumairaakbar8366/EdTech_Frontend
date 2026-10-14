@@ -30,7 +30,7 @@ export function LandingHeader() {
         </nav>
         <div className="ml-auto flex items-center gap-2">
           <ThemeToggle compact />
-          <Link to="/access?mode=login" aria-label="Sign in" title="Sign in" className="focus-ring inline-flex items-center gap-1.5 rounded-lg px-2 py-2 text-sm font-bold uppercase text-slate-700 hover:bg-slate-500/10 sm:gap-2 sm:px-3 dark:text-slate-200">
+          <Link to="/login" aria-label="Sign in" title="Sign in" className="focus-ring inline-flex items-center gap-1.5 rounded-lg px-2 py-2 text-sm font-bold uppercase text-slate-700 hover:bg-slate-500/10 sm:gap-2 sm:px-3 dark:text-slate-200">
             <LogIn size={16} /> <span className="hidden min-[420px]:inline">Sign in</span>
           </Link>
           <Link to="/access?mode=signup" aria-label="Sign up" title="Sign up" className="focus-ring inline-flex items-center gap-1.5 rounded-lg bg-brand px-2 py-2 text-sm font-bold uppercase text-white shadow-glow hover:brightness-110 sm:gap-2 sm:px-3">

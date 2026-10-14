@@ -38,7 +38,7 @@ const price = (p: PublicPlan) => (p.priceMonthly === null ? null : `${p.currency
 const limit = (n: number | null, unit: string) => (n === null ? `Unlimited ${unit}` : `Up to ${n.toLocaleString()} ${unit}`);
 
 /** The subscription plans with their current prices; Growth is highlighted. */
-export function PlansSection({ demoHref }: { demoHref: string }) {
+export function PlansSection({ demoHref, onStartTrial }: { demoHref: string; onStartTrial: () => void }) {
   const plans = usePlans();
   return (
     <section id="plans" className="relative overflow-hidden px-4 py-16 sm:px-8 sm:py-20">
@@ -67,12 +67,11 @@ export function PlansSection({ demoHref }: { demoHref: string }) {
                       <li key={`${lineIndex}-${line}`} className="flex items-center gap-2"><Check size={14} className="shrink-0 text-primary-600" /> {line}</li>
                     ))}
                   </ul>
-                  <a
-                    href={demoHref}
-                    className={`focus-ring mt-5 block border px-4 py-2 text-center text-sm font-semibold transition ${featured ? 'border-orange-500 bg-brand text-slate-950 hover:bg-magenta-600' : 'border-slate-200 bg-white text-slate-800 hover:border-primary-500 dark:border-white/10 dark:bg-white/5 dark:text-white'}`}
-                  >
-                    {t.priceMonthly === null ? 'Contact sales' : 'Start free trial'}
-                  </a>
+                  {t.priceMonthly === null ? (
+                    <a href={demoHref} className={`focus-ring mt-5 block border px-4 py-2 text-center text-sm font-semibold transition ${featured ? 'border-orange-500 bg-brand text-slate-950 hover:bg-magenta-600' : 'border-slate-200 bg-white text-slate-800 hover:border-primary-500 dark:border-white/10 dark:bg-white/5 dark:text-white'}`}>Contact sales</a>
+                  ) : (
+                    <button type="button" onClick={onStartTrial} className={`focus-ring mt-5 block w-full border px-4 py-2 text-center text-sm font-semibold transition ${featured ? 'border-orange-500 bg-brand text-slate-950 hover:bg-magenta-600' : 'border-slate-200 bg-white text-slate-800 hover:border-primary-500 dark:border-white/10 dark:bg-white/5 dark:text-white'}`}>Start free trial</button>
+                  )}
                 </Tilt>
               </motion.div>
             );
