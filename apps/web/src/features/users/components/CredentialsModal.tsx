@@ -39,7 +39,13 @@ function LoginCard({ c, schoolName }: { c: LoginHandover; schoolName: string }) 
       </div>
       <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
         <span className="min-w-0">
-          {!c.user.email
+          {c.emailedTo !== undefined
+            ? c.emailedTo
+              ? <>The new sign-in details were emailed to <strong>{c.emailedTo}</strong>.</>
+              : c.user.email
+                ? <>Could not email <strong>{c.user.email}</strong> just now. Hand these details over yourself.</>
+                : 'No email on file: hand these details over in person.'
+            : !c.user.email
             ? 'No email on file: they sign in with the User ID. Hand these details over in person.'
             : c.user.emailVerified
               ? <>Also emailed to <strong>{c.user.email}</strong> (verified), with the temporary password.</>

@@ -53,6 +53,8 @@ export function SsoCallbackPage() {
   const [error, setError] = useState<string | null>(result.ok ? null : result.message);
   const [choices, setChoices] = useState<{ school: string; name: string }[] | null>(null);
   const [busy, setBusy] = useState(false);
+  /** Signed in with Google but has no account yet: continue into the free trial. */
+  const [trial, setTrial] = useState(false);
   const started = useRef(false);
   const request = result.request;
 
@@ -64,7 +66,7 @@ export function SsoCallbackPage() {
     marketingService
       .socialTicket({ provider: result.request.provider, credential: result.credential, nonce: result.nonce, school })
       .then(
-        (r) => ('continueUrl' in r ? window.location.replace(r.continueUrl) : setChoices(r.choose)),
+        (r) => ('continueUrl' in r ? window.location.replace(r.continueUrl) : 'noAccount' in r ? setTrial(true) : setChoices(r.choose)),
         (e) => setError(errorMessage(e, 'You could not be signed in. Please try again.')),
       )
       .finally(() => setBusy(false));
@@ -75,12 +77,12 @@ export function SsoCallbackPage() {
     ticket(result.request.school);
   }, [result]);
 
-  const signup = request?.purpose !== 'login';
+  const signup = request?.purpose !== 'login' || trial;
   return (
     <AuthCard
       icon={signup ? UserPlus : LogIn}
       title={signup ? 'Start your free trial' : 'Signing you in'}
-      sub={!error && result.ok && !signup ? 'Opening your school…' : undefined}
+      sub={trial ? 'No account uses this Google email yet. Create your school on a free trial.' : !error && result.ok && !signup ? 'Opening your school…' : undefined}
       back={false}
     >
       {choices ? (

@@ -24,4 +24,13 @@ export default defineConfig({
       '/api': { target: 'http://localhost:3000', changeOrigin: false },
     },
   },
+  // Production: `vite build`, then `vite preview` serves dist/ (with the same /api proxy) behind nginx.
+  preview: {
+    port: 5173,
+    strictPort: true,
+    allowedHosts: ['.localhost', '.ed-tech.anetcybersolution.com'],
+    proxy: {
+      '/api': { target: 'http://localhost:3000', changeOrigin: false },
+    },
+  },
 });

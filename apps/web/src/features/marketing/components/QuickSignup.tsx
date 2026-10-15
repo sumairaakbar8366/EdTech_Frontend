@@ -43,35 +43,75 @@ export function SignupDone({ result }: { result: SignupResult }) {
   );
 }
 
-/** After "Continue with Google": only the school's name is still needed. */
+/**
+ * After "Continue with Google": the school's name, then a 6-digit code emailed to that Google
+ * address (Google proves the account is real; the code proves this person reads its inbox).
+ */
 export function ProviderSignupFinish({ provider, credential, nonce, email, name }: { provider: SocialProvider; credential: string; nonce: string; email?: string; name?: string }) {
+  const config = useAuthConfig();
+  const codeNeeded = config.data?.emailVerification !== 'off';
   const [schoolName, setSchoolName] = useState('');
+  const [verificationId, setVerificationId] = useState<string | null>(null);
+  const [code, setCode] = useState('');
   const [result, setResult] = useState<SignupResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   if (result) return <SignupDone result={result} />;
-  const create = async () => {
+  const run = async (fn: () => Promise<void>) => {
     setBusy(true);
     setError(null);
     try {
-      setResult(await marketingService.quickSignup({ schoolName: schoolName.trim(), provider, credential, nonce }));
+      await fn();
     } catch (e) {
       setError(errorMessage(e, 'Your school could not be created. Please try again.'));
     } finally {
       setBusy(false);
     }
   };
+  const create = (extra: Partial<QuickSignupBody> = {}) => run(async () => setResult(await marketingService.quickSignup({ schoolName: schoolName.trim(), provider, credential, nonce, ...extra })));
+  const sendCode = () =>
+    run(async () => {
+      if (!codeNeeded) return void (await create());
+      if (!email) throw new Error('Your Google email could not be read. Please continue with Google again.');
+      const r = await marketingService.signupCode(email.toLowerCase());
+      if (r.skipped || !r.verificationId) return void (await create());
+      setVerificationId(r.verificationId);
+      setCode('');
+    });
+
+  const account = (
+    <div className="rounded-lg border border-slate-200 px-4 py-3 text-sm dark:border-white/10">
+      <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Signed in with {PROVIDER_LABEL[provider]}</div>
+      <div className="mt-0.5 font-semibold text-slate-900 dark:text-white">{name ?? email}</div>
+      {name && email && <div className="text-slate-500">{email}</div>}
+    </div>
+  );
+
+  if (verificationId) {
+    return (
+      <form onSubmit={onSubmit(() => void create({ verificationId, code }))} className="space-y-4">
+        {error && <Alert>{error}</Alert>}
+        {account}
+        <Alert tone="info">To confirm it is really you, we sent a 6-digit code to <strong>{email}</strong>. It is valid for 10 minutes.</Alert>
+        <Field label="Verification code">
+          <Input required autoFocus inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} className="font-mono text-2xl tracking-[0.4em]" />
+        </Field>
+        <Button type="submit" icon={MailCheck} loading={busy} className="w-full py-3" disabled={code.length !== 6}>Verify &amp; create my school</Button>
+        <div className="flex items-center justify-between gap-3 text-sm">
+          <button type="button" onClick={() => { setError(null); setVerificationId(null); }} className="inline-flex items-center gap-1 font-semibold text-slate-600 hover:underline dark:text-slate-300"><ArrowLeft size={15} /> Back</button>
+          <button type="button" disabled={busy} onClick={() => void sendCode()} className="font-semibold text-orange-700 hover:underline disabled:opacity-50 dark:text-orange-300">Send a new code</button>
+        </div>
+      </form>
+    );
+  }
+
   return (
-    <form onSubmit={onSubmit(() => void create())} className="space-y-4">
+    <form onSubmit={onSubmit(() => void sendCode())} className="space-y-4">
       {error && <Alert>{error}</Alert>}
-      <div className="rounded-lg border border-slate-200 px-4 py-3 text-sm dark:border-white/10">
-        <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Signed in with {PROVIDER_LABEL[provider]}</div>
-        <div className="mt-0.5 font-semibold text-slate-900 dark:text-white">{name ?? email}</div>
-        {name && email && <div className="text-slate-500">{email}</div>}
-      </div>
+      {account}
       <AdminNotice />
       <Field label="Your school’s name"><Input required autoFocus maxLength={150} value={schoolName} onChange={(e) => setSchoolName(e.target.value)} placeholder="Greenfield High School" /></Field>
-      <Button type="submit" icon={ArrowRight} loading={busy} className="w-full py-3" disabled={!schoolName.trim()}>Create my school</Button>
+      <Button type="submit" icon={ArrowRight} loading={busy} className="w-full py-3" disabled={!schoolName.trim()}>{codeNeeded ? 'Continue' : 'Create my school'}</Button>
       <Privacy />
     </form>
   );

@@ -1,4 +1,4 @@
-import type { ConsoleLogin, ConsolePerson, Finance, Growth, Paged, Phase, PersonKind, SchoolDetail, SchoolsPage } from '@/features/platform/types/console.types';
+import type { ConsoleLogin, ConsolePerson, Finance, Growth, OwnerNotificationsPage, Paged, Phase, PersonKind, SchoolDetail, SchoolsPage } from '@/features/platform/types/console.types';
 import { api } from '@/services/api/http';
 
 const qs = (o: Record<string, string | number | boolean | undefined>) =>
@@ -11,6 +11,9 @@ export const consoleService = {
   people: (q: { type: PersonKind; schoolId: string; q?: string; page: number }) => api<Paged<ConsolePerson>>(`/platform/console/people?${qs(q)}`),
   logins: (schoolId: string, q: { q?: string; page: number }) => api<Paged<ConsoleLogin>>(`/platform/console/schools/${schoolId}/logins?${qs(q)}`),
   growth: () => api<Growth>('/platform/console/growth'),
+  notifications: (q: { show: 'all' | 'unread'; page: number; pageSize?: number }) => api<OwnerNotificationsPage>(`/platform/console/notifications?${qs(q)}`),
+  /** Marks these notifications read (all when `ids` is omitted). */
+  markRead: (ids?: string[]) => api<void>('/platform/console/notifications/read', { method: 'POST', body: { ids } }),
   finance: () => api<Finance>('/platform/console/finance'),
   /** A one-time link into the school as its hidden support admin (opens in a new tab). */
   support: (schoolId: string) => api<{ url: string }>(`/platform/schools/${schoolId}/support-session`, { method: 'POST' }),

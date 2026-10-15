@@ -14,3 +14,5 @@ export const useSchoolPeople = (q: { type: PersonKind; schoolId: string; q?: str
   useQuery({ queryKey: [...CONSOLE_KEY, 'people', q], queryFn: () => consoleService.people(q), placeholderData: keepPreviousData });
 export const useGrowth = () => useQuery({ queryKey: [...CONSOLE_KEY, 'growth'], queryFn: consoleService.growth, refetchInterval: 120_000 });
 export const useFinance = () => useQuery({ queryKey: [...CONSOLE_KEY, 'finance'], queryFn: consoleService.finance, refetchInterval: 60_000 });
+export const useOwnerNotifications = (q: { show: 'all' | 'unread'; page: number; pageSize?: number }, refetchInterval = 30_000) =>
+  useQuery({ queryKey: [...CONSOLE_KEY, 'notifications', q], queryFn: () => consoleService.notifications(q), placeholderData: keepPreviousData, refetchInterval, staleTime: 0 });

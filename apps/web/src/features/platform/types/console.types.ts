@@ -98,3 +98,22 @@ export interface ConsoleLogin {
   lastLoginMethod: string | null;
   createdAt: string;
 }
+
+export type OwnerNotificationKind = 'school_signup' | 'school_application' | 'payment_received' | 'password_reset_request' | 'user_id_request' | 'password_reset_done';
+
+export interface OwnerNotification {
+  id: string;
+  kind: OwnerNotificationKind;
+  title: string;
+  body: string | null;
+  /** Console path, e.g. "/schools/<id>". */
+  link: string | null;
+  schoolId: string | null;
+  actor: string | null;
+  readAt: string | null;
+  createdAt: string;
+}
+
+export interface OwnerNotificationsPage extends Paged<OwnerNotification> {
+  unread: number;
+}

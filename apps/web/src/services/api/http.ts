@@ -29,6 +29,19 @@ export const apiUrl = (path: string) => `${apiBase}${path}`;
 export const apiAsset = (url: string | null | undefined) => (url && url.startsWith('/api/') ? apiUrl(url.slice(4)) : url ?? undefined);
 let refreshInFlight: Promise<boolean> | null = null;
 
+/**
+ * Calls that change the session cookie run one at a time, in this tab and across tabs. The refresh
+ * token rotates and a reused one ends the session, so a refresh racing a sign-in (the /welcome
+ * ticket) or another tab's refresh would sign the person out ("Session expired").
+ */
+let sessionQueue: Promise<unknown> = Promise.resolve();
+function exclusive<T>(fn: () => Promise<T>): Promise<T> {
+  if (typeof navigator !== 'undefined' && navigator.locks) return navigator.locks.request(`schoolerp-session:${apiBase}`, fn);
+  const run = sessionQueue.then(fn, fn);
+  sessionQueue = run.catch(() => undefined);
+  return run;
+}
+
 export function setAccessToken(token: string | null): void {
   accessToken = token;
 }
@@ -68,7 +81,7 @@ function errorMessage(body: unknown): string | undefined {
 
 /** Exchanges the refresh cookie for a new access token. Concurrent callers share one request. */
 export function refreshSession(): Promise<boolean> {
-  refreshInFlight ??= (async () => {
+  refreshInFlight ??= exclusive(async () => {
     try {
       const res = await send('/auth/refresh', { method: 'POST' });
       if (!res.ok) {
@@ -83,7 +96,7 @@ export function refreshSession(): Promise<boolean> {
     } finally {
       refreshInFlight = null;
     }
-  })();
+  });
   return refreshInFlight;
 }
 
@@ -141,26 +154,34 @@ export async function download(path: string, fileName: string): Promise<void> {
 
 /** `identifier`: the User ID on a school's site, the email on the platform console. */
 export async function login(identifier: string, password: string, remember = false): Promise<void> {
-  const tokens = await api<TokenResponse>('/auth/login', { method: 'POST', body: { identifier, password, remember } });
-  setAccessToken(tokens.accessToken);
+  await exclusive(async () => {
+    const tokens = await api<TokenResponse>('/auth/login', { method: 'POST', body: { identifier, password, remember } });
+    setAccessToken(tokens.accessToken);
+  });
 }
 
 /** Exchanges a one-time ticket (sign-up or support hand-over) for a session on this host. */
 export async function exchangeTicket(ticket: string): Promise<void> {
-  const tokens = await api<TokenResponse>('/auth/ticket', { method: 'POST', body: { ticket } });
-  setAccessToken(tokens.accessToken);
+  await exclusive(async () => {
+    const tokens = await api<TokenResponse>('/auth/ticket', { method: 'POST', body: { ticket } });
+    setAccessToken(tokens.accessToken);
+  });
 }
 
 export async function logout(): Promise<void> {
-  try {
-    await api<void>('/auth/logout', { method: 'POST' });
-  } finally {
-    setAccessToken(null);
-  }
+  await exclusive(async () => {
+    try {
+      await api<void>('/auth/logout', { method: 'POST' });
+    } finally {
+      setAccessToken(null);
+    }
+  });
 }
 
 /** Replaces the signed-in user's password; the session continues with a fresh access token. */
 export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
-  const tokens = await api<TokenResponse>('/auth/change-password', { method: 'POST', body: { currentPassword, newPassword } });
-  setAccessToken(tokens.accessToken);
+  await exclusive(async () => {
+    const tokens = await api<TokenResponse>('/auth/change-password', { method: 'POST', body: { currentPassword, newPassword } });
+    setAccessToken(tokens.accessToken);
+  });
 }

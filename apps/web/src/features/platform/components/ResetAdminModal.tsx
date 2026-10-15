@@ -12,10 +12,10 @@ interface SchoolAdmin { id: string; loginId: string; firstName: string; lastName
 /** Account recovery for a locked-out school admin: a one-time temporary password. */
 export function ResetAdminModal({ school, onClose }: { school: SchoolSummary | null; onClose: () => void }) {
   const admins = useQuery({ queryKey: ['platform', 'school-admins', school?.id], queryFn: () => api<SchoolAdmin[]>(`/platform/schools/${school!.id}/admins`), enabled: !!school });
-  const [result, setResult] = useState<{ loginId: string; password: string } | null>(null);
+  const [result, setResult] = useState<{ loginId: string; password: string; emailedTo: string | null } | null>(null);
   const [copied, setCopied] = useState(false);
-  const reset = useAction((userId: string) => api<{ user: SchoolAdmin; temporaryPassword: string }>(`/platform/schools/${school!.id}/admins/${userId}/reset-password`, { method: 'POST' }), {
-    onDone: (r) => setResult({ loginId: r.user.loginId, password: r.temporaryPassword }),
+  const reset = useAction((userId: string) => api<{ user: SchoolAdmin; temporaryPassword: string; emailedTo: string | null }>(`/platform/schools/${school!.id}/admins/${userId}/reset-password`, { method: 'POST' }), {
+    onDone: (r) => setResult({ loginId: r.user.loginId, password: r.temporaryPassword, emailedTo: r.emailedTo }),
   });
   const close = () => { setResult(null); setCopied(false); onClose(); };
   if (!school) return null;
@@ -24,7 +24,10 @@ export function ResetAdminModal({ school, onClose }: { school: SchoolSummary | n
     <Modal open title={`Reset admin password · ${school.name}`} onClose={close} footer={<Button onClick={close}>Done</Button>}>
       {result ? (
         <div className="space-y-4">
-          <Alert tone="info">Shown only once. The admin must choose a new password at sign-in; their other sessions were signed out.</Alert>
+          <Alert tone="info">
+            {result.emailedTo ? <>The new sign-in details were emailed to <strong>{result.emailedTo}</strong>. </> : 'Not emailed (no email on file or sending failed): copy the details below and send them yourself. '}
+            Shown only once. The admin must choose a new password at sign-in; their other sessions were signed out.
+          </Alert>
           <div className="rounded-lg border border-slate-200 p-4 font-mono dark:border-white/10"><div>{result.loginId}</div><div className="text-xl font-bold tracking-wider">{result.password}</div></div>
           <Button variant="secondary" icon={copied ? Check : Copy} onClick={() => void navigator.clipboard.writeText(message).then(() => setCopied(true))}>{copied ? 'Copied' : 'Copy login details'}</Button>
         </div>

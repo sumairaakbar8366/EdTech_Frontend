@@ -46,12 +46,16 @@ export interface Candidate {
 export interface Credentials {
   user: SchoolLogin;
   temporaryPassword: string;
+  /** After a password reset: where the new details were emailed (null = not emailed). */
+  emailedTo?: string | null;
 }
 
 /** What a credentials hand-over needs: a new login from hiring, staff, enrolment or Users & Access. */
 export interface LoginHandover {
   user: Pick<SchoolLogin, 'firstName' | 'lastName' | 'loginId' | 'email'> & { emailVerified?: boolean; roles: { name: string }[] };
   temporaryPassword: string;
+  /** After a password reset: where the new details were emailed (null = not emailed). */
+  emailedTo?: string | null;
 }
 
 /** A new login as the API returns it (shown once). */
