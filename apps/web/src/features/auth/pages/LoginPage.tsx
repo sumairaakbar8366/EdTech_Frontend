@@ -1,5 +1,5 @@
-import { GraduationCap, IdCard, KeyRound, Mail, ShieldCheck, Sparkles } from 'lucide-react';
-import { useEffect, useRef, useState, type FormEvent, type InputHTMLAttributes } from 'react';
+import { IdCard, KeyRound, Mail, ShieldCheck, Sparkles } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState, type FormEvent, type InputHTMLAttributes } from 'react';
 import type { CSSProperties } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { motion } from 'motion/react';
@@ -16,6 +16,9 @@ import { OrDivider, SocialButtons } from '@/features/auth/components/SocialButto
 import { startSso } from '@/features/auth/sso';
 import { userAreas } from '@/app/router/SchoolRoutes';
 import { type Me, type Tenant } from '@/types/session';
+import { BrandLoader, holdLoader, useResetOnRestore } from '@/components/brand/BrandLoader';
+import { BrandLockup } from '@/components/brand/BrandLogo';
+import { PRODUCT_NAME } from '@/config/brand';
 
 function IconInput({ icon: Icon, ...props }: InputHTMLAttributes<HTMLInputElement> & { icon: typeof Mail }) {
   const fieldProps = useFieldProps();
@@ -63,6 +66,7 @@ export function LoginPage({ tenant }: { tenant: Tenant }) {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [remember, setRemember] = useState(false);
+  useResetOnRestore(useCallback(() => setSubmitting(false), []));
 
   // The sign-in page always starts fresh (the school address and /login both open it): an earlier
   // session in this browser is signed out, so whoever signs in next lands on their own dashboard.
@@ -88,9 +92,11 @@ export function LoginPage({ tenant }: { tenant: Tenant }) {
   async function signIn(attempt: () => Promise<Me>) {
     setError(null);
     setSubmitting(true);
+    const startedAt = performance.now();
     try {
       justSignedIn.current = true;
       const signedIn = await attempt();
+      await holdLoader(startedAt);
       // Came from a link in an email or notification: continue there.
       const next = params.get('next');
       navigate(next && next.startsWith('/open?') ? next : homePath(signedIn), { replace: true });
@@ -111,20 +117,17 @@ export function LoginPage({ tenant }: { tenant: Tenant }) {
   return (
     <div className="relative grid min-h-dvh lg:grid-cols-2" style={brandColor ? { '--brand-primary': brandColor } as CSSProperties : undefined}>
       <Backdrop />
+      <BrandLoader show={submitting} label="Signing in" />
 
       {/* 3D hero */}
       <div className="relative hidden flex-col justify-start overflow-hidden p-10 lg:flex">
         <div className="flex items-center gap-3">
-          <span className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-brand text-white shadow-glow">
-            <span className="absolute inset-x-0 top-0 h-1/2 rounded-2xl bg-linear-to-b from-white/40 to-transparent" />
-            <GraduationCap size={22} className="relative" />
-          </span>
-          <span><span className="block font-display text-xl font-bold uppercase tracking-wide text-slate-900 dark:text-white">Anet Cyber Solutions</span><span className="block text-xs font-semibold uppercase text-magenta-600 dark:text-magenta-300">SchoolERP</span></span>
+          <BrandLockup size="lg" />
         </div>
         <div className="relative z-10 my-auto mx-auto max-w-md lg:translate-x-6 xl:translate-x-12">
           <SlideShow
             tone="dark"
-            label="Why SchoolERP"
+            label={`Why ${PRODUCT_NAME}`}
             slides={PITCH.map((p) => ({
               key: p.key,
               content: (
@@ -172,7 +175,7 @@ export function LoginPage({ tenant }: { tenant: Tenant }) {
               {logo ? (
                 <img src={apiAsset(logo)} alt="" className="mx-auto mb-4 h-14 w-14 rounded-2xl object-contain" />
               ) : null}
-              <p className="text-sm font-bold uppercase tracking-[0.2em] text-magenta-600 dark:text-magenta-300">{isPlatform ? 'Anet Cyber Solutions' : 'Welcome back'}</p>
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-magenta-600 dark:text-magenta-300">{isPlatform ? PRODUCT_NAME : 'Welcome back'}</p>
               <h1 className="mt-1 text-3xl font-bold uppercase tracking-wide text-slate-900 dark:text-white">{heading}</h1>
               <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Sign in to continue</p>
             </div>

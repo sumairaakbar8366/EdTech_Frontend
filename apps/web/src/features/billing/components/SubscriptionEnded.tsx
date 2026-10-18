@@ -3,6 +3,7 @@ import { AreaLink } from '@/app/router/area';
 import { Button } from '@/components/ui';
 import { useAuth } from '@/features/auth/AuthProvider';
 import type { SubscriptionState } from '@/features/billing/billing';
+import { PRODUCT_NAME } from '@/config/brand';
 
 /**
  * Shown on every page once the trial (or plan) and its grace days have ended. The school is locked:
@@ -29,7 +30,7 @@ export function SubscriptionEnded({ state, isAdmin }: { state: SubscriptionState
         ) : (
           <>
             <p className="mt-2 text-base text-slate-600 dark:text-slate-300">
-              Your school’s SchoolERP subscription needs to be renewed. Please contact your school office; as soon as they renew, you can continue where you left off.
+              Your school’s {PRODUCT_NAME} subscription needs to be renewed. Please contact your school office; as soon as they renew, you can continue where you left off.
             </p>
             <div className="mt-6 flex justify-center"><Button variant="secondary" icon={LogOut} onClick={() => void logout()}>Sign out</Button></div>
           </>

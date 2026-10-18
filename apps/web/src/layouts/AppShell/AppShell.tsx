@@ -49,12 +49,12 @@ export function AppShell({ title, subtitle, nav, userName, userDetail, brandColo
 
   return (
     <MotionConfig reducedMotion="user">
-    <div className="flex h-dvh overflow-hidden" style={{ '--sidebar-size': `${sidebar.size}px`, ...(brandColor ? { '--brand-primary': brandColor, '--brand-action': brandColor } : {}) } as CSSProperties}>
+    <div className="flex h-dvh overflow-hidden" style={{ '--sidebar-size': `${sidebar.size}px`, '--sidebar-reserved': `${sidebar.reserved}px`, ...(brandColor ? { '--brand-primary': brandColor, '--brand-action': brandColor } : {}) } as CSSProperties}>
       <Backdrop variant="app" />
       {sidebar.open && <div className="fixed inset-0 z-30 bg-slate-950/50 lg:hidden" onClick={() => sidebar.setOpen(false)} />}
-      <Sidebar title={title} subtitle={subtitle} nav={nav} userName={userName} userDetail={userDetail} state={sidebar} />
+      <Sidebar nav={nav} userName={userName} userDetail={userDetail} state={sidebar} />
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <Header title={title} pageTitle={current?.label ?? pageTitle(pathname, titleOffset)} areas={areas} actions={headerActions} onOpenMenu={() => sidebar.setOpen(true)} />
+        <Header title={subtitle ? `${title} · ${subtitle}` : title} pageTitle={current?.label ?? pageTitle(pathname, titleOffset)} areas={areas} actions={headerActions} onOpenMenu={() => sidebar.setOpen(true)} />
         <div ref={scroller} className="flex-1 overflow-x-hidden overflow-y-auto">
           <div className="mx-auto w-full max-w-[1480px] px-4 py-5 sm:px-6 sm:py-7 xl:px-10">
             {banner}

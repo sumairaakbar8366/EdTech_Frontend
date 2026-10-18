@@ -1,0 +1,22 @@
+# EdTech: search engines may list the home page and each school's public website
+# (/<school>). Sign-in pages, the owner console and every dashboard stay out of search.
+User-agent: *
+Allow: /$
+Disallow: /login
+Disallow: /access
+Disallow: /signup
+Disallow: /sso/
+Disallow: /pay/
+Disallow: /console
+# Dashboards and sign-in pages live under /<school>/…; the school's site itself is /<school>.
+Disallow: /*/
+# What a crawler needs to render the public pages.
+Allow: /assets/
+Allow: /images/
+Allow: /og-image.jpg
+Allow: /brand/
+Disallow: /api/
+Allow: /api/public/
+Allow: /api/s/*/public/
+
+Sitemap: https://ed-tech.anetcybersolution.com/sitemap.xml

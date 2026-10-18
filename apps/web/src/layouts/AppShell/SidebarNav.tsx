@@ -6,7 +6,7 @@ import type { ShellNavItem } from '@/layouts/AppShell/types';
 /** Main menu on the greyish-blue sidebar; the active item gets a light fill and an orange marker. */
 export function SidebarNav({ nav, compact, onNavigate }: { nav: readonly ShellNavItem[]; compact: boolean; onNavigate: () => void }) {
   return (
-    <nav className="relative flex-1 space-y-0.5 overflow-y-auto px-3 pb-4" aria-label="Main">
+    <nav className="relative flex-1 space-y-0.5 overflow-x-hidden overflow-y-auto px-3 pb-4" aria-label="Main">
       {nav.map((item) => {
         const [Icon] = navVisual(item.label);
         return (

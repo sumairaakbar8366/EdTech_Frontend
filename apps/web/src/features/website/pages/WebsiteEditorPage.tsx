@@ -6,8 +6,10 @@ import { errorMessage } from '@/lib/errors';
 import { onSubmit } from '@/lib/forms';
 import { CATEGORY_LABEL, mediaUrl, useWebsiteAction, useWebsiteAdmin, websiteService, type MediaCategory, type WebsiteMedia, type WebsiteSettings } from '@/features/website/website';
 import { appRootUrl } from '@/config/site';
+import { SocialFields } from '@/features/website/components/SocialFields';
+import { EMPTY_SOCIAL } from '@/features/website/social';
 
-const EMPTY: WebsiteSettings = { published: true, tagline: '', about: '', principalName: '', principalMessage: '', phone: '', email: '', address: '', mapUrl: '', facebookUrl: '', admissionsOpen: true, careersOpen: true, heroMediaId: null };
+const EMPTY: WebsiteSettings = { published: true, tagline: '', about: '', principalName: '', principalMessage: '', phone: '', email: '', address: '', mapUrl: '', ...EMPTY_SOCIAL, admissionsOpen: true, careersOpen: true, heroMediaId: null };
 
 function Toggle({ label, hint, checked, onChange }: { label: string; hint: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -74,8 +76,11 @@ export function WebsiteEditorPage() {
                 <Field label="Email"><Input type="email" maxLength={254} value={f.email ?? ''} onChange={text('email')} /></Field>
                 <div className="sm:col-span-2"><Field label="Address"><Input maxLength={300} value={f.address ?? ''} onChange={text('address')} /></Field></div>
                 <Field label="Google Maps embed link" hint="Maps → Share → Embed a map → copy the https link"><Input type="url" maxLength={600} value={f.mapUrl ?? ''} onChange={text('mapUrl')} /></Field>
-                <Field label="Facebook page"><Input type="url" maxLength={300} value={f.facebookUrl ?? ''} onChange={text('facebookUrl')} /></Field>
               </div>
+            </Card>
+            <Card title="Social media" icon={Globe}>
+              <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">Add your school's own accounts. They appear on your website and help Google connect them to your school. Leave a field empty to hide it.</p>
+              <SocialFields value={f} onChange={(v) => setF({ ...f, ...v })} />
             </Card>
             <Card title="Switches" icon={Globe}>
               <div className="grid gap-3">

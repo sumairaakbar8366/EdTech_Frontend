@@ -1,9 +1,9 @@
-import { ArrowRight, Briefcase, Building2, CalendarDays, CheckCircle2, ClipboardList, ExternalLink, FileCheck2, GraduationCap, LogIn, Mail, MapPin, Menu, PhoneCall, Phone, Quote, Send, UserCheck, Users, X } from 'lucide-react';
+import { ArrowRight, Briefcase, Building2, CalendarDays, CheckCircle2, ClipboardList, FileCheck2, GraduationCap, LogIn, Mail, MapPin, Menu, PhoneCall, Phone, Quote, Send, UserCheck, Users, X } from 'lucide-react';
 import { JobApplyModal } from '@/features/website/components/JobApplyModal';
 import { SiteArtwork } from '@/features/website/components/SiteArtwork';
 import { SiteGallery } from '@/features/website/components/SiteGallery';
 import { motion } from 'motion/react';
-import { useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import { Alert, Button, CompactNumber, Field, FullPageMessage, Input, Select, TextArea } from '@/components/ui';
 import { useForcedLightTheme } from '@/app/providers/ThemeProvider';
@@ -17,6 +17,9 @@ import { errorMessage } from '@/lib/errors';
 import { apiAsset } from '@/services/api/http';
 import { onSubmit } from '@/lib/forms';
 import '@/features/website/school-site.css';
+import { SocialLinks } from '@/features/website/components/SocialLinks';
+import { socialEntries } from '@/features/website/social';
+import { PRODUCT_NAME } from '@/config/brand';
 
 const Reveal = ({ children, className = '' }: { children: ReactNode; className?: string }) => (
   <motion.div initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-8% 0px' }} transition={{ duration: 0.5, ease: 'easeOut' }} className={className}>
@@ -131,6 +134,10 @@ export function SchoolSitePage() {
   const branding = tenant.data?.kind === 'school' ? tenant.data.school.branding : null;
   const primary = site.data?.school.primaryColor ?? branding?.primaryColor ?? null;
   const palette = useMemo(() => sitePalette(primary, branding?.secondaryColor), [primary, branding?.secondaryColor]);
+  // The server writes the same title into the page for search engines; this keeps the tab in step.
+  useEffect(() => {
+    if (site.data) document.title = `${site.data.school.name} | ${site.data.tagline}`;
+  }, [site.data]);
 
   if (site.isLoading) return <FullPageMessage title="Loading…" />;
   if (!site.data) return <FullPageMessage title="This website is not available" icon={Building2}>Please try again later.</FullPageMessage>;
@@ -435,7 +442,12 @@ export function SchoolSitePage() {
               {s.contact.email && <a href={`mailto:${s.contact.email}`} className="flex items-center gap-4 text-slate-700 hover:text-(--site-accent)"><span className="flex h-10 w-10 items-center justify-center rounded-full bg-(--site-accent-soft) text-(--site-accent)"><Mail size={18} /></span><span><span className="block text-xs uppercase tracking-[0.14em] text-slate-400">Email</span><span className="font-semibold">{s.contact.email}</span></span></a>}
               {s.contact.address && <p className="flex items-start gap-4 text-slate-700"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-(--site-accent-soft) text-(--site-accent)"><MapPin size={18} /></span><span><span className="block text-xs uppercase tracking-[0.14em] text-slate-400">Address</span><span className="font-semibold">{s.contact.address}</span></span></p>}
               {!hasContact && <p className="text-slate-500">Contact details will be added soon. Meanwhile, parents and staff can reach the school through the portal.</p>}
-              {s.contact.facebookUrl && <a href={s.contact.facebookUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 border-t border-(--site-line) pt-5 font-semibold text-slate-700 hover:text-(--site-accent)"><ExternalLink size={18} /> Follow us on Facebook</a>}
+              {socialEntries(s.contact).length > 0 && (
+                <div className="border-t border-(--site-line) pt-5">
+                  <span className="mb-3 block text-xs uppercase tracking-[0.14em] text-slate-400">Follow us</span>
+                  <SocialLinks links={s.contact} linkClassName="bg-white text-slate-700 ring-(--site-line) hover:text-(--site-accent)" />
+                </div>
+              )}
             </Panel>
             {s.contact.mapUrl ? (
               <iframe title="Map" src={s.contact.mapUrl} className="h-80 w-full rounded-md border border-(--site-line) bg-white" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
@@ -483,7 +495,7 @@ export function SchoolSitePage() {
         <div className={classic ? 'border-t border-white/10' : 'border-t border-(--site-line) bg-(--site-page)'}>
           <div className={`mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 text-xs sm:px-6 ${classic ? 'text-slate-400' : 'text-slate-500'}`}>
             <span>© {new Date().getFullYear()} {s.school.name}. All rights reserved.</span>
-            <span>School website by <strong className={`font-semibold ${classic ? 'text-slate-200' : 'text-slate-700'}`}>SchoolERP</strong> · Anet Cyber Solutions</span>
+            <span>School website by <strong className={`font-semibold ${classic ? 'text-slate-200' : 'text-slate-700'}`}>{PRODUCT_NAME}</strong></span>
           </div>
         </div>
       </footer>

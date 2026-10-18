@@ -1,6 +1,7 @@
 import { ArrowRight, LogIn, Mail, Rocket } from 'lucide-react';
 import { motion, useMotionTemplate, useMotionValue, useReducedMotion, useSpring } from 'motion/react';
 import type { PointerEvent, ReactNode } from 'react';
+import { PRODUCT_NAME } from '@/config/brand';
 
 /** A button that leans toward the pointer while it hovers nearby. */
 function Magnetic({ children }: { children: ReactNode }) {
@@ -44,7 +45,7 @@ export function CtaSection({ demoHref, onFindSchool, onStartTrial }: { demoHref:
         className="relative mx-auto max-w-4xl px-4 py-16 text-center text-slate-900 sm:px-8 sm:py-20 dark:text-white"
       >
         <span className="inline-block border-l-2 border-orange-500 bg-primary-50 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary-700 dark:bg-primary-500/10 dark:text-primary-200">Get started</span>
-        <h2 className="mx-auto mt-3 max-w-2xl font-display font-semibold">See SchoolERP with your own school’s data</h2>
+        <h2 className="mx-auto mt-3 max-w-2xl font-display font-semibold">See {PRODUCT_NAME} with your own school’s data</h2>
         <p className="mx-auto mt-3 max-w-2xl text-base leading-7 text-slate-600 dark:text-primary-100">Sign up with your own email and your school is ready in two minutes: a free one-month trial with every module and every role, no card needed.</p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
           <Magnetic>

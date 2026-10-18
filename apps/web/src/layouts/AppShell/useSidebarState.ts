@@ -1,8 +1,12 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
+import { useEffect, useRef, useState, type FocusEvent, type KeyboardEvent, type PointerEvent } from 'react';
 
 export const SIDEBAR_MIN = 216;
 export const SIDEBAR_MAX = 360;
-const COMPACT_WIDTH = 72;
+export const COMPACT_WIDTH = 72;
+/** Small delays so a cursor passing over the rail doesn't flash it open, and a brief slip outside doesn't snap it shut. */
+const HOVER_OPEN_DELAY = 120;
+const HOVER_CLOSE_DELAY = 200;
+const DESKTOP_QUERY = '(min-width: 1024px)';
 
 function stored<T>(key: string, parse: (v: string | null) => T, fallback: T): T {
   try {
@@ -12,8 +16,23 @@ function stored<T>(key: string, parse: (v: string | null) => T, fallback: T): T 
   }
 }
 
-/** Sidebar width (drag or arrow keys), compact mode and mobile drawer; width/compact persist per browser. */
+function useIsDesktop() {
+  const [desktop, setDesktop] = useState(() => typeof window !== 'undefined' && window.matchMedia(DESKTOP_QUERY).matches);
+  useEffect(() => {
+    const query = window.matchMedia(DESKTOP_QUERY);
+    const change = () => setDesktop(query.matches);
+    query.addEventListener('change', change);
+    return () => query.removeEventListener('change', change);
+  }, []);
+  return desktop;
+}
+
+/**
+ * Sidebar state. On desktop it rests as a slim icon rail, expands over the page on hover (or keyboard focus)
+ * and can be pinned open; pinned and width persist per browser. On small screens it is a full-width drawer.
+ */
 export function useSidebarState() {
+  const desktop = useIsDesktop();
   const [open, setOpen] = useState(false);
   const [width, setWidth] = useState(() =>
     stored('schoolerp-sidebar-width', (v) => {
@@ -21,15 +40,20 @@ export function useSidebarState() {
       return Number.isFinite(n) && n >= SIDEBAR_MIN && n <= SIDEBAR_MAX ? n : 264;
     }, 264),
   );
-  const [compact, setCompact] = useState(() => stored('schoolerp-sidebar-compact', (v) => v === 'true', false));
-  const resizing = useRef(false);
+  const [pinned, setPinned] = useState(() => stored('schoolerp-sidebar-pinned', (v) => v === 'true', false));
+  const [hovered, setHovered] = useState(false);
+  const [resizing, setResizing] = useState(false);
+  const resizingRef = useRef(false);
+  const hoverTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     const move = (event: globalThis.PointerEvent) => {
-      if (resizing.current) setWidth(Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, event.clientX)));
+      if (resizingRef.current) setWidth(Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, event.clientX)));
     };
     const stop = () => {
-      resizing.current = false;
+      if (!resizingRef.current) return;
+      resizingRef.current = false;
+      setResizing(false);
       document.body.style.cursor = '';
     };
     window.addEventListener('pointermove', move);
@@ -40,6 +64,7 @@ export function useSidebarState() {
       window.removeEventListener('pointerup', stop);
       window.removeEventListener('pointercancel', stop);
       document.body.style.cursor = '';
+      clearTimeout(hoverTimer.current);
     };
   }, []);
 
@@ -47,26 +72,52 @@ export function useSidebarState() {
     try { localStorage.setItem('schoolerp-sidebar-width', String(width)); } catch { /* per-browser convenience only */ }
   }, [width]);
   useEffect(() => {
-    try { localStorage.setItem('schoolerp-sidebar-compact', String(compact)); } catch { /* per-browser convenience only */ }
-  }, [compact]);
+    try { localStorage.setItem('schoolerp-sidebar-pinned', String(pinned)); } catch { /* per-browser convenience only */ }
+  }, [pinned]);
+
+  const hoverTo = (next: boolean) => {
+    clearTimeout(hoverTimer.current);
+    hoverTimer.current = setTimeout(() => setHovered(next), next ? HOVER_OPEN_DELAY : HOVER_CLOSE_DELAY);
+  };
+
+  // The mobile drawer always shows labels; on desktop the rail is compact unless pinned or hovered.
+  const expanded = !desktop || pinned || hovered;
 
   return {
     open,
     setOpen,
-    compact,
-    toggleCompact: () => setCompact((v) => !v),
+    compact: !expanded,
+    pinned,
+    togglePinned: () => setPinned((v) => !v),
+    /** Unpinned and opened by hover: the panel floats over the page instead of pushing it. */
+    floating: desktop && !pinned && hovered,
+    resizing,
     width,
-    size: compact ? COMPACT_WIDTH : width,
+    /** Width the panel is drawn at. */
+    size: expanded ? width : COMPACT_WIDTH,
+    /** Width the page layout reserves for it (the hover expansion overlays the page). */
+    reserved: pinned ? width : COMPACT_WIDTH,
+    hoverHandlers: {
+      onMouseEnter: () => hoverTo(true),
+      onMouseLeave: () => hoverTo(false),
+      onFocus: () => {
+        clearTimeout(hoverTimer.current);
+        setHovered(true);
+      },
+      onBlur: (event: FocusEvent<HTMLElement>) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) hoverTo(false);
+      },
+    },
     startResize(event: PointerEvent) {
-      if (compact) return;
+      if (!pinned) return;
       event.preventDefault();
-      resizing.current = true;
+      resizingRef.current = true;
+      setResizing(true);
       document.body.style.cursor = 'col-resize';
     },
     resizeWithKeyboard(event: KeyboardEvent) {
       if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
       event.preventDefault();
-      setCompact(false);
       setWidth((w) => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, w + (event.key === 'ArrowRight' ? 16 : -16))));
     },
   };

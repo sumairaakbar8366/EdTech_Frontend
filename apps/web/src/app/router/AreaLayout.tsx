@@ -1,4 +1,5 @@
 import { ROLE_NAVIGATION } from '@schoolerp/shared';
+import { PRODUCT_NAME } from '@/config/brand';
 import { Navigate, Route } from 'react-router';
 import { AreaProvider } from '@/app/router/area';
 import { NotificationBell } from '@/features/communication/components/NotificationBell';
@@ -42,7 +43,7 @@ export function areaRouteTree(area: AreaSlug, routes: AreaRoutes, me: SchoolMe, 
           <SchoolShell
             area={area}
             isAdmin={me.roles.some((r) => r.key === 'school_admin')}
-            title={me.school?.name ?? 'SchoolERP'}
+            title={me.school?.name ?? PRODUCT_NAME}
             subtitle={AREAS[area].label}
             nav={nav}
             userName={`${me.user.firstName} ${me.user.lastName}`}

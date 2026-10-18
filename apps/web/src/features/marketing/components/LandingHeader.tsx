@@ -1,8 +1,10 @@
-import { GraduationCap, LogIn, UserPlus } from 'lucide-react';
+import { LogIn, UserPlus } from 'lucide-react';
 import { motion, useScroll, useSpring } from 'motion/react';
 import { Link } from 'react-router';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { NAV_LINKS } from '@/features/marketing/content/landing.content';
+import { BrandLockup } from '@/components/brand/BrandLogo';
+import { PRODUCT_NAME } from '@/config/brand';
 
 /** Sticky glass header with a scroll-progress line along its bottom edge. */
 export function LandingHeader() {
@@ -11,15 +13,9 @@ export function LandingHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-xl dark:border-white/5 dark:bg-[#0b1220]/95">
       <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:gap-8 sm:px-8">
-        <a href="#top" className="flex items-center gap-2.5">
-          <motion.span whileHover={{ scale: 1.03 }} className="flex h-9 w-9 items-center justify-center border-l-2 border-orange-500 bg-primary-950 text-slate-100">
-            <GraduationCap size={19} strokeWidth={1.75} />
-          </motion.span>
-          <span className="min-w-0">
-            <span className="block font-display text-sm font-bold leading-tight text-[#14213d] dark:text-white">Anet Cyber Solutions</span>
-            <span className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-magenta-600 dark:text-magenta-300">SchoolERP</span>
-          </span>
-        </a>
+        <motion.a href="#top" whileHover={{ scale: 1.02 }} className="shrink-0" aria-label={`${PRODUCT_NAME} home`}>
+          <BrandLockup size="sm" />
+        </motion.a>
         <nav className="hidden flex-1 items-center gap-6 md:flex" aria-label="Site">
           {NAV_LINKS.map((s) => (
             <a key={s.id} href={`#${s.id}`} className="group relative text-sm font-medium text-slate-600 hover:text-primary-600 dark:text-slate-300 dark:hover:text-white">

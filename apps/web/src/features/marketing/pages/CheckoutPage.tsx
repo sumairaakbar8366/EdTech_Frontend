@@ -6,6 +6,7 @@ import { Alert, Button, Field, Input, Select, Spinner } from '@/components/ui';
 import { gatewayService, type GatewayMethod } from '@/features/marketing/services/marketingService';
 import { errorMessage } from '@/lib/errors';
 import { onSubmit } from '@/lib/forms';
+import { PRODUCT_NAME } from '@/config/brand';
 
 const METHODS: { id: GatewayMethod; label: string; icon: typeof CreditCard; hint: string }[] = [
   { id: 'card', label: 'Debit / credit card', icon: CreditCard, hint: 'Visa, Mastercard, UnionPay' },
@@ -163,7 +164,7 @@ function Shell({ children, sandbox = true }: { children: React.ReactNode; sandbo
     <main className="flex min-h-dvh items-center justify-center bg-slate-100 p-4 dark:bg-slate-950">
       <div className="w-full max-w-md">
         <div className="mb-3 flex items-center justify-between">
-          <span className="inline-flex items-center gap-2 font-bold text-slate-800 dark:text-white"><ShieldCheck size={18} className="text-emerald-600" /> SchoolERP Pay</span>
+          <span className="inline-flex items-center gap-2 font-bold text-slate-800 dark:text-white"><ShieldCheck size={18} className="text-emerald-600" /> {PRODUCT_NAME} Pay</span>
           <span className="text-xs text-slate-500">Secure checkout · PKR</span>
         </div>
         {sandbox && <div className="mb-3 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-900 dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-200">TEST MODE: no money is taken. Decline tests: card 4000 0000 0000 0002, or wallet PIN 0000.</div>}

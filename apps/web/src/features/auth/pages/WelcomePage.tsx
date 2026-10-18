@@ -6,6 +6,7 @@ import { userAreas } from '@/app/router/SchoolRoutes';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { AuthCard } from '@/features/auth/components/AuthCard';
 import { errorMessage } from '@/lib/errors';
+import { PRODUCT_NAME } from '@/config/brand';
 
 /** Where a new school's admin lands after sign-up: the one-time ticket becomes a session here. */
 export function WelcomePage() {
@@ -27,7 +28,7 @@ export function WelcomePage() {
   }, [params, loginWithTicket, navigate]);
 
   return (
-    <AuthCard icon={Rocket} title="Welcome to SchoolERP" sub="Opening your school…" back={false}>
+    <AuthCard icon={Rocket} title={`Welcome to ${PRODUCT_NAME}`} sub="Opening your school…" back={false}>
       {error ? (
         <div className="space-y-4">
           <Alert>{error}</Alert>

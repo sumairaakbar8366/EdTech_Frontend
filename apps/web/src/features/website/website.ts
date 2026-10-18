@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAction } from '@/lib/hooks/useAction';
 import { api, apiUrl, upload } from '@/services/api/http';
 import type { SiteTier } from '@/features/website/siteImagery';
+import type { SocialLinks } from '@/features/website/social';
 
 // School public website: types, service and hooks.
 
@@ -13,7 +14,7 @@ export interface PublicSite {
   about: string;
   principalName: string | null;
   principalMessage: string | null;
-  contact: { phone: string | null; email: string | null; address: string | null; mapUrl: string | null; facebookUrl: string | null };
+  contact: SocialLinks & { phone: string | null; email: string | null; address: string | null; mapUrl: string | null };
   admissionsOpen: boolean;
   careersOpen: boolean;
   heroMediaId: string | null;
@@ -28,7 +29,7 @@ export interface PublicSite {
 export type MediaCategory = 'campus' | 'students' | 'events' | 'achievements';
 export const CATEGORY_LABEL: Record<MediaCategory, string> = { campus: 'Campus', students: 'Students', events: 'Events & functions', achievements: 'Achievements' };
 
-export interface WebsiteSettings {
+export interface WebsiteSettings extends SocialLinks {
   published: boolean;
   tagline: string | null;
   about: string | null;
@@ -38,7 +39,6 @@ export interface WebsiteSettings {
   email: string | null;
   address: string | null;
   mapUrl: string | null;
-  facebookUrl: string | null;
   admissionsOpen: boolean;
   careersOpen: boolean;
   heroMediaId: string | null;

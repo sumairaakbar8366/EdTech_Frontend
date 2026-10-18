@@ -28,7 +28,7 @@ const SPECIALS: Special[] = [
     text: 'The moment a school joins, it gets a public website made from its own data: classes, campuses, teachers, open jobs. The admin adds texts and photos; parents apply online.',
     points: ['Online admission form → straight into Admissions', 'Careers page with online job applications', 'Photo gallery: campus, students, functions', 'Free subdomain; own domain as a yearly add-on'],
     visual: () => (
-      <Frame label="greenfield.schoolerp.pk">
+      <Frame label="ed-tech.anetcybersolution.com/greenfield">
         <div className="rounded-lg bg-[#2f3e52] p-4 text-white"><div className="text-xs uppercase tracking-widest text-orange-300">Welcome to</div><div className="text-xl font-extrabold">Greenfield School</div><div className="mt-2 inline-block rounded bg-orange-500 px-2.5 py-1 text-xs font-bold">Apply for admission</div></div>
         <div className="mt-3 grid grid-cols-3 gap-2">{[0, 1, 2].map((i) => <motion.div key={i} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 + i * 0.15 }} className="aspect-[4/3] rounded-md bg-linear-to-br from-slate-200 to-slate-300 dark:from-white/10 dark:to-white/5" />)}</div>
       </Frame>

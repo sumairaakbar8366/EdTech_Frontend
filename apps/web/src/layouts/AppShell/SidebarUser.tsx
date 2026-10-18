@@ -37,7 +37,6 @@ export function SidebarUser({ name, detail, compact }: { name: string; detail: s
           <LogOut size={16} />
         </button>
       </div>
-      {!compact && <div className="mt-2 border-t border-white/10 pt-2 text-center text-[10px] font-semibold uppercase text-slate-400">Anet Cyber Solutions</div>}
       <AccountModal open={account} onClose={() => setAccount(false)} />
     </div>
   );

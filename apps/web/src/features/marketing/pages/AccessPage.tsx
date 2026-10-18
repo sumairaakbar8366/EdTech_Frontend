@@ -1,4 +1,4 @@
-import { GraduationCap, LogIn, UserPlus } from 'lucide-react';
+import { LogIn, UserPlus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { motion } from 'motion/react';
@@ -7,6 +7,8 @@ import { StorySlides, type Story } from '@/components/motion/StorySlides';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { Alert } from '@/components/ui';
 import { QuickSignup } from '@/features/marketing/components/QuickSignup';
+import { BrandLockup } from '@/components/brand/BrandLogo';
+import { PRODUCT_NAME } from '@/config/brand';
 
 type Mode = 'login' | 'signup';
 
@@ -38,8 +40,7 @@ export function AccessPage() {
       <Backdrop />
       <section className="relative hidden min-h-dvh overflow-hidden p-10 lg:flex lg:flex-col lg:justify-between">
         <Link to="/" className="relative flex items-center gap-3 text-white">
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand text-white shadow-glow"><GraduationCap size={23} /></span>
-          <span><span className="block font-display text-xl font-bold uppercase">Anet Cyber Solutions</span><span className="block text-xs font-semibold uppercase text-primary-100">SchoolERP</span></span>
+          <BrandLockup tone="dark" size="lg" />
         </Link>
         <StorySlides stories={STORIES} />
         <div className="relative text-sm text-white/70">Admissions, academics, attendance and more, in one place.</div>
@@ -49,14 +50,14 @@ export function AccessPage() {
         <div className="absolute right-4 top-4"><ThemeToggle /></div>
         <div className="w-full max-w-xl">
           <div className="mb-5 flex items-center justify-between lg:hidden">
-            <Link to="/" className="flex items-center gap-2 font-display text-lg font-bold uppercase text-slate-900 dark:text-white">
-              <GraduationCap size={22} className="text-primary-600" /> Anet Cyber Solutions
+            <Link to="/" aria-label={`${PRODUCT_NAME} home`}>
+              <BrandLockup />
             </Link>
           </div>
           <motion.div key={mode} initial={{ opacity: 0, x: 40, rotateY: -8 }} animate={{ opacity: 1, x: 0, rotateY: 0 }} transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }} style={{ transformPerspective: 1200 }} className="surface rounded-xl p-5 shadow-depth-3 sm:p-8">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-bold uppercase text-magenta-600 dark:text-magenta-300">SchoolERP by Anet Cyber Solutions</p>
+                <p className="text-xs font-bold uppercase text-magenta-600 dark:text-magenta-300">{PRODUCT_NAME}</p>
                 <h2 className="mt-1 font-display text-3xl font-bold uppercase text-slate-900 dark:text-white">
                   {mode === 'login' ? 'Sign in' : 'Start free trial'}
                 </h2>

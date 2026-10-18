@@ -8,6 +8,7 @@ import { useSchoolApplications, useSchools, useTiers } from '@/features/platform
 import { compactNumber, formatDate } from '@/lib/format';
 import { FinanceSection } from '@/features/platform/components/FinanceSection';
 import { GrowthSection } from '@/features/platform/components/GrowthSection';
+import { PRODUCT_NAME } from '@/config/brand';
 
 const DAY = 86_400_000;
 const plural = (n: number, one: string) => `${compactNumber(n)} ${one}${n === 1 ? '' : 's'}`;
@@ -33,7 +34,7 @@ export function PlatformDashboard({ adminName }: { adminName: string }) {
   const maxTier = Math.max(1, ...byTier.values());
 
   const slides: HeroSlide[] = [
-    { key: 'welcome', kicker: `${greeting()} · ${todayLabel()}`, icon: Sun, title: adminName, text: 'SchoolERP platform console' },
+    { key: 'welcome', kicker: `${greeting()} · ${todayLabel()}`, icon: Sun, title: adminName, text: `${PRODUCT_NAME} platform console` },
     ...(pending.length ? [{ key: 'apps', kicker: 'Applications', icon: ClipboardList, title: `${plural(pending.length, 'school')} asking to join`, text: 'Review new requests and approve the ones to onboard.', cta: { label: 'Review applications', to: '/applications' } }] : []),
     ...(approved.length ? [{ key: 'onboard', kicker: 'Ready to onboard', icon: Building2, title: `${plural(approved.length, 'approved school')} to provision`, text: 'Create their tenant, plan and first admin.', cta: { label: 'Open applications', to: '/applications' } }] : []),
     ...(trials.length ? [{ key: 'trials', kicker: 'Free trials', icon: Hourglass, title: `${plural(trials.length, 'school')} on trial`, text: endingSoon.length ? `${plural(endingSoon.length, 'trial')} end within a week.` : 'None end this week.', cta: { label: 'See schools', to: '/schools' } }] : []),
