@@ -2,10 +2,11 @@ import { ArrowLeft, ClipboardPen, Lock, Save } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { AreaLink } from '@/app/router/area';
-import { Alert, Badge, Button, Card, Spinner } from '@/components/ui';
+import { Alert, Badge, Button, Card, SearchInput, Spinner } from '@/components/ui';
 import { useExamsAction, useMarksheet } from '@/features/exams/hooks/useExams';
 import { examService } from '@/features/exams/services/examService';
 import { errorMessage } from '@/lib/errors';
+import { matchesText } from '@/lib/textMatch';
 
 type Entry = { marks: string; isAbsent: boolean; remarks: string };
 
@@ -18,6 +19,8 @@ export function MarksheetPage() {
   const sheet = useMarksheet(id, sectionId, subjectId);
   const [entries, setEntries] = useState<Record<string, Entry>>({});
   const [dirty, setDirty] = useState(false);
+  // Only narrows the rows on screen; marks typed for hidden students are kept and saved.
+  const [text, setText] = useState('');
   useEffect(() => {
     if (!sheet.data) return;
     setEntries(Object.fromEntries(sheet.data.rows.map((r) => [r.id, { marks: r.marks !== null ? String(Number(r.marks)) : '', isAbsent: r.isAbsent, remarks: r.remarks ?? '' }])));
@@ -62,6 +65,7 @@ export function MarksheetPage() {
         }
       >
         {invalid && <div className="p-4"><Alert>Marks must be numbers between 0 and {max}.</Alert></div>}
+        <div className="border-b border-slate-200 p-4 dark:border-white/5"><SearchInput label="Find student" value={text} onChange={setText} placeholder="Find student by name, roll or admission no…" /></div>
         <div className="overflow-x-auto">
           <table className="w-full text-base">
             <thead>
@@ -74,7 +78,7 @@ export function MarksheetPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200/70 dark:divide-white/5">
-              {s.rows.map((r) => {
+              {s.rows.filter((r) => matchesText(text, r.firstName, r.lastName, r.admissionNo, r.rollNo)).map((r) => {
                 const e = entries[r.id] ?? { marks: '', isAbsent: false, remarks: '' };
                 const bad = !e.isAbsent && e.marks !== '' && (Number(e.marks) > max || !/^\d{1,4}(\.\d{1,2})?$/.test(e.marks));
                 const failing = !e.isAbsent && e.marks !== '' && !bad && Number(e.marks) < pass;

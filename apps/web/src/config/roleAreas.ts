@@ -6,6 +6,7 @@ import type { SchoolRoleKey } from '@schoolerp/shared';
  * Adding a role = one entry here + its routes file in app/router/areas.
  */
 export const AREAS = {
+  principal: { role: 'principal', label: 'Principal' },
   admin: { role: 'school_admin', label: 'Administration' },
   accounts: { role: 'accounts', label: 'Accounts' },
   teacher: { role: 'teacher', label: 'Teaching' },
@@ -16,8 +17,10 @@ export const AREAS = {
 
 export type AreaSlug = keyof typeof AREAS;
 
-export function areaForRole(role: SchoolRoleKey): AreaSlug {
-  return (Object.keys(AREAS) as AreaSlug[]).find((a) => AREAS[a].role === role)!;
+/** Shared admin accounts ("Admin 2"…, role key delegate_N) work in the admin area with only their granted parts. */
+export function areaForRole(role: SchoolRoleKey | string): AreaSlug {
+  if (role.startsWith('delegate_')) return 'admin';
+  return (Object.keys(AREAS) as AreaSlug[]).find((a) => AREAS[a].role === role) ?? 'admin';
 }
 
 export function isAreaSlug(value: string | undefined): value is AreaSlug {

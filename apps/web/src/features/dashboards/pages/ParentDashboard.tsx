@@ -14,8 +14,8 @@ export function ParentDashboard() {
   const { childId, ready, switcher } = useChildSwitch();
   const slides = useLearnerHeroSlides({ studentId: childId, ready, parent: true });
   return (
-    <div className="space-y-6">
-      <DashboardHero slides={slides} image="/images/dashboard-parent.png" />
+    <div className="dash space-y-6">
+      <DashboardHero slides={slides} />
       <div className="grid gap-6 lg:grid-cols-3">
         <ChildrenWidget className="lg:col-span-2" />
         {can('fees.own') && <FeesDueWidget to="/fees" />}

@@ -2,7 +2,7 @@ import { ArrowLeft, Ban, Check, FileText, RefreshCw, Send, SlidersHorizontal, Un
 import { useState } from 'react';
 import { useParams } from 'react-router';
 import { AreaLink } from '@/app/router/area';
-import { Alert, Badge, Button, Card, IconButton, Spinner, StatCard } from '@/components/ui';
+import { Alert, Badge, Button, Card, IconButton, SearchInput, Spinner, StatCard } from '@/components/ui';
 import type { PaymentMethod } from '@/features/fees/types/fee.types';
 import { money } from '@/features/fees/utils/fee.utils';
 import { PayslipModal } from '@/features/payroll/components/payslips/PayslipModal';
@@ -15,6 +15,7 @@ import { payrollService } from '@/features/payroll/services/payrollService';
 import type { PayItem, RunAction } from '@/features/payroll/types/payroll.types';
 import { employeeName } from '@/features/payroll/utils/payroll.utils';
 import { formatDate } from '@/lib/format';
+import { matchesText } from '@/lib/textMatch';
 
 type ActVars = { action: RunAction; body?: { note?: string; method?: PaymentMethod; reference?: string | null } };
 
@@ -25,6 +26,7 @@ export function RunDetailPage({ canEdit, canApprove }: { canEdit: boolean; canAp
   const [slipId, setSlipId] = useState<string | null>(null);
   const [noteFor, setNoteFor] = useState<'return' | 'cancel' | null>(null);
   const [paying, setPaying] = useState(false);
+  const [text, setText] = useState('');
   const run = usePayrollRun(id);
   const act = usePayrollAction(({ action, body }: ActVars) => payrollService.runAction(id!, action, body).then(() => action), {
     success: (action) => RUN_ACTION_SUCCESS[action],
@@ -90,6 +92,7 @@ export function RunDetailPage({ canEdit, canApprove }: { canEdit: boolean; canAp
       </div>
 
       <Card padded={false} title="Employees" icon={FileText} tone={RUN_TONE[r.status]}>
+        <div className="border-b border-slate-200 p-4 dark:border-white/5"><SearchInput label="Search employees" value={text} onChange={setText} placeholder="Search employee or designation…" /></div>
         <div className="overflow-x-auto">
           <table className="w-full text-base">
             <thead>
@@ -103,7 +106,7 @@ export function RunDetailPage({ canEdit, canApprove }: { canEdit: boolean; canAp
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200/70 dark:divide-white/5">
-              {r.items.map((i) => (
+              {r.items.filter((i) => matchesText(text, employeeName(i.employee), i.employee.designation, i.note)).map((i) => (
                 <tr key={i.id}>
                   <td className="px-5 py-3">
                     <div className="font-semibold text-slate-800 dark:text-slate-100">{employeeName(i.employee)}</div>

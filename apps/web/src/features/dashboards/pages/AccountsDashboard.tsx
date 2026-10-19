@@ -16,8 +16,8 @@ export function AccountsDashboard() {
   const s = useFeesSummary().data;
   const invoices = s ? Object.values(s.byStatus).reduce((a, b) => a + (b ?? 0), 0) : undefined;
   return (
-    <div className="space-y-6">
-      <DashboardHero slides={slides} image="/images/dashboard-finance.png" />
+    <div className="dash space-y-6">
+      <DashboardHero slides={slides} />
       {can('fees.view') && (
         <>
           <div className="stagger grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">

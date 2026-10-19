@@ -12,8 +12,8 @@ export function StudentDashboard() {
   const can = useCan();
   const slides = useLearnerHeroSlides();
   return (
-    <div className="space-y-6">
-      <DashboardHero slides={slides} image="/images/dashboard-student.png" />
+    <div className="dash space-y-6">
+      <DashboardHero slides={slides} />
       <div className="grid gap-6 lg:grid-cols-3">
         {can('timetable.view') && <TodayTimetableWidget />}
         {can('assignment.view') && <AssignmentsDueWidget to="/assignments" className="lg:col-span-2" />}

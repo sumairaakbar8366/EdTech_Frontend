@@ -31,16 +31,16 @@ function useIsDesktop() {
  * Sidebar state. On desktop it rests as a slim icon rail, expands over the page on hover (or keyboard focus)
  * and can be pinned open; pinned and width persist per browser. On small screens it is a full-width drawer.
  */
-export function useSidebarState() {
+export function useSidebarState(storageKey = 'schoolerp-sidebar', defaultWidth = 264, compactWidth = COMPACT_WIDTH) {
   const desktop = useIsDesktop();
   const [open, setOpen] = useState(false);
   const [width, setWidth] = useState(() =>
-    stored('schoolerp-sidebar-width', (v) => {
+    stored(`${storageKey}-width`, (v) => {
       const n = Number(v);
-      return Number.isFinite(n) && n >= SIDEBAR_MIN && n <= SIDEBAR_MAX ? n : 264;
-    }, 264),
+      return Number.isFinite(n) && n >= SIDEBAR_MIN && n <= SIDEBAR_MAX ? n : defaultWidth;
+    }, defaultWidth),
   );
-  const [pinned, setPinned] = useState(() => stored('schoolerp-sidebar-pinned', (v) => v === 'true', false));
+  const [pinned, setPinned] = useState(() => stored(`${storageKey}-pinned`, (v) => v === 'true', false));
   const [hovered, setHovered] = useState(false);
   const [resizing, setResizing] = useState(false);
   const resizingRef = useRef(false);
@@ -69,10 +69,10 @@ export function useSidebarState() {
   }, []);
 
   useEffect(() => {
-    try { localStorage.setItem('schoolerp-sidebar-width', String(width)); } catch { /* per-browser convenience only */ }
+    try { localStorage.setItem(`${storageKey}-width`, String(width)); } catch { /* per-browser convenience only */ }
   }, [width]);
   useEffect(() => {
-    try { localStorage.setItem('schoolerp-sidebar-pinned', String(pinned)); } catch { /* per-browser convenience only */ }
+    try { localStorage.setItem(`${storageKey}-pinned`, String(pinned)); } catch { /* per-browser convenience only */ }
   }, [pinned]);
 
   const hoverTo = (next: boolean) => {
@@ -94,9 +94,9 @@ export function useSidebarState() {
     resizing,
     width,
     /** Width the panel is drawn at. */
-    size: expanded ? width : COMPACT_WIDTH,
+    size: expanded ? width : compactWidth,
     /** Width the page layout reserves for it (the hover expansion overlays the page). */
-    reserved: pinned ? width : COMPACT_WIDTH,
+    reserved: pinned ? width : compactWidth,
     hoverHandlers: {
       onMouseEnter: () => hoverTo(true),
       onMouseLeave: () => hoverTo(false),

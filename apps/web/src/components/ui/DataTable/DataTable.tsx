@@ -1,4 +1,6 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
+import { SearchInput } from '@/components/ui/SearchInput/SearchInput';
+import { matchesText } from '@/lib/textMatch';
 
 export interface Column<T> {
   /** Header text (empty for action columns). */
@@ -13,7 +15,8 @@ const ALIGN = { left: 'text-left', right: 'text-right', center: 'text-center' } 
 
 /**
  * The app's table: header styling, row dividers, hover and keyboard-accessible row clicks.
- * Feature tables (StudentTable, InvoiceTable…) only declare their columns.
+ * Feature tables (StudentTable, InvoiceTable…) only declare their columns. With `searchText` a
+ * search box above the table narrows the rows already loaded (every typed word must appear).
  */
 export function DataTable<T>({
   columns,
@@ -21,14 +24,26 @@ export function DataTable<T>({
   rowKey,
   onRowClick,
   rowClassName,
+  searchText,
+  searchPlaceholder = 'Search…',
 }: {
   columns: Column<T>[];
   rows: T[];
   rowKey: (row: T) => string;
   onRowClick?: (row: T) => void;
   rowClassName?: (row: T) => string;
+  /** The values a row can be found by (names, numbers, statuses…). */
+  searchText?: (row: T) => (string | number | null | undefined)[];
+  searchPlaceholder?: string;
 }) {
+  const [text, setText] = useState('');
+  const shown = searchText && text ? rows.filter((r) => matchesText(text, ...searchText(r))) : rows;
   return (
+    <>
+    {searchText && (
+      <div className="border-b border-slate-200 p-4 dark:border-white/5"><SearchInput label="Search table" value={text} onChange={setText} placeholder={searchPlaceholder} /></div>
+    )}
+    {searchText && text && shown.length === 0 && <p className="px-5 py-4 text-sm text-slate-500">Nothing matches “{text}”.</p>}
     <div className="overflow-x-auto">
       <table className="w-full text-base">
         <thead>
@@ -39,7 +54,7 @@ export function DataTable<T>({
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-200/70 dark:divide-white/5">
-          {rows.map((row) => (
+          {shown.map((row) => (
             <tr
               key={rowKey(row)}
               {...(onRowClick && {
@@ -57,5 +72,6 @@ export function DataTable<T>({
         </tbody>
       </table>
     </div>
+    </>
   );
 }

@@ -29,6 +29,7 @@ import { CommunicationPage } from '@/features/communication/pages/CommunicationP
 import { ReportsPage } from '@/features/reports/pages/ReportsPage';
 import { SchoolDocumentsPage } from '@/features/documents/pages/DocumentsPage';
 import { UsersPage } from '@/features/users/pages/UsersPage';
+import { ActivityPage } from '@/features/audit/pages/ActivityPage';
 
 /** School administrator (board page 4: Admin dashboard menu). */
 export const adminRoutes: AreaRoutes = (can) => [
@@ -55,6 +56,7 @@ export const adminRoutes: AreaRoutes = (can) => [
   { path: 'exams/:id/marks', capability: 'results.enter', element: <MarksheetPage /> },
   { path: 'website', capability: 'settings.manage', element: <WebsiteEditorPage /> },
   { path: 'users-and-access', capability: 'settings.manage', element: <UsersPage /> },
+  { path: 'activity', capability: 'audit.view', element: <ActivityPage /> },
   { path: 'plans-and-billing', capability: 'settings.manage', element: <BillingPage /> },
   { path: 'billing', capability: 'settings.manage', element: <BillingPage /> },
   { path: 'settings', capability: 'settings.manage', element: <SettingsPage /> },

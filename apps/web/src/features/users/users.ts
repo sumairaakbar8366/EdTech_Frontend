@@ -73,7 +73,7 @@ export const handover = (firstName: string, lastName: string, role: string, c: A
   temporaryPassword: c.password,
 });
 
-const ROLE_NAME: Record<SchoolRoleKey, string> = { school_admin: 'School Admin', accounts: 'Accounts', teacher: 'Teacher', non_teaching_staff: 'Staff', parent: 'Parent', student: 'Student' };
+const ROLE_NAME: Record<SchoolRoleKey, string> = { principal: 'Principal', school_admin: 'School Admin', accounts: 'Accounts', teacher: 'Teacher', non_teaching_staff: 'Staff', parent: 'Parent', student: 'Student' };
 
 /** API hand-overs (with name and role) → modal entries. */
 export const handoversOf = (list: ApiCredentials[]): LoginHandover[] =>
@@ -103,6 +103,7 @@ export const STAFF_ROLE_OPTIONS: { key: SchoolRoleKey; label: string; hint: stri
   { key: 'non_teaching_staff', label: 'Non-teaching staff', hint: 'Own attendance, leave, tasks, payslips' },
   { key: 'accounts', label: 'Accounts', hint: 'Fees, payments, payroll' },
   { key: 'school_admin', label: 'School Admin', hint: 'Everything, including Users & Access' },
+  { key: 'principal', label: 'Principal', hint: 'Oversees the school: all activity, approvals, basic edits' },
 ];
 
 /** Display status: an active login whose temporary password has not been replaced yet is "pending". */
@@ -128,7 +129,43 @@ export const usersService = {
   setStatus: ({ id, status }: { id: string; status: 'active' | 'disabled' }) => api<SchoolLogin>(`/users/${id}/status`, { method: 'POST', body: { status } }),
 };
 
+/** Areas an admin may share, with the levels allowed (the first is read-only); mirrors the API's list. */
+export const SHAREABLE: { module: string; label: string; levels: { level: string; label: string }[] }[] = [
+  { module: 'communication', label: 'Notifications & announcements', levels: [{ level: 'view', label: 'View' }, { level: 'crud', label: 'Send & manage' }] },
+  { module: 'students', label: 'Students', levels: [{ level: 'view', label: 'View' }, { level: 'crud', label: 'Add / edit' }] },
+  { module: 'staff', label: 'Staff', levels: [{ level: 'view', label: 'View' }, { level: 'crud', label: 'Add / edit' }] },
+  { module: 'admissions', label: 'Admissions', levels: [{ level: 'view', label: 'View' }, { level: 'crud', label: 'Manage' }] },
+  { module: 'academics', label: 'Classes & subjects', levels: [{ level: 'view', label: 'View' }, { level: 'crud', label: 'Manage' }] },
+  { module: 'attendance', label: 'Attendance', levels: [{ level: 'view', label: 'View' }, { level: 'crud', label: 'Manage' }] },
+  { module: 'timetable', label: 'Timetable', levels: [{ level: 'view', label: 'View' }, { level: 'crud', label: 'Edit' }] },
+  { module: 'leave', label: 'Leave', levels: [{ level: 'view', label: 'View' }, { level: 'approve', label: 'Approve' }] },
+  { module: 'fees', label: 'Fees', levels: [{ level: 'view', label: 'View' }, { level: 'crud', label: 'Collect & manage' }] },
+  { module: 'exams', label: 'Exams', levels: [{ level: 'view', label: 'View' }, { level: 'crud', label: 'Manage' }] },
+  { module: 'results', label: 'Results', levels: [{ level: 'view', label: 'View' }, { level: 'crud', label: 'Enter & publish' }] },
+  { module: 'lms', label: 'LMS', levels: [{ level: 'view', label: 'View' }, { level: 'crud', label: 'Manage' }] },
+  { module: 'documents', label: 'Documents', levels: [{ level: 'view', label: 'View' }, { level: 'crud', label: 'Manage' }] },
+  { module: 'reports', label: 'Reports', levels: [{ level: 'all', label: 'View all' }] },
+];
+
+export interface SharedAccess {
+  roleId: string;
+  /** "Admin 2", "Admin 3"… */
+  label: string;
+  sharedBy: string | null;
+  createdAt: string;
+  access: { module: string; level: string }[];
+  user: { id: string; firstName: string; lastName: string; email: string | null; loginId: string; status: 'active' | 'disabled'; lastLoginAt: string | null } | null;
+}
+
+export const sharedService = {
+  list: () => api<SharedAccess[]>('/users/shared'),
+  share: (body: { firstName: string; lastName: string; email: string; access: { module: string; level: string }[] }) => api<Credentials>('/users/shared', { method: 'POST', body }),
+  update: ({ roleId, access }: { roleId: string; access: { module: string; level: string }[] }) => api<SharedAccess[]>(`/users/shared/${roleId}`, { method: 'PATCH', body: { access } }),
+  revoke: (roleId: string) => api<SharedAccess[]>(`/users/shared/${roleId}/revoke`, { method: 'POST' }),
+};
+
 const USERS_KEY = ['users'] as const;
+export const useSharedAccess = () => useQuery({ queryKey: [...USERS_KEY, 'shared'], queryFn: sharedService.list });
 export const useUsers = (q: UsersQuery) => useQuery({ queryKey: [...USERS_KEY, 'list', q], queryFn: () => usersService.list(q), placeholderData: keepPreviousData });
 export const useUsersSummary = () => useQuery({ queryKey: [...USERS_KEY, 'summary'], queryFn: usersService.summary });
 export const useCandidates = (type: PersonType, q: string, enabled: boolean) =>

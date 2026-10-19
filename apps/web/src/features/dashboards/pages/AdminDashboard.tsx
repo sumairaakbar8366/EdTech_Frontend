@@ -19,8 +19,8 @@ export function AdminDashboard() {
   const can = useCan();
   const slides = useAdminHeroSlides();
   return (
-    <div className="space-y-6">
-      <DashboardHero slides={slides} image="/images/dashboard-admin.png" />
+    <div className="dash space-y-6">
+      <DashboardHero slides={slides} />
       {can('students.view') && can('staff.view') && can('admissions.view') && can('fees.view') && <AdminKpisWidget />}
       <div className="grid gap-6 lg:grid-cols-3">
         {can('admissions.view') && <AdmissionsPipelineWidget />}
@@ -37,8 +37,8 @@ export function AdminDashboard() {
           {can('staff.view') && <HiringWidget />}
         </div>
       </div>
-      <AddonsStrip />
-      <UpgradePopup />
+      {can('settings.manage') && <AddonsStrip />}
+      {can('settings.manage') && <UpgradePopup />}
     </div>
   );
 }

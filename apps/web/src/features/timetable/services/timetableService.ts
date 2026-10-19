@@ -39,6 +39,8 @@ export interface SlotQuery {
   dayOfWeek: number;
   startTime: string;
   endTime: string;
+  /** When editing a period: leave it out of the clash checks. */
+  excludeSlotId?: string;
 }
 
 export interface TodaySlot extends TimetableSlot {
@@ -50,8 +52,11 @@ export const timetableService = {
   section: (sectionId: string) => api<TimetableSlot[]>(`/timetable/section?sectionId=${sectionId}`),
   addSlot: (body: { sectionId: string; subjectId: string; employeeId: string; roomId: string | null; dayOfWeek: number; startTime: string; endTime: string }) =>
     api('/timetable/slots', { method: 'POST', body }),
+  updateSlot: (id: string, body: { sectionId: string; subjectId: string; employeeId: string; roomId: string | null; dayOfWeek: number; startTime: string; endTime: string }) =>
+    api(`/timetable/slots/${id}`, { method: 'PATCH', body }),
   removeSlot: (id: string) => api(`/timetable/slots/${id}`, { method: 'DELETE' }),
-  teacherOptions: (q: SlotQuery) => api<TeacherOptions>(`/timetable/teacher-options?${new URLSearchParams({ ...q, dayOfWeek: String(q.dayOfWeek) })}`),
+  teacherOptions: ({ excludeSlotId, ...q }: SlotQuery) =>
+    api<TeacherOptions>(`/timetable/teacher-options?${new URLSearchParams({ ...q, dayOfWeek: String(q.dayOfWeek), ...(excludeSlotId && { excludeSlotId }) })}`),
   sectionAssignments: (sectionId: string) => api<TeacherAssignment[]>(`/academics/teacher-assignments?sectionId=${sectionId}`),
   mine: () => api<{ kind: 'teacher' | 'student'; slots: TimetableSlot[] }>('/timetable/me'),
   children: () => api<{ studentId: string; name: string; slots: TimetableSlot[] }[]>('/timetable/children'),

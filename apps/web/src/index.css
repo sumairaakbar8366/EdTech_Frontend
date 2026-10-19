@@ -136,6 +136,37 @@ h1, h2, h3 {
 .dashboard-link-tile:hover { transform: translateY(-2px); border-color: #f3a46a; box-shadow: 0 6px 16px -6px rgb(15 23 42 / 0.12); }
 [data-theme='dark'] .dashboard-link-tile:hover { border-color: #b4581e; }
 
+/* Raised card (every Card / StatCard): soft blue rim, top light, layered drop shadow. On dashboards (.dash) it lifts with an orange rim on hover. */
+.card-3d {
+  border-radius: 1rem;
+  border-color: #c3d6ef;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    0 1px 2px rgb(15 23 42 / 0.06),
+    0 4px 8px -2px rgb(15 23 42 / 0.08),
+    0 12px 24px -10px rgb(15 23 42 / 0.16);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+.dash .card-3d:hover {
+  transform: translateY(-2px);
+  border-color: #f5b98a;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    0 2px 4px rgb(15 23 42 / 0.06),
+    0 8px 16px -4px rgb(15 23 42 / 0.1),
+    0 20px 32px -12px rgb(15 23 42 / 0.22);
+}
+[data-theme='dark'] .card-3d {
+  border-color: #2e4766;
+  background-image: linear-gradient(180deg, #1b2330 0%, #161d27 100%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 4px 10px -2px rgb(0 0 0 / 0.4), 0 14px 28px -12px rgb(0 0 0 / 0.55);
+}
+[data-theme='dark'] .dash .card-3d:hover {
+  border-color: #8a4a1f;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 8px 16px -4px rgb(0 0 0 / 0.45), 0 22px 36px -14px rgb(0 0 0 / 0.6);
+}
+
 /* Dark smoky-grey sidebar with light text, in both themes. */
 .app-sidebar {
   background: linear-gradient(180deg, var(--app-sidebar-bg) 0%, var(--app-sidebar-bg-deep) 100%);

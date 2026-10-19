@@ -17,7 +17,7 @@ export function SidebarUser({ name, detail, compact }: { name: string; detail: s
   const { logout, me } = useAuth();
   const [account, setAccount] = useState(false);
   return (
-    <div className={`relative rounded-xl border border-white/10 bg-white/5 text-white ${compact ? 'mx-2 my-3 p-2' : 'm-3 p-3'}`}>
+    <div className={`relative rounded-xl border border-white/10 bg-white/5 text-white ${compact ? 'mx-1.5 my-2 p-1' : 'm-3 p-3'}`}>
       <div className={`flex items-center ${compact ? 'flex-col gap-2' : 'gap-3'}`}>
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-500 text-xs font-bold text-white">
           {initials(name)}

@@ -13,6 +13,7 @@ export const STAFF_LOGIN_ROLES = [
   { key: 'non_teaching_staff', label: 'Non-teaching staff' },
   { key: 'accounts', label: 'Accounts' },
   { key: 'school_admin', label: 'School admin' },
+  { key: 'principal', label: 'Principal' },
 ] as const;
 
 export const roleLabel = (key: string) => STAFF_LOGIN_ROLES.find((r) => r.key === key)?.label ?? key;

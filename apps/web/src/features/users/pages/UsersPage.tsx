@@ -9,10 +9,12 @@ import { CredentialsModal } from '@/features/users/components/CredentialsModal';
 import { EditRolesModal } from '@/features/users/components/EditRolesModal';
 import { EmailEditModal } from '@/features/users/components/EmailEditModal';
 import { GrantAccessModal } from '@/features/users/components/GrantAccessModal';
+import { SharedAccessCard } from '@/features/users/components/SharedAccessCard';
 import { loginStatus, PERSON_LABEL, usersService, useUsers, useUsersAction, useUsersSummary, type Credentials, type PersonType, type SchoolLogin, type UserStatusFilter } from '@/features/users/users';
 import { compactNumber } from '@/lib/format';
 
 const ROLE_FILTER: { key: SchoolRoleKey; label: string }[] = [
+  { key: 'principal', label: 'Principal' },
   { key: 'school_admin', label: 'School Admin' },
   { key: 'accounts', label: 'Accounts' },
   { key: 'teacher', label: 'Teacher' },
@@ -105,6 +107,8 @@ export function UsersPage() {
         <StatCard label="Waiting for first sign-in" value={summary?.pending ?? '–'} icon={KeyRound} tone="amber" hint="Temporary password not changed yet" />
         <StatCard label="Disabled" value={summary?.disabled ?? '–'} icon={ShieldOff} tone="rose" />
       </div>
+
+      <SharedAccessCard onCreated={(c) => setCredentials({ c, title: 'Access shared' })} />
 
       <Card padded={false}>
         <FilterBar>

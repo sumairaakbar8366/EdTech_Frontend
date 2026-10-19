@@ -32,7 +32,9 @@ export function AnnouncementList({ canDelete = false }: { canDelete?: boolean })
               <h3 className="text-lg font-bold uppercase tracking-wide text-slate-900 dark:text-white">{a.title}</h3>
               <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-sm text-slate-500">
                 {formatDate(a.publishedAt)} ·
-                {a.targetRoles.length ? a.targetRoles.map((r) => <Badge key={r} tone="slate">{ROLE_NAME[r] ?? r}</Badge>) : <Badge tone="primary">Everyone</Badge>}
+                {a.targetRoles.map((r) => <Badge key={r} tone="slate">{ROLE_NAME[r] ?? r}</Badge>)}
+                {!!a.targetUserIds?.length && <Badge tone="slate">{a.targetUserIds.length} {a.targetUserIds.length === 1 ? 'person' : 'people'}</Badge>}
+                {!a.targetRoles.length && !a.targetUserIds?.length && <Badge tone="primary">Everyone</Badge>}
               </div>
               <p className="mt-2 whitespace-pre-wrap text-slate-700 dark:text-slate-200">{a.body}</p>
             </div>

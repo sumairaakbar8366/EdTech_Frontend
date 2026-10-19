@@ -29,8 +29,11 @@ export function areaNav(area: AreaSlug): ShellNavItem[] {
  */
 export function areaRouteTree(area: AreaSlug, routes: AreaRoutes, me: SchoolMe, brandColor: string | null) {
   const can = (c: Parameters<typeof canFor>[1]) => canFor(me.permissions, c);
-  const pages = routes(can).filter((r) => !r.capability || can(r.capability));
-  const nav = areaNav(area);
+  const all = routes(can);
+  const pages = all.filter((r) => !r.capability || can(r.capability));
+  // Menu entries whose page this login may not open are hidden (e.g. a shared "Admin 2" sees only what was shared).
+  const denied = new Set(all.filter((r) => r.capability && !can(r.capability)).map((r) => r.path));
+  const nav = areaNav(area).filter((n) => !denied.has(n.path.slice(area.length + 2)));
   const built = new Set(pages.map((p) => p.path));
   const areas = me.roles.map((r) => areaForRole(r.key)).map((slug) => ({ slug, label: AREAS[slug].label, href: `/${slug}` }));
 

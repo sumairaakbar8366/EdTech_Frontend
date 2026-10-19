@@ -45,7 +45,7 @@ export function ClassMonitor() {
       <Card padded={false}>
         {data.isLoading && <div className="px-5"><Spinner /></div>}
         {data.data?.rows.length === 0 && <EmptyState icon={CalendarDays} title="No classes scheduled on this day" tone="sky" />}
-        {!!data.data?.rows.length && <DataTable columns={COLUMNS} rows={data.data.rows} rowKey={(r) => r.id} />}
+        {!!data.data?.rows.length && <DataTable columns={COLUMNS} rows={data.data.rows} rowKey={(r) => r.id} searchText={(r) => [r.section.schoolClass.name, r.section.name, r.section.campus.code, r.subject.name, r.employee.firstName, r.employee.lastName, r.state]} searchPlaceholder="Search class, subject, teacher or status…" />}
       </Card>
     </div>
   );

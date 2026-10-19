@@ -12,7 +12,8 @@ export type Tenant =
     };
 
 export type Me =
-  | { scope: 'platform'; admin: { id: string; email: string; name: string } }
+  /** `isPrimary`: the main owner (manages the owner team, edits / deletes logs); others are labelled "Owner 2"… */
+  | { scope: 'platform'; admin: { id: string; email: string; name: string; isPrimary?: boolean; label?: string | null } }
   | {
       scope: 'school';
       /**

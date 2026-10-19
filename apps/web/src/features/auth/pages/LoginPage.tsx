@@ -8,7 +8,7 @@ import { SlideShow } from '@/components/motion/SlideShow';
 import { SplitText } from '@/components/motion/SplitText';
 import { Hero3D } from '@/components/effects/Hero3D';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
-import { Alert, Button, Field, useFieldProps } from '@/components/ui';
+import { Alert, Button, Field, PasswordToggle, useFieldProps } from '@/components/ui';
 import { ApiError, apiAsset } from '@/services/api/http';
 import { marketingOrigin, photo } from '@/config/site';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -20,16 +20,20 @@ import { BrandLoader, holdLoader, useResetOnRestore } from '@/components/brand/B
 import { BrandLockup } from '@/components/brand/BrandLogo';
 import { PRODUCT_NAME } from '@/config/brand';
 
-function IconInput({ icon: Icon, ...props }: InputHTMLAttributes<HTMLInputElement> & { icon: typeof Mail }) {
+function IconInput({ icon: Icon, type, ...props }: InputHTMLAttributes<HTMLInputElement> & { icon: typeof Mail }) {
   const fieldProps = useFieldProps();
+  const [shown, setShown] = useState(false);
+  const password = type === 'password';
   return (
     <div className="relative">
       <Icon size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
       <input
         {...fieldProps}
-        className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-3.5 text-base text-slate-900 shadow-[inset_0_1px_2px_rgb(15_23_42/0.06)] outline-none transition focus:border-primary-400 focus:ring-4 focus:ring-primary-500/15 dark:border-white/10 dark:bg-slate-950/50 dark:text-white"
+        className={`w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 text-base text-slate-900 shadow-[inset_0_1px_2px_rgb(15_23_42/0.06)] outline-none transition focus:border-primary-400 focus:ring-4 focus:ring-primary-500/15 dark:border-white/10 dark:bg-slate-950/50 dark:text-white ${password ? 'pr-11' : 'pr-3.5'}`}
+        type={password && shown ? 'text' : type}
         {...props}
       />
+      {password && <PasswordToggle shown={shown} onToggle={() => setShown((s) => !s)} />}
     </div>
   );
 }
