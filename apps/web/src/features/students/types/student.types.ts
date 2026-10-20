@@ -5,6 +5,8 @@ import { type Gender, type Relation, type SectionRef } from '@/types/common';
 export type StudentStatus = 'active' | 'inactive' | 'graduated' | 'withdrawn';
 
 export interface StudentListItem {
+  /** Profile picture (GET /photos/<key>). */
+  photoKey?: string | null;
   id: string;
   admissionNo: string;
   firstName: string;
@@ -32,6 +34,8 @@ export interface GuardianRecord {
 }
 
 export interface StudentDetail {
+  /** Profile picture (GET /photos/<key>). */
+  photoKey?: string | null;
   id: string;
   admissionNo: string;
   firstName: string;
@@ -69,6 +73,8 @@ export interface StudentSummary {
 
 /** A parent's child card (GET /students/my-children). */
 export interface Child {
+  /** Profile picture (GET /photos/<key>). */
+  photoKey?: string | null;
   id: string;
   admissionNo: string;
   firstName: string;
@@ -98,6 +104,8 @@ export interface PromotionCandidate {
 type Nullable = string | null;
 
 export interface CreateStudentPayload {
+  /** Picture uploaded first (POST /photos/upload). */
+  photoId?: string;
   admissionNo?: string;
   firstName: string;
   lastName: string;
@@ -122,4 +130,15 @@ export interface UpdateStudentPayload {
   admissionDate: string;
   profile: { bloodGroup: Nullable; nationalId: Nullable; religion: Nullable; nationality: Nullable; address: Nullable };
   medical: { allergies: Nullable; conditions: Nullable; medications: Nullable; doctorName: Nullable; doctorPhone: Nullable };
+}
+
+/** A parent's child at a glance (dashboard cards). */
+export interface ChildOverview {
+  studentId: string;
+  /** This academic year; null before any attendance is marked. */
+  attendancePercent: number | null;
+  feesDue: number;
+  overdueInvoices: number;
+  nextDueDate: string | null;
+  latestResult: { exam: string; grade: string; percentage: number; passed: boolean } | null;
 }

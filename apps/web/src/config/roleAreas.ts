@@ -17,6 +17,17 @@ export const AREAS = {
 
 export type AreaSlug = keyof typeof AREAS;
 
+/** The big title on each role's dashboard (instead of "Dashboard"). */
+export const DASHBOARD_TITLE: Record<AreaSlug, string> = {
+  principal: 'Principal',
+  admin: 'Admin',
+  accounts: 'Accounts',
+  teacher: 'Teachers',
+  staff: 'Staff',
+  student: 'Students',
+  parent: 'Parents',
+};
+
 /** Shared admin accounts ("Admin 2"…, role key delegate_N) work in the admin area with only their granted parts. */
 export function areaForRole(role: SchoolRoleKey | string): AreaSlug {
   if (role.startsWith('delegate_')) return 'admin';

@@ -1,5 +1,5 @@
 import { KeyRound } from 'lucide-react';
-import { DataTable, StatusBadge, type Column } from '@/components/ui';
+import { Avatar, DataTable, StatusBadge, type Column } from '@/components/ui';
 import { STATUS_LABEL, STATUS_TONE, TYPE_LABEL, TYPE_TONE } from '@/features/staff/constants';
 import type { EmployeeListItem } from '@/features/staff/types/staff.types';
 import { fullName } from '@/features/staff/utils/staff.utils';
@@ -9,7 +9,7 @@ const COLUMNS: Column<EmployeeListItem>[] = [
     header: 'Staff member',
     cell: (e) => (
       <div className="flex items-center gap-3">
-        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ${e.staffType === 'teaching' ? 'bg-primary-800' : 'bg-slate-600'}`}>{e.firstName[0]}{e.lastName[0]}</span>
+        <Avatar photoKey={e.photoKey} name={`${e.firstName} ${e.lastName}`} />
         <div className="min-w-0">
           <div className="flex items-center gap-1.5 font-semibold text-slate-800 dark:text-slate-100">
             {fullName(e)}

@@ -25,9 +25,10 @@ export function PeoplePicker({ value, onChange }: { value: PersonOption[]; onCha
 
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap gap-2">
-        <div className="min-w-0 flex-1"><SearchInput value={text} onChange={setText} placeholder="Search name, User ID or class…" label="Search people" /></div>
-        <div className="w-40">
+      {/* Stacked: the announcement card is narrow, so search and role each get the full width. */}
+      <div className="flex flex-col gap-2">
+        <SearchInput value={text} onChange={setText} placeholder="Search name, User ID or class…" label="Search people" />
+        <div>
           <Select aria-label="Filter by role" value={role} onChange={(e) => setRole(e.target.value)}>
             <option value="">All roles</option>
             {SCHOOL_ROLES.map((r) => <option key={r.key} value={r.key}>{r.name}</option>)}

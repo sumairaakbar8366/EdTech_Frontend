@@ -33,6 +33,8 @@ export interface Interview {
 }
 
 export interface JobApplication {
+  /** Picture sent with the application. */
+  photoKey?: string | null;
   id: string;
   firstName: string;
   lastName: string;

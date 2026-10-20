@@ -5,7 +5,7 @@ import { AreaProvider } from '@/app/router/area';
 import { NotificationBell } from '@/features/communication/components/NotificationBell';
 import type { AreaRoutes } from '@/app/router/types';
 import { can as canFor } from '@/config/permissions';
-import { AREAS, areaForRole, type AreaSlug } from '@/config/roleAreas';
+import { AREAS, DASHBOARD_TITLE, areaForRole, type AreaSlug } from '@/config/roleAreas';
 import { ModulePlaceholderPage } from '@/components/common/ModulePlaceholderPage';
 import { SchoolShell } from '@/features/billing/components/SchoolShell';
 import type { ShellNavItem } from '@/layouts/AppShell/types';
@@ -48,6 +48,7 @@ export function areaRouteTree(area: AreaSlug, routes: AreaRoutes, me: SchoolMe, 
             isAdmin={me.roles.some((r) => r.key === 'school_admin')}
             title={me.school?.name ?? PRODUCT_NAME}
             subtitle={AREAS[area].label}
+            dashboardTitle={DASHBOARD_TITLE[area]}
             nav={nav}
             userName={`${me.user.firstName} ${me.user.lastName}`}
             userDetail={me.user.email ?? me.user.loginId}

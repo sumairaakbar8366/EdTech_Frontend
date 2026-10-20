@@ -10,6 +10,8 @@ export interface MonitorRow extends TimetableSlot {
 export interface MonitorData {
   date: string;
   dayOfWeek: number;
+  /** Minutes since midnight at the school (null for another day). */
+  nowMinute: number | null;
   totals: Record<string, number>;
   rows: MonitorRow[];
 }
@@ -60,7 +62,8 @@ export const timetableService = {
   sectionAssignments: (sectionId: string) => api<TeacherAssignment[]>(`/academics/teacher-assignments?sectionId=${sectionId}`),
   mine: () => api<{ kind: 'teacher' | 'student'; slots: TimetableSlot[] }>('/timetable/me'),
   children: () => api<{ studentId: string; name: string; slots: TimetableSlot[] }[]>('/timetable/children'),
-  monitor: (date: string) => api<MonitorData>(`/class-sessions/monitor?date=${date}`),
+  /** Without a date: today at the school (its own time zone). */
+  monitor: (date: string) => api<MonitorData>(`/class-sessions/monitor${date ? `?date=${date}` : ''}`),
   today: () => api<{ date: string; nowMinute: number; slots: TodaySlot[] }>('/class-sessions/today'),
   startClass: (timetableSlotId: string, topic: string | null) => api('/class-sessions/start', { method: 'POST', body: { timetableSlotId, topic } }),
   endClass: (sessionId: string) => api(`/class-sessions/${sessionId}/end`, { method: 'POST' }),

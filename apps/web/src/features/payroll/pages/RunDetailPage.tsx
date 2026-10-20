@@ -2,7 +2,7 @@ import { ArrowLeft, Ban, Check, FileText, RefreshCw, Send, SlidersHorizontal, Un
 import { useState } from 'react';
 import { useParams } from 'react-router';
 import { AreaLink } from '@/app/router/area';
-import { Alert, Badge, Button, Card, IconButton, SearchInput, Spinner, StatCard } from '@/components/ui';
+import { Alert, Avatar, Badge, Button, Card, IconButton, SearchInput, Spinner, StatCard } from '@/components/ui';
 import type { PaymentMethod } from '@/features/fees/types/fee.types';
 import { money } from '@/features/fees/utils/fee.utils';
 import { PayslipModal } from '@/features/payroll/components/payslips/PayslipModal';
@@ -109,8 +109,13 @@ export function RunDetailPage({ canEdit, canApprove }: { canEdit: boolean; canAp
               {r.items.filter((i) => matchesText(text, employeeName(i.employee), i.employee.designation, i.note)).map((i) => (
                 <tr key={i.id}>
                   <td className="px-5 py-3">
-                    <div className="font-semibold text-slate-800 dark:text-slate-100">{employeeName(i.employee)}</div>
-                    <div className="text-sm text-slate-500">{i.employee.designation}{i.note && ` · ${i.note}`}</div>
+                    <div className="flex items-center gap-3">
+                      <Avatar photoKey={i.employee.photoKey} name={employeeName(i.employee)} />
+                      <div>
+                        <div className="font-semibold text-slate-800 dark:text-slate-100">{employeeName(i.employee)}</div>
+                        <div className="text-sm text-slate-500">{i.employee.designation}{i.note && ` · ${i.note}`}</div>
+                      </div>
+                    </div>
                   </td>
                   <td className="px-5 py-3 text-sm text-slate-600 dark:text-slate-300">
                     <span className="font-semibold tabular-nums">{i.payableDays}/{i.workingDays}</span>

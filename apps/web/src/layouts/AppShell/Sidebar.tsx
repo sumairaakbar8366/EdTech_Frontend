@@ -24,10 +24,10 @@ export function Sidebar({ nav, userName, userDetail, state, variant = 'panel' }:
       <aside
         {...state.hoverHandlers}
         className={`app-sidebar fixed inset-y-0 left-0 z-40 flex w-[var(--sidebar-size)] flex-col overflow-hidden lg:translate-x-0 ${ease} ${
-          inset ? 'lg:bottom-auto lg:left-3 lg:top-1/2 lg:-translate-y-1/2 lg:max-h-[calc(100dvh-1.5rem)] lg:rounded-2xl lg:shadow-xl lg:shadow-slate-950/25 lg:[&>nav]:flex-[0_1_auto]' : ''
+          inset ? 'lg:bottom-auto lg:left-3 lg:top-1/2 lg:-translate-y-1/2 lg:max-h-[min(34rem,calc(100dvh-12rem))] lg:rounded-2xl lg:shadow-xl lg:shadow-slate-950/25 lg:[&>nav]:flex-[0_1_auto]' : ''
         } ${floating ? 'shadow-2xl shadow-slate-950/40' : ''} ${open ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <div className={`relative flex items-center gap-3 py-5 ${compact ? 'justify-center px-2' : 'px-5'}`}>
+        <div className={`relative flex items-center gap-3 ${inset ? 'py-3' : 'py-5'} ${compact ? 'justify-center px-2' : 'px-5'}`}>
           {compact ? <BrandMark tone="dark" size={inset ? 'sm' : 'md'} /> : <BrandLockup tone="dark" className="flex-1" />}
           {!compact && !inset && (
             <button

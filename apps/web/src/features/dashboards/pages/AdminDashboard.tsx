@@ -1,3 +1,4 @@
+import { LiveClassesSlides } from '@/features/timetable/components/monitor/LiveClassesSlides';
 import { useCan } from '@/features/auth/usePermissions';
 import { UpgradePopup } from '@/features/billing/components/UpgradePopup';
 import { AddonsStrip } from '@/features/billing/components/AddonsStrip';
@@ -22,15 +23,19 @@ export function AdminDashboard() {
     <div className="dash space-y-6">
       <DashboardHero slides={slides} />
       {can('students.view') && can('staff.view') && can('admissions.view') && can('fees.view') && <AdminKpisWidget />}
-      <div className="grid gap-6 lg:grid-cols-3">
+      {can('attendance.view') && <LiveClassesSlides />}
+      {/* Rows of equal-height cards. */}
+      <div className="grid gap-6 lg:grid-cols-3 [&>*]:h-full">
         {can('admissions.view') && <AdmissionsPipelineWidget />}
-        {can('fees.view') && <FeesSnapshotWidget to="/finance" className="lg:col-span-2" />}
-        {(can('students.view') || can('staff.view')) && <PeopleWidget />}
         {can('leave.view') && <LeaveApprovalsWidget to="/attendance" />}
         {can('payroll.view') && <PayrollStatusWidget to="/payroll" />}
       </div>
+      <div className="grid gap-6 lg:grid-cols-3 [&>*]:h-full">
+        {can('fees.view') && <FeesSnapshotWidget to="/finance" className="lg:col-span-2" />}
+        {(can('students.view') || can('staff.view')) && <PeopleWidget />}
+      </div>
       {can('academics.view') && <SchoolStructureWidget />}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-3 [&>*]:h-full">
         <QuickAccess className="lg:col-span-2" />
         <div className="space-y-6">
           {can('academics.view') && <AcademicYearWidget />}

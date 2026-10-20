@@ -22,7 +22,7 @@ const NAV = [...PLATFORM_NAVIGATION, { label: 'Activity', path: '/activity' }, {
 /** Platform console (admin host): schools, applications and subscription tiers. */
 export function platformRouteTree(me: Extract<Me, { scope: 'platform' }>) {
   return (
-    <Route element={<AppShell title={PRODUCT_NAME} subtitle="Platform Console" nav={NAV} userName={me.admin.label ? `${me.admin.name} (${me.admin.label})` : me.admin.name} userDetail={me.admin.email} headerActions={<><NotificationBell /><PaymentWatcher /></>} />}>
+    <Route element={<AppShell title={PRODUCT_NAME} subtitle="Platform Console" dashboardTitle="Owner" nav={NAV} userName={me.admin.label ? `${me.admin.name} (${me.admin.label})` : me.admin.name} userDetail={me.admin.email} headerActions={<><NotificationBell /><PaymentWatcher /></>} />}>
       <Route path="dashboard" element={<PlatformDashboard adminName={me.admin.name} />} />
       <Route path="schools" element={<SchoolsPage />} />
       <Route path="applications" element={<ApplicationsPage />} />

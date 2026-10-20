@@ -1,5 +1,5 @@
 import { CalendarDays } from 'lucide-react';
-import { Card, EmptyState, Spinner } from '@/components/ui';
+import { Card, EmptyState, LiveDot, Spinner } from '@/components/ui';
 import { ViewAll } from '@/features/dashboards/components/ViewAll';
 import { useMyTimetable } from '@/features/timetable/hooks/useTimetable';
 import { isoWeekdayToday, subjectColor } from '@/features/timetable/utils/timetable.utils';
@@ -23,7 +23,7 @@ export function TodayTimetableWidget({ to = '/timetable', className = '' }: { to
               <li key={s.id} className={`relative rounded-xl px-3 py-2 ${isNow ? 'bg-primary-500/10 ring-1 ring-primary-400/50' : 'bg-slate-500/5'} ${done ? 'opacity-60' : ''}`}>
                 <span aria-hidden className={`absolute -left-[1.4rem] top-3 h-3 w-3 rounded-full ring-2 ring-white dark:ring-[#0b1220] ${subjectColor(s.subjectId)}`} />
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-semibold text-slate-800 dark:text-slate-100">{s.subject.name}</span>
+                  <span className="inline-flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-100">{isNow && <LiveDot label="Happening now" />}{s.subject.name}{isNow && <span className="text-xs font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">Now</span>}</span>
                   <span className="text-sm tabular-nums text-slate-500">{s.startTime}–{s.endTime}</span>
                 </div>
                 <div className="text-sm text-slate-500">

@@ -1,5 +1,6 @@
 // Design system: generic, business-agnostic UI. Feature components compose these.
 export { Alert } from '@/components/ui/Alert/Alert';
+export { Avatar } from '@/components/ui/Avatar/Avatar';
 export { Badge } from '@/components/ui/Badge/Badge';
 export { Button, type ButtonVariant } from '@/components/ui/Button/Button';
 export { IconButton } from '@/components/ui/Button/IconButton';
@@ -13,6 +14,7 @@ export { FormSection } from '@/components/ui/FormSection/FormSection';
 export { FullPageMessage } from '@/components/ui/FullPageMessage/FullPageMessage';
 export { IconTile } from '@/components/ui/IconTile/IconTile';
 export { InfoItem } from '@/components/ui/InfoItem/InfoItem';
+export { LiveDot } from '@/components/ui/LiveDot/LiveDot';
 export { Input, PasswordToggle } from '@/components/ui/Input/Input';
 export { Spinner } from '@/components/ui/LoadingState/Spinner';
 export { ConfirmDialog } from '@/components/ui/Modal/ConfirmDialog';

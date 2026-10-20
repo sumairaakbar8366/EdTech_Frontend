@@ -6,7 +6,7 @@ import type { ShellNavItem } from '@/layouts/AppShell/types';
 /** Main menu on the greyish-blue sidebar; the active item gets a light fill and an orange marker. */
 export function SidebarNav({ nav, compact, onNavigate }: { nav: readonly ShellNavItem[]; compact: boolean; onNavigate: () => void }) {
   return (
-    <nav className={`relative flex-1 space-y-0.5 overflow-x-hidden overflow-y-auto pb-4 ${compact ? 'px-2' : 'px-3'}`} aria-label="Main">
+    <nav className={`relative flex-1 space-y-0.5 overflow-x-hidden overflow-y-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${compact ? 'px-2' : 'px-3'}`} aria-label="Main">
       {nav.map((item) => {
         const [Icon] = navVisual(item.label);
         return (
@@ -18,7 +18,7 @@ export function SidebarNav({ nav, compact, onNavigate }: { nav: readonly ShellNa
             title={compact ? item.label : undefined}
             aria-label={item.label}
             className={({ isActive }) =>
-              `group relative flex items-center rounded-lg py-2 text-sm font-semibold transition-all ${compact ? 'justify-center px-0' : 'gap-3 px-3'} ${
+              `group relative flex items-center rounded-lg py-1 text-sm font-semibold transition-all ${compact ? 'justify-center px-0' : 'gap-3 px-3'} ${
                 isActive
                   ? 'bg-white/10 text-white'
                   : 'text-slate-300 hover:bg-white/6 hover:text-white'

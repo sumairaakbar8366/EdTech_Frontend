@@ -18,7 +18,7 @@ interface AuthState {
 }
 
 const AuthContext = createContext<AuthState | null>(null);
-const ME_KEY = ['auth', 'me'] as const;
+export const ME_KEY = ['auth', 'me'] as const;
 
 /** Restores the session from the refresh cookie on load, then exposes the current user. */
 export function AuthProvider({ children }: { children: ReactNode }) {

@@ -504,3 +504,6 @@ table { font-variant-numeric: tabular-nums; }
 }
 :root[data-theme='dark'] .field-required > label::after,
 :root[data-theme='dark'] .field:has(input[required], select[required], textarea[required]) > label::after { color: #f87171; }
+
+/* Live classes TV: the thin bar that fills while a slide is shown. */
+@keyframes slide-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }

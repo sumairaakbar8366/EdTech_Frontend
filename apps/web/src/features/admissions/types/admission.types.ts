@@ -11,6 +11,8 @@ export type AdmissionStatus =
   | 'withdrawn';
 
 export interface AdmissionApplication {
+  /** Picture sent with the application. */
+  photoKey?: string | null;
   id: string;
   applicationNo: string;
   academicYearId: string;

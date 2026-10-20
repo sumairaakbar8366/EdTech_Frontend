@@ -6,9 +6,9 @@ export const NOTIFICATIONS_KEY = ['notifications'] as const;
 export const COMMUNICATION_KEY = ['communication'] as const;
 
 export const useNotifications = (page: number, enabled = true) => useQuery({ queryKey: [...NOTIFICATIONS_KEY, 'list', page], queryFn: () => communicationService.notifications(page), enabled });
-/** Unread badge in the header; checked every 15 s while the tab is open, and on focus. */
+/** Unread badge in the header (and new-notification popups); checked every 10 s, also in a background tab. */
 export const useUnreadCount = (enabled = true) =>
-  useQuery({ queryKey: [...NOTIFICATIONS_KEY, 'unread'], queryFn: communicationService.unreadCount, enabled, refetchInterval: 15_000, staleTime: 0 });
+  useQuery({ queryKey: [...NOTIFICATIONS_KEY, 'unread'], queryFn: communicationService.unreadCount, enabled, refetchInterval: 10_000, refetchIntervalInBackground: true, staleTime: 0 });
 export const useAnnouncements = (enabled = true) => useQuery({ queryKey: [...COMMUNICATION_KEY, 'announcements'], queryFn: communicationService.announcements, enabled });
 export const useContacts = (enabled = true) => useQuery({ queryKey: [...COMMUNICATION_KEY, 'contacts'], queryFn: communicationService.contacts, enabled });
 export const useThreads = () => useQuery({ queryKey: [...COMMUNICATION_KEY, 'threads'], queryFn: communicationService.threads, refetchInterval: 30_000 });

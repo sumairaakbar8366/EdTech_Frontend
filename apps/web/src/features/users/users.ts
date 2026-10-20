@@ -10,6 +10,7 @@ export type PersonType = 'staff' | 'guardian' | 'student';
 export type UserStatusFilter = 'active' | 'disabled' | 'pending';
 
 export interface SchoolLogin {
+  photoKey?: string | null;
   id: string;
   /** Sign-in User ID, e.g. TCH-2026-0007 (never changes). */
   loginId: string;

@@ -1,5 +1,5 @@
 import { Coffee, Pencil, Plus, Trash2 } from 'lucide-react';
-import { IconButton } from '@/components/ui';
+import { IconButton, LiveDot } from '@/components/ui';
 import type { TimetableSlot } from '@/features/timetable/types/timetable.types';
 import { subjectAccent } from '@/features/timetable/utils/timetable.utils';
 import { DAY_NAMES } from '@/lib/format';
@@ -22,6 +22,7 @@ export function WeekGrid({ slots, show, onDelete, onEdit, onAdd, highlightDay }:
 }) {
   const days = [1, 2, 3, 4, 5, ...[6, 7].filter((d) => slots.some((s) => s.dayOfWeek === d))];
   const periods = [...new Map(slots.map((s) => [`${s.startMinute}-${s.endMinute}`, { start: s.startMinute, end: s.endMinute }])).values()].sort((a, b) => a.start - b.start || a.end - b.end);
+  const nowMinute = new Date().getHours() * 60 + new Date().getMinutes();
   if (periods.length === 0) return <p className="py-10 text-center text-slate-500">No periods scheduled yet.</p>;
 
   const rows: ({ kind: 'period'; start: number; end: number } | { kind: 'break'; start: number; end: number })[] = [];
@@ -80,7 +81,10 @@ export function WeekGrid({ slots, show, onDelete, onEdit, onAdd, highlightDay }:
                           {(() => {
                             const body = (
                               <>
-                                <div className="truncate pr-6 font-semibold text-slate-800 dark:text-slate-100">{s.subject.name}</div>
+                                <div className="flex items-center gap-1.5 truncate pr-6 font-semibold text-slate-800 dark:text-slate-100">
+                                  {d === highlightDay && nowMinute >= s.startMinute && nowMinute < s.endMinute && <LiveDot label="Happening now" />}
+                                  <span className="truncate">{s.subject.name}</span>
+                                </div>
                                 <div className="truncate text-xs text-slate-500 dark:text-slate-400">
                                   {show === 'teacher' ? `${s.employee.firstName} ${s.employee.lastName}` : `${s.section.schoolClass.name} ${s.section.name}`}
                                   {s.room && <> · {s.room.name}</>}

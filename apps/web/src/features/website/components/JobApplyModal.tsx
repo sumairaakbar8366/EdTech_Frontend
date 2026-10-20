@@ -1,3 +1,4 @@
+import { PhotoPicker } from '@/features/photos/PhotoPicker';
 import { CheckCircle2 } from 'lucide-react';
 import { useState } from 'react';
 import { Alert, Button, Field, FormSection, Input, Modal, Select, TextArea } from '@/components/ui';
@@ -22,16 +23,18 @@ export function JobApplyModal({ job, onClose }: { job: PublicSite['jobs'][number
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const set = (k: keyof Form) => (e: { target: { value: string } }) => setF({ ...f, [k]: e.target.value });
-  const close = () => { setF(BLANK); setDone(false); setError(null); onClose(); };
+  const [photoId, setPhotoId] = useState<string | null>(null);
+  const close = () => { setF(BLANK); setDone(false); setError(null); setPhotoId(null); onClose(); };
   if (!job) return null;
   const teaching = /teach|lecturer|instructor/i.test(job.title) || (job as { staffType?: string }).staffType === 'teaching';
 
   const submit = async () => {
+    if (!photoId) return setError('Please add your photo.');
     setBusy(true);
     setError(null);
     try {
       const body = Object.fromEntries(Object.entries(f).map(([k, v]) => [k, v.trim() === '' ? null : NUMBERS.includes(k as keyof Form) ? Number(v) : v.trim()]));
-      await websiteService.applyJob(job.id, { ...body, firstName: f.firstName.trim(), lastName: f.lastName.trim(), email: f.email.trim(), website: f.website } as Parameters<typeof websiteService.applyJob>[1]);
+      await websiteService.applyJob(job.id, { ...body, photoId, firstName: f.firstName.trim(), lastName: f.lastName.trim(), email: f.email.trim(), website: f.website } as Parameters<typeof websiteService.applyJob>[1]);
       setDone(true);
     } catch (e) {
       setError(errorMessage(e, 'Could not send the application.'));
@@ -49,6 +52,7 @@ export function JobApplyModal({ job, onClose }: { job: PublicSite['jobs'][number
           {error && <Alert>{error}</Alert>}
           <input type="text" tabIndex={-1} autoComplete="off" value={f.website} onChange={set('website')} className="hidden" aria-hidden />
           <FormSection title="About you">
+            <PhotoPicker publicForm required value={photoId} onChange={setPhotoId} name={`${f.firstName} ${f.lastName}`.trim()} label="Your photo" />
             <div className="grid gap-3 sm:grid-cols-3">
               <Field label="First name"><Input required maxLength={100} value={f.firstName} onChange={set('firstName')} /></Field>
               <Field label="Last name"><Input required maxLength={100} value={f.lastName} onChange={set('lastName')} /></Field>

@@ -1,3 +1,4 @@
+import { PhotoPicker } from '@/features/photos/PhotoPicker';
 import { ArrowRight, Briefcase, Building2, CalendarDays, CheckCircle2, ClipboardList, FileCheck2, GraduationCap, LogIn, Mail, MapPin, Menu, PhoneCall, Phone, Quote, Send, UserCheck, Users, X } from 'lucide-react';
 import { JobApplyModal } from '@/features/website/components/JobApplyModal';
 import { SiteArtwork } from '@/features/website/components/SiteArtwork';
@@ -56,15 +57,18 @@ function AdmissionForm({ site }: { site: PublicSite }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
+  const [photoId, setPhotoId] = useState<string | null>(null);
   const set = (k: keyof typeof f) => (e: { target: { value: string } }) => setF({ ...f, [k]: e.target.value });
   const submit = async () => {
+    if (!photoId) return setError("Please add the student's photo.");
     setBusy(true);
     setError(null);
     try {
       const body = Object.fromEntries(Object.entries(f).map(([k, v]) => [k, v === '' && !['website'].includes(k) ? null : v]));
-      const r = await websiteService.applyAdmission({ ...body, firstName: f.firstName, lastName: f.lastName, classId: f.classId, campusId: f.campusId, dateOfBirth: f.dateOfBirth, guardianFirstName: f.guardianFirstName, guardianLastName: f.guardianLastName, guardianPhone: f.guardianPhone, guardianRelation: f.guardianRelation });
+      const r = await websiteService.applyAdmission({ ...body, photoId, firstName: f.firstName, lastName: f.lastName, classId: f.classId, campusId: f.campusId, dateOfBirth: f.dateOfBirth, guardianFirstName: f.guardianFirstName, guardianLastName: f.guardianLastName, guardianPhone: f.guardianPhone, guardianRelation: f.guardianRelation });
       setDone(r.applicationNo);
       setF(blank);
+      setPhotoId(null);
     } catch (e) {
       setError(errorMessage(e, 'Could not send the application. Please check the form and try again.'));
     } finally {
@@ -88,6 +92,7 @@ function AdmissionForm({ site }: { site: PublicSite }) {
         {error && <div className="sm:col-span-2"><Alert>{error}</Alert></div>}
         <input type="text" tabIndex={-1} autoComplete="off" value={f.website} onChange={set('website')} className="hidden" aria-hidden />
         {heading('Student')}
+        <div className="sm:col-span-2"><PhotoPicker publicForm required value={photoId} onChange={setPhotoId} name={`${f.firstName} ${f.lastName}`.trim()} label="Student photo" hint="A clear, recent photo of the child's face. JPG or PNG, up to 3 MB." /></div>
         {site.sessions.length > 1 && (
           <Field label="Session"><Select required value={f.academicYearId} onChange={set('academicYearId')}>{site.sessions.map((s) => <option key={s.id} value={s.id}>{s.name}{s.isCurrent ? ' (current)' : ''}</option>)}</Select></Field>
         )}

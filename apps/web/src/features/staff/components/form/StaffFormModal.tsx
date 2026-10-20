@@ -10,14 +10,16 @@ import { toStaffForm, toStaffPayload, type StaffForm } from '@/features/staff/ut
 import { CredentialsModal } from '@/features/users/components/CredentialsModal';
 import { handover, type ApiCredentials, type LoginHandover } from '@/features/users/users';
 import { onSubmit } from '@/lib/forms';
+import { PhotoPicker } from '@/features/photos/PhotoPicker';
 
 /** Add a staff member, or edit one (`employee` given). */
 export function StaffFormModal({ open, employee, onClose }: { open: boolean; employee?: EmployeeDetail; onClose: () => void }) {
   const editing = !!employee;
   const [form, setForm] = useState<StaffForm>(() => toStaffForm(employee));
   const campuses = useActiveCampuses();
+  const [photoId, setPhotoId] = useState<string | null>(null);
   useEffect(() => {
-    if (open) setForm(toStaffForm(employee));
+    if (open) { setForm(toStaffForm(employee)); setPhotoId(null); }
   }, [open, employee]);
   useEffect(() => {
     if (!form.campusId && campuses.data?.[0]) setForm((s) => ({ ...s, campusId: campuses.data![0]!.id }));
@@ -31,6 +33,7 @@ export function StaffFormModal({ open, employee, onClose }: { open: boolean; emp
       if (editing) return staffService.update(employee!.id, body);
       return staffService.create({
         ...body,
+        ...(photoId && { photoId }),
         ...(form.employeeNo.trim() && { employeeNo: form.employeeNo.trim() }),
         ...(form.createLogin && { login: { roles: form.roles } }),
       });
@@ -50,9 +53,10 @@ export function StaffFormModal({ open, employee, onClose }: { open: boolean; emp
       size="xl"
       title={editing ? `Edit ${employee!.firstName} ${employee!.lastName}` : 'Add staff member'}
       onClose={onClose}
-      footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" form="staff-form" loading={save.isPending}>{editing ? 'Save changes' : 'Add staff'}</Button></>}
+      footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" form="staff-form" loading={save.isPending} disabled={!editing && !photoId} title={!editing && !photoId ? 'Add the staff picture first' : undefined}>{editing ? 'Save changes' : 'Add staff'}</Button></>}
     >
       <form id="staff-form" onSubmit={onSubmit(() => save.mutate(undefined))} className="space-y-6">
+        {!editing && <PhotoPicker value={photoId} onChange={setPhotoId} name={`${form.firstName} ${form.lastName}`.trim()} label="Staff picture" required />}
         <PersonalSection form={form} set={set} />
         <EmploymentSection form={form} set={set} editing={editing} />
         <ProfileSection form={form} set={set} />

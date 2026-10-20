@@ -57,6 +57,9 @@ export function TenantApp({ basename }: { basename: string }) {
 /** Students may postpone confirming an email (many young students have none); others may not. */
 const SKIP_KEY = 'schoolerp.skipEmailVerification';
 
+/** Only a student without an email of their own (they sign in with their User ID) may skip; the API enforces the same. */
+const studentWithoutEmail = (me: { user: { email: string | null }; roles: { key: string }[] }) => !me.user.email && me.roles.every((r) => r.key === 'student');
+
 function SignedInRoutes({ tenant }: { tenant: Tenant }) {
   const { me, isLoading } = useAuth();
   const [skipped, setSkipped] = useState(() => {
@@ -82,13 +85,13 @@ function SignedInRoutes({ tenant }: { tenant: Tenant }) {
       ) : me.user.mustChangePassword ? (
         // An administrator-issued password must be replaced before anything else (the API enforces it too).
         <Route path="*" element={<ChangePasswordPage />} />
-      ) : !me.user.emailVerified && !skipped && !me.support ? (
+      ) : !me.user.emailVerified && !me.support && !(skipped && studentWithoutEmail(me)) ? (
         // Then they confirm their own email (OTP), which "forgot password" relies on.
         <Route
           path="*"
           element={
             <VerifyEmailPage
-              optional={me.roles.every((r) => r.key === 'student')}
+              optional={studentWithoutEmail(me)}
               onSkip={() => {
                 try { sessionStorage.setItem(SKIP_KEY, '1'); } catch { /* private mode */ }
                 setSkipped(true);

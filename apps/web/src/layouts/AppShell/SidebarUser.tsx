@@ -2,6 +2,8 @@ import { LogOut, UserCog } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { AccountModal } from '@/features/auth/components/AccountModal';
+import { Avatar } from '@/components/ui';
+import { MyPhotoModal } from '@/features/photos/MyPhotoModal';
 
 function initials(name: string): string {
   return name
@@ -16,12 +18,19 @@ function initials(name: string): string {
 export function SidebarUser({ name, detail, compact }: { name: string; detail: string; compact: boolean }) {
   const { logout, me } = useAuth();
   const [account, setAccount] = useState(false);
+  const [photo, setPhoto] = useState(false);
   return (
-    <div className={`relative rounded-xl border border-white/10 bg-white/5 text-white ${compact ? 'mx-1.5 my-2 p-1' : 'm-3 p-3'}`}>
+    <div className={`relative rounded-xl border border-white/10 bg-white/5 text-white ${compact ? 'mx-1.5 mb-2 mt-1 p-1' : 'm-3 p-3'}`}>
       <div className={`flex items-center ${compact ? 'flex-col gap-2' : 'gap-3'}`}>
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-500 text-xs font-bold text-white">
-          {initials(name)}
-        </span>
+        {me?.scope === 'school' ? (
+          <button onClick={() => setPhoto(true)} className="shrink-0 rounded-full ring-2 ring-orange-400/70 transition hover:ring-orange-300" aria-label="My picture" title="My picture">
+            <Avatar photoKey={me.user.photoKey} name={name} size="sm" />
+          </button>
+        ) : (
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-500 text-xs font-bold text-white">
+            {initials(name)}
+          </span>
+        )}
         {!compact && (
           <div className="min-w-0 flex-1">
             <div className="truncate text-sm font-semibold">{name}</div>
@@ -38,6 +47,7 @@ export function SidebarUser({ name, detail, compact }: { name: string; detail: s
         </button>
       </div>
       <AccountModal open={account} onClose={() => setAccount(false)} />
+      <MyPhotoModal open={photo} onClose={() => setPhoto(false)} />
     </div>
   );
 }

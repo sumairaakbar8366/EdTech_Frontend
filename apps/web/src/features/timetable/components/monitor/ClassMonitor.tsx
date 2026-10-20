@@ -35,10 +35,11 @@ export function ClassMonitor() {
         <div className="w-52"><Field label="Date"><Input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></Field></div>
         {data.data && <span className="pb-2 text-lg font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">{DAY_NAMES[data.data.dayOfWeek]}</span>}
       </div>
-      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
+      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-6">
         <StatCard label="Scheduled" value={t?.scheduled ?? '–'} icon={CalendarDays} tone="slate" />
         <StatCard label="Live now" value={t?.live ?? '–'} icon={CirclePlay} tone="emerald" />
-        <StatCard label="Completed" value={t?.completed ?? '–'} icon={CircleStop} tone="primary" />
+        <StatCard label="Finished" value={t?.completed ?? '–'} icon={CircleStop} tone="primary" />
+        <StatCard label="Late (not started)" value={t?.late ?? '–'} icon={Clock} tone="amber" />
         <StatCard label="Missed" value={t?.missed ?? '–'} icon={Clock} tone="rose" />
         <StatCard label="Upcoming" value={t?.upcoming ?? '–'} icon={Presentation} tone="sky" />
       </div>

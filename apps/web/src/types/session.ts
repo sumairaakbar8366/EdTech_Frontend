@@ -21,7 +21,7 @@ export type Me =
        * `emailVerified` once confirmed with a code (needed for "forgot password").
        * `mustChangePassword`: an administrator set the password; the user must replace it first.
        */
-      user: { id: string; loginId: string; email: string | null; emailVerified: boolean; firstName: string; lastName: string; phone: string | null; mustChangePassword?: boolean };
+      user: { id: string; loginId: string; email: string | null; emailVerified: boolean; firstName: string; lastName: string; phone: string | null; mustChangePassword?: boolean; photoKey?: string | null; photoNeedsApproval?: boolean };
       school: { id: string; name: string; slug: string } | null;
       roles: { key: SchoolRoleKey; name: string; level: number }[];
       permissions: string[];
