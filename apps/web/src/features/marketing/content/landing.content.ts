@@ -26,6 +26,7 @@ import type { Tone } from '@/components/ui';
 /** Landing-page sections, in order; the side navigator and header links use these ids. */
 export const SECTIONS = [
   { id: 'top', label: 'Home' },
+  { id: 'tour', label: 'How it works' },
   { id: 'features', label: 'Features' },
   { id: 'roles', label: 'Dashboards' },
   { id: 'modules', label: 'Modules' },
@@ -35,7 +36,7 @@ export const SECTIONS = [
   { id: 'contact', label: 'Get started' },
 ] as const;
 
-export const NAV_LINKS = SECTIONS.filter((s) => ['features', 'roles', 'modules', 'special', 'plans'].includes(s.id));
+export const NAV_LINKS = SECTIONS.filter((s) => ['tour', 'features', 'roles', 'modules', 'special', 'plans'].includes(s.id));
 
 export interface FeatureSlide {
   title: string;

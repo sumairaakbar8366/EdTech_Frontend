@@ -1,5 +1,6 @@
 import { BillingPage } from '@/features/billing/pages/BillingPage';
 import { WebsiteEditorPage } from '@/features/website/pages/WebsiteEditorPage';
+import { AdmissionFormBuilderPage } from '@/features/website/pages/AdmissionFormBuilderPage';
 import { MessagesPage } from '@/features/communication/pages/MessagesPage';
 import type { AreaRoutes } from '@/app/router/types';
 import { AcademicsPage } from '@/features/academics/pages/AcademicsPage';
@@ -29,6 +30,8 @@ import { CommunicationPage } from '@/features/communication/pages/CommunicationP
 import { ReportsPage } from '@/features/reports/pages/ReportsPage';
 import { SchoolDocumentsPage } from '@/features/documents/pages/DocumentsPage';
 import { UsersPage } from '@/features/users/pages/UsersPage';
+import { ActivityPage } from '@/features/audit/pages/ActivityPage';
+import { LiveClassesPage } from '@/features/timetable/pages/LiveClassesPage';
 
 /** School administrator (board page 4: Admin dashboard menu). */
 export const adminRoutes: AreaRoutes = (can) => [
@@ -44,6 +47,7 @@ export const adminRoutes: AreaRoutes = (can) => [
   { path: 'academics', capability: 'academics.view', element: <AcademicsPage readOnly={!can('academics.edit')} /> },
   { path: 'attendance', capability: 'attendance.view', element: <AttendanceAdminPage canEdit={can('attendance.edit')} canApproveLeave={can('leave.approve')} /> },
   { path: 'timetable', capability: 'timetable.view', element: <TimetableAdminPage /> },
+  { path: 'live-classes', capability: 'attendance.view', element: <LiveClassesPage /> },
   { path: 'finance', capability: 'fees.view', element: <FinancePage canEdit={can('fees.create')} /> },
   { path: 'payroll', capability: 'payroll.view', element: <PayrollPage canEdit={can('payroll.process')} /> },
   { path: 'payroll/runs/:id', capability: 'payroll.view', element: <RunDetailPage canEdit={can('payroll.process')} canApprove={can('payroll.approve')} /> },
@@ -54,7 +58,9 @@ export const adminRoutes: AreaRoutes = (can) => [
   { path: 'exams/:id', capability: 'exams.view', element: <ExamDetailPage canEdit={can('exams.manage')} canEnter={can('results.enter')} canPublish={can('results.publish')} /> },
   { path: 'exams/:id/marks', capability: 'results.enter', element: <MarksheetPage /> },
   { path: 'website', capability: 'settings.manage', element: <WebsiteEditorPage /> },
+  { path: 'website/admission-form', capability: 'settings.manage', element: <AdmissionFormBuilderPage /> },
   { path: 'users-and-access', capability: 'settings.manage', element: <UsersPage /> },
+  { path: 'activity', capability: 'audit.view', element: <ActivityPage /> },
   { path: 'plans-and-billing', capability: 'settings.manage', element: <BillingPage /> },
   { path: 'billing', capability: 'settings.manage', element: <BillingPage /> },
   { path: 'settings', capability: 'settings.manage', element: <SettingsPage /> },

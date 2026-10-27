@@ -1,6 +1,6 @@
 import { Award as AwardIcon, Pencil, Percent, Plus, XCircle } from 'lucide-react';
 import { useState } from 'react';
-import { Badge, Button, Card, CompactNumber, ConfirmDialog, EmptyState, IconButton, Spinner } from '@/components/ui';
+import { Badge, Button, Card, CompactNumber, ConfirmDialog, EmptyState, IconButton, SearchInput, Spinner } from '@/components/ui';
 import { AwardModal } from '@/features/fees/components/concessions/AwardModal';
 import { ConcessionModal } from '@/features/fees/components/concessions/ConcessionModal';
 import { CONCESSION_KIND_TONE } from '@/features/fees/constants';
@@ -9,16 +9,19 @@ import { feeService } from '@/features/fees/services/feeService';
 import type { Award, Concession } from '@/features/fees/types/fee.types';
 import { concessionValue, studentName } from '@/features/fees/utils/fee.utils';
 import { formatDate } from '@/lib/format';
+import { matchesText } from '@/lib/textMatch';
 
 /** Discounts, scholarships and reliefs, and their awards to students (page 8: concessions). */
 export function ConcessionsTab({ canEdit, focus = 'all' }: { canEdit: boolean; focus?: 'all' | 'discounts' | 'scholarships' }) {
   const [editing, setEditing] = useState<Concession | 'new' | null>(null);
   const [granting, setGranting] = useState(false);
   const [revoking, setRevoking] = useState<Award | null>(null);
+  const [text, setText] = useState('');
   const concessions = useConcessions();
   const awards = useAwards();
   const revoke = useFeesAction(feeService.revokeAward, { success: 'Award revoked; future invoices will not apply it', onDone: () => setRevoking(null) });
   const shown = concessions.data?.filter((c) => focus === 'all' || (focus === 'scholarships' ? c.kind === 'scholarship' : c.kind !== 'scholarship'));
+  const awarded = awards.data?.filter((a) => matchesText(text, studentName(a.student), a.student.admissionNo, a.discount.name, a.reason, a.status));
 
   return (
     <div className="grid gap-4 xl:grid-cols-[1fr_1.3fr]">
@@ -46,6 +49,10 @@ export function ConcessionsTab({ canEdit, focus = 'all' }: { canEdit: boolean; f
         {awards.isLoading && <div className="px-5"><Spinner /></div>}
         {awards.data?.length === 0 && <EmptyState icon={AwardIcon} title="No awards yet" tone="magenta">Award a concession to a student; it applies to invoices issued within its dates.</EmptyState>}
         {!!awards.data?.length && (
+          <div className="border-b border-slate-200 p-4 dark:border-white/5"><SearchInput label="Search awards" value={text} onChange={setText} placeholder="Search student, admission no. or concession…" /></div>
+        )}
+        {!!awards.data?.length && awarded?.length === 0 && <p className="px-5 py-4 text-sm text-slate-500">No award matches this search.</p>}
+        {!!awarded?.length && (
           <div className="overflow-x-auto">
             <table className="w-full text-base">
               <thead>
@@ -58,7 +65,7 @@ export function ConcessionsTab({ canEdit, focus = 'all' }: { canEdit: boolean; f
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200/70 dark:divide-white/5">
-                {awards.data.map((a) => (
+                {awarded.map((a) => (
                   <tr key={a.id}>
                     <td className="px-5 py-3">
                       <div className="font-semibold text-slate-800 dark:text-slate-100">{studentName(a.student)}</div>

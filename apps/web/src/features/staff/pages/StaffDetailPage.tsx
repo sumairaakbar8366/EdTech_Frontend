@@ -8,6 +8,9 @@ import { ExperienceTab } from '@/features/staff/components/detail/ExperienceTab'
 import { QualificationsTab } from '@/features/staff/components/detail/QualificationsTab';
 import { StaffLoginModal, StaffStatusModal } from '@/features/staff/components/detail/StaffAdminModals';
 import { StaffHeader } from '@/features/staff/components/detail/StaffHeader';
+import { ServiceRecordCard } from '@/features/staff/components/detail/ServiceRecordCard';
+import { ReplaceAdminModal } from '@/features/staff/components/ReplaceAdminModal';
+import { useSchoolUser } from '@/features/auth/usePermissions';
 import { StaffOverviewTab } from '@/features/staff/components/detail/StaffOverviewTab';
 import { TeachingTab } from '@/features/staff/components/detail/TeachingTab';
 import { StaffFormModal } from '@/features/staff/components/form/StaffFormModal';
@@ -25,6 +28,10 @@ export function StaffDetailPage({ canEdit, canEditAcademics, own = false }: { ca
   const detail = useStaffMember(id, own);
   const e = detail.data;
   const editable = canEdit && !own;
+  const me = useSchoolUser();
+  const [replacing, setReplacing] = useState(false);
+  // Only the principal or a School Admin replaces an admin (never themself).
+  const canReplace = editable && me.roles.some((r) => r.key === 'principal' || r.key === 'school_admin');
 
   if (detail.isLoading) return <Spinner />;
   if (detail.error || !e) {
@@ -52,7 +59,8 @@ export function StaffDetailPage({ canEdit, canEditAcademics, own = false }: { ca
           <ArrowLeft size={16} /> All staff
         </AreaLink>
       )}
-      <StaffHeader employee={e} editable={editable} onLogin={() => setDialog('login')} onStatus={() => setDialog('status')} onEdit={() => setDialog('edit')} />
+      <StaffHeader employee={e} editable={editable} onLogin={() => setDialog('login')} onStatus={() => setDialog('status')} onEdit={() => setDialog('edit')} onReplaceAdmin={canReplace && e.userId !== me.user.id ? () => setReplacing(true) : undefined} />
+      {!own && <ServiceRecordCard employeeId={e.id} />}
       <Tabs tabs={tabs} value={tab} onChange={setTab} />
       {tab === 'overview' && <StaffOverviewTab employee={e} />}
       {tab === 'qualifications' && <QualificationsTab employee={e} editable={editable} />}
@@ -62,7 +70,8 @@ export function StaffDetailPage({ canEdit, canEditAcademics, own = false }: { ca
       {editable && (
         <>
           <StaffFormModal open={dialog === 'edit'} employee={e} onClose={close} />
-          <StaffStatusModal open={dialog === 'status'} employee={e} onClose={close} />
+          <StaffStatusModal open={dialog === 'status'} employee={e} onClose={close} onReplaceAdmin={canReplace && e.userId !== me.user.id ? () => setReplacing(true) : undefined} />
+          <ReplaceAdminModal open={replacing} admin={e} onClose={() => setReplacing(false)} />
           <StaffLoginModal open={dialog === 'login'} employee={e} onClose={close} />
         </>
       )}

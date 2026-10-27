@@ -35,17 +35,18 @@ export function ClassMonitor() {
         <div className="w-52"><Field label="Date"><Input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></Field></div>
         {data.data && <span className="pb-2 text-lg font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">{DAY_NAMES[data.data.dayOfWeek]}</span>}
       </div>
-      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
+      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-6">
         <StatCard label="Scheduled" value={t?.scheduled ?? '–'} icon={CalendarDays} tone="slate" />
         <StatCard label="Live now" value={t?.live ?? '–'} icon={CirclePlay} tone="emerald" />
-        <StatCard label="Completed" value={t?.completed ?? '–'} icon={CircleStop} tone="primary" />
+        <StatCard label="Finished" value={t?.completed ?? '–'} icon={CircleStop} tone="primary" />
+        <StatCard label="Late (not started)" value={t?.late ?? '–'} icon={Clock} tone="amber" />
         <StatCard label="Missed" value={t?.missed ?? '–'} icon={Clock} tone="rose" />
         <StatCard label="Upcoming" value={t?.upcoming ?? '–'} icon={Presentation} tone="sky" />
       </div>
       <Card padded={false}>
         {data.isLoading && <div className="px-5"><Spinner /></div>}
         {data.data?.rows.length === 0 && <EmptyState icon={CalendarDays} title="No classes scheduled on this day" tone="sky" />}
-        {!!data.data?.rows.length && <DataTable columns={COLUMNS} rows={data.data.rows} rowKey={(r) => r.id} />}
+        {!!data.data?.rows.length && <DataTable columns={COLUMNS} rows={data.data.rows} rowKey={(r) => r.id} searchText={(r) => [r.section.schoolClass.name, r.section.name, r.section.campus.code, r.subject.name, r.employee.firstName, r.employee.lastName, r.state]} searchPlaceholder="Search class, subject, teacher or status…" />}
       </Card>
     </div>
   );

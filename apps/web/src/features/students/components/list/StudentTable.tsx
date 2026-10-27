@@ -1,5 +1,5 @@
 import { KeyRound } from 'lucide-react';
-import { Badge, DataTable, StatusBadge, type Column } from '@/components/ui';
+import { Avatar, Badge, DataTable, StatusBadge, type Column } from '@/components/ui';
 import { STUDENT_STATUS_LABEL, STUDENT_STATUS_TONE } from '@/features/students/constants';
 import type { StudentListItem } from '@/features/students/types/student.types';
 import { age } from '@/features/students/utils/student.utils';
@@ -9,7 +9,7 @@ const COLUMNS: Column<StudentListItem>[] = [
     header: 'Student',
     cell: (s) => (
       <div className="flex items-center gap-3">
-        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ${s.gender === 'female' ? 'bg-rose-500' : 'bg-emerald-600'}`}>{s.firstName[0]}{s.lastName[0]}</span>
+        <Avatar photoKey={s.photoKey} name={`${s.firstName} ${s.lastName}`} />
         <div>
           <div className="flex items-center gap-1.5 font-semibold text-slate-800 dark:text-slate-100">
             {s.firstName} {s.lastName}

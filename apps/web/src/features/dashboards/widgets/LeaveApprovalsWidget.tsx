@@ -1,5 +1,5 @@
 import { CalendarOff } from 'lucide-react';
-import { Badge, Card, EmptyState, Spinner } from '@/components/ui';
+import { Avatar, Badge, Card, EmptyState, Spinner } from '@/components/ui';
 import { ViewAll } from '@/features/dashboards/components/ViewAll';
 import { useLeaveRequests } from '@/features/leave/leave';
 import { compactNumber, formatDate } from '@/lib/format';
@@ -15,6 +15,7 @@ export function LeaveApprovalsWidget({ to, className = '' }: { to: string; class
       <ul className="divide-y divide-slate-200/70 dark:divide-white/5">
         {rows.slice(0, 5).map((r) => (
           <li key={r.id} className="flex items-center gap-3 py-2">
+            <Avatar photoKey={r.employee.photoKey} name={`${r.employee.firstName} ${r.employee.lastName}`} />
             <div className="min-w-0 flex-1">
               <div className="truncate font-semibold text-slate-800 dark:text-slate-100">{r.employee.firstName} {r.employee.lastName}</div>
               <div className="text-sm text-slate-500">{formatDate(r.startDate)} – {formatDate(r.endDate)} · {r.days} day(s)</div>

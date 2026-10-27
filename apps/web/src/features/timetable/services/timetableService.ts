@@ -10,6 +10,8 @@ export interface MonitorRow extends TimetableSlot {
 export interface MonitorData {
   date: string;
   dayOfWeek: number;
+  /** Minutes since midnight at the school (null for another day). */
+  nowMinute: number | null;
   totals: Record<string, number>;
   rows: MonitorRow[];
 }
@@ -39,6 +41,8 @@ export interface SlotQuery {
   dayOfWeek: number;
   startTime: string;
   endTime: string;
+  /** When editing a period: leave it out of the clash checks. */
+  excludeSlotId?: string;
 }
 
 export interface TodaySlot extends TimetableSlot {
@@ -50,12 +54,16 @@ export const timetableService = {
   section: (sectionId: string) => api<TimetableSlot[]>(`/timetable/section?sectionId=${sectionId}`),
   addSlot: (body: { sectionId: string; subjectId: string; employeeId: string; roomId: string | null; dayOfWeek: number; startTime: string; endTime: string }) =>
     api('/timetable/slots', { method: 'POST', body }),
+  updateSlot: (id: string, body: { sectionId: string; subjectId: string; employeeId: string; roomId: string | null; dayOfWeek: number; startTime: string; endTime: string }) =>
+    api(`/timetable/slots/${id}`, { method: 'PATCH', body }),
   removeSlot: (id: string) => api(`/timetable/slots/${id}`, { method: 'DELETE' }),
-  teacherOptions: (q: SlotQuery) => api<TeacherOptions>(`/timetable/teacher-options?${new URLSearchParams({ ...q, dayOfWeek: String(q.dayOfWeek) })}`),
+  teacherOptions: ({ excludeSlotId, ...q }: SlotQuery) =>
+    api<TeacherOptions>(`/timetable/teacher-options?${new URLSearchParams({ ...q, dayOfWeek: String(q.dayOfWeek), ...(excludeSlotId && { excludeSlotId }) })}`),
   sectionAssignments: (sectionId: string) => api<TeacherAssignment[]>(`/academics/teacher-assignments?sectionId=${sectionId}`),
   mine: () => api<{ kind: 'teacher' | 'student'; slots: TimetableSlot[] }>('/timetable/me'),
   children: () => api<{ studentId: string; name: string; slots: TimetableSlot[] }[]>('/timetable/children'),
-  monitor: (date: string) => api<MonitorData>(`/class-sessions/monitor?date=${date}`),
+  /** Without a date: today at the school (its own time zone). */
+  monitor: (date: string) => api<MonitorData>(`/class-sessions/monitor${date ? `?date=${date}` : ''}`),
   today: () => api<{ date: string; nowMinute: number; slots: TodaySlot[] }>('/class-sessions/today'),
   startClass: (timetableSlotId: string, topic: string | null) => api('/class-sessions/start', { method: 'POST', body: { timetableSlotId, topic } }),
   endClass: (sessionId: string) => api(`/class-sessions/${sessionId}/end`, { method: 'POST' }),

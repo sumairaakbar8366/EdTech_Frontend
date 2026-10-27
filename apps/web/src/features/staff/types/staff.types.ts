@@ -9,6 +9,8 @@ export type EmployeeStatus = 'active' | 'on_leave' | 'resigned' | 'terminated';
 export type EmploymentType = 'full_time' | 'part_time' | 'contract';
 
 export interface EmployeeListItem {
+  /** Profile picture (GET /photos/<key>). */
+  photoKey?: string | null;
   id: string;
   employeeNo: string;
   firstName: string;

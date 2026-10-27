@@ -74,7 +74,7 @@ export function BankAccountsTab({ canEdit }: { canEdit: boolean }) {
         ]} rows={async () => approved.data ?? []} />}
       >
         {approved.isLoading && <div className="p-6"><Spinner /></div>}
-        {!!approved.data?.length && <DataTable columns={acctCols} rows={approved.data} rowKey={(a) => a.id} />}
+        {!!approved.data?.length && <DataTable columns={acctCols} rows={approved.data} rowKey={(a) => a.id} searchText={(a) => [a.employee?.firstName, a.employee?.lastName, a.employee?.employeeNo, a.bankName, a.accountTitle, a.accountNumber]} searchPlaceholder="Search staff, bank or account…" />}
         {missing.length > 0 && (
           <div className="border-t border-(--surface-border) px-6 py-4">
             <p className="mb-2 text-sm font-semibold text-slate-600 dark:text-slate-300">No approved account yet ({missing.length}) · salaries for them cannot be paid by bank transfer</p>

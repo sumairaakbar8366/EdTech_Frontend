@@ -6,6 +6,8 @@ import { SsoCallbackPage, SsoStartPage } from '@/features/auth/pages/SsoPages';
 import { AccessPage } from '@/features/marketing/pages/AccessPage';
 import { CheckoutPage } from '@/features/marketing/pages/CheckoutPage';
 import { LandingPage } from '@/features/marketing/pages/LandingPage';
+import { GuidePage } from '@/features/marketing/pages/GuidePage';
+import { TourPage } from '@/features/marketing/pages/TourPage';
 import { setApiBase } from '@/services/api/http';
 
 /**
@@ -25,6 +27,9 @@ export function App() {
         <Route path="/" element={<LandingPage />} />
         {/* One sign-in for the owner and every school; it continues in the right dashboard. */}
         <Route path="/login" element={<MainLoginPage />} />
+        {/* How it works: the walkthrough video and the written user guide. */}
+        <Route path="/tour" element={<TourPage />} />
+        <Route path="/guide" element={<GuidePage />} />
         <Route path="/access" element={<AccessPage />} />
         <Route path="/signup" element={<Navigate to="/access?mode=signup" replace />} />
         {/* "Continue with Google": the Google round trip always runs on the main site. */}

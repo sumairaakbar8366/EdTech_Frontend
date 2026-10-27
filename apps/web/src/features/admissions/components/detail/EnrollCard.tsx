@@ -14,6 +14,7 @@ import { onSubmit } from '@/lib/forms';
 /** Approved → enrolled: creates the student, generates the logins and opens their record. */
 export function EnrollCard({ application: a }: { application: AdmissionApplication }) {
   const navigate = useAreaNavigate();
+  const saved = a.formAnswers?.filter((x) => x.saveTo).length ?? 0;
   const [e, setE] = useState({ sectionId: '', rollNo: '', admissionDate: todayIso(), parentLogin: true, studentLogin: true });
   const [done, setDone] = useState<{ studentId: string; credentials: GeneratedLogin[] } | null>(null);
   const enroll = useAdmissionsAction(
@@ -42,6 +43,9 @@ export function EnrollCard({ application: a }: { application: AdmissionApplicati
         <p className="text-sm text-slate-500">Passwords are generated automatically and shown once after enrolment; they must be changed at first sign-in.</p>
         <Button type="submit" icon={GraduationCap} className="w-full" loading={enroll.isPending}>Enroll student</Button>
         <p className="text-sm text-slate-500">If the parent’s email already exists (a sibling), the existing parent is linked instead of creating a duplicate.</p>
+        <p className="text-sm text-slate-500">
+          The student record gets everything from the application: details, photo{saved ? `, ${saved} answer${saved === 1 ? '' : 's'} linked to student details` : ''} and the application’s documents.
+        </p>
       </form>
 
       {done && (

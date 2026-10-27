@@ -12,6 +12,7 @@ import { WelcomePage } from '@/features/auth/pages/WelcomePage';
 import { OpenLinkPage } from '@/features/auth/pages/OpenLinkPage';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { SchoolSitePage } from '@/features/website/pages/SchoolSitePage';
+import { AdmissionApplyPage } from '@/features/website/pages/AdmissionApplyPage';
 import { useTenant } from '@/features/tenancy/useTenant';
 import { ApiError } from '@/services/api/http';
 import { marketingOrigin } from '@/config/site';
@@ -57,6 +58,9 @@ export function TenantApp({ basename }: { basename: string }) {
 /** Students may postpone confirming an email (many young students have none); others may not. */
 const SKIP_KEY = 'schoolerp.skipEmailVerification';
 
+/** Only a student without an email of their own (they sign in with their User ID) may skip; the API enforces the same. */
+const studentWithoutEmail = (me: { user: { email: string | null }; roles: { key: string }[] }) => !me.user.email && me.roles.every((r) => r.key === 'student');
+
 function SignedInRoutes({ tenant }: { tenant: Tenant }) {
   const { me, isLoading } = useAuth();
   const [skipped, setSkipped] = useState(() => {
@@ -68,6 +72,8 @@ function SignedInRoutes({ tenant }: { tenant: Tenant }) {
     <Routes>
       {/* A school's address is its public website; the console opens its dashboard (or the main /login). */}
       <Route path="/" element={tenant.kind === 'school' ? <SchoolSitePage /> : me ? <Navigate to="/dashboard" replace /> : <ToMainLogin />} />
+      {/* The website's "Apply now": the school's own admission form, open to everyone. */}
+      {tenant.kind === 'school' && <Route path="/apply" element={<AdmissionApplyPage />} />}
       <Route path="/login" element={tenant.kind === 'school' ? <LoginPage tenant={tenant} /> : me ? <Navigate to="/dashboard" replace /> : <ToMainLogin />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage tenant={tenant} />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
@@ -82,13 +88,13 @@ function SignedInRoutes({ tenant }: { tenant: Tenant }) {
       ) : me.user.mustChangePassword ? (
         // An administrator-issued password must be replaced before anything else (the API enforces it too).
         <Route path="*" element={<ChangePasswordPage />} />
-      ) : !me.user.emailVerified && !skipped && !me.support ? (
+      ) : !me.user.emailVerified && !me.support && !(skipped && studentWithoutEmail(me)) ? (
         // Then they confirm their own email (OTP), which "forgot password" relies on.
         <Route
           path="*"
           element={
             <VerifyEmailPage
-              optional={me.roles.every((r) => r.key === 'student')}
+              optional={studentWithoutEmail(me)}
               onSkip={() => {
                 try { sessionStorage.setItem(SKIP_KEY, '1'); } catch { /* private mode */ }
                 setSkipped(true);

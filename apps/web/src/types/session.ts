@@ -12,7 +12,8 @@ export type Tenant =
     };
 
 export type Me =
-  | { scope: 'platform'; admin: { id: string; email: string; name: string } }
+  /** `isPrimary`: the main owner (manages the owner team, edits / deletes logs); others are labelled "Owner 2"… */
+  | { scope: 'platform'; admin: { id: string; email: string; name: string; isPrimary?: boolean; label?: string | null } }
   | {
       scope: 'school';
       /**
@@ -20,7 +21,7 @@ export type Me =
        * `emailVerified` once confirmed with a code (needed for "forgot password").
        * `mustChangePassword`: an administrator set the password; the user must replace it first.
        */
-      user: { id: string; loginId: string; email: string | null; emailVerified: boolean; firstName: string; lastName: string; phone: string | null; mustChangePassword?: boolean };
+      user: { id: string; loginId: string; email: string | null; emailVerified: boolean; firstName: string; lastName: string; phone: string | null; mustChangePassword?: boolean; photoKey?: string | null; photoNeedsApproval?: boolean };
       school: { id: string; name: string; slug: string } | null;
       roles: { key: SchoolRoleKey; name: string; level: number }[];
       permissions: string[];

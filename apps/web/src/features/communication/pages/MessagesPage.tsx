@@ -1,8 +1,9 @@
 import { ArrowLeft, MessagesSquare, Plus, Send } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
+import { matchesText } from '@/lib/textMatch';
 import { useSearchParams } from 'react-router';
-import { Button, Card, EmptyState, PageHeader, Spinner, TextArea } from '@/components/ui';
+import { Button, Card, EmptyState, PageHeader, SearchInput, Spinner, TextArea } from '@/components/ui';
 import { NewThreadModal } from '@/features/communication/components/NewThreadModal';
 import { useCommunicationAction, useThread, useThreads } from '@/features/communication/hooks/useCommunication';
 import { communicationService } from '@/features/communication/services/communicationService';
@@ -15,6 +16,8 @@ export function MessagesPage({ title = 'Messages', sub = 'Private conversations 
   const active = params.get('thread');
   const [composing, setComposing] = useState(false);
   const threads = useThreads();
+  const [text, setText] = useState('');
+  const shown = threads.data?.filter((t) => matchesText(text, t.subject, t.student.firstName, t.student.lastName, ...t.others.map((o) => o.name), t.lastMessage?.body));
   const select = (id: string | null) => setParams(id ? { thread: id } : {}, { replace: true });
 
   return (
@@ -24,8 +27,10 @@ export function MessagesPage({ title = 'Messages', sub = 'Private conversations 
         <Card padded={false} className={active ? 'hidden lg:block' : ''}>
           {threads.isLoading && <div className="p-5"><Spinner /></div>}
           {threads.data?.length === 0 && <EmptyState icon={MessagesSquare} title="No conversations yet" tone="rose">Start one with “New message”.</EmptyState>}
+          {!!threads.data?.length && <div className="border-b border-slate-200 p-3 dark:border-white/5"><SearchInput label="Search conversations" value={text} onChange={setText} placeholder="Search name, student or subject…" /></div>}
+          {!!threads.data?.length && shown?.length === 0 && <p className="px-4 py-3 text-sm text-slate-500">No conversation matches.</p>}
           <ul className="divide-y divide-slate-200/70 dark:divide-white/5">
-            {threads.data?.map((t) => (
+            {shown?.map((t) => (
               <li key={t.id}>
                 <button onClick={() => select(t.id)} className={`relative flex w-full flex-col gap-0.5 px-4 py-3 text-left transition-colors hover:bg-primary-500/5 ${t.id === active ? 'bg-primary-500/10' : ''}`}>
                   {t.id === active && <motion.span layoutId="thread-active" className="absolute inset-y-0 left-0 w-1 bg-brand" />}

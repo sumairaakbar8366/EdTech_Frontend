@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight, CreditCard, Plus, Printer, Undo2 } from 'lucide-react';
 import { useState } from 'react';
-import { Badge, Button, Card, CompactNumber, EmptyState, Field, IconButton, Input, Spinner } from '@/components/ui';
+import { Badge, Button, Card, CompactNumber, EmptyState, Field, IconButton, Input, SearchInput, Spinner } from '@/components/ui';
 import { allPages } from '@/components/shared/ExportMenu';
 import { SheetActions } from '@/components/shared/SheetActions';
 import { feeService } from '@/features/fees/services/feeService';
@@ -13,6 +13,7 @@ import { usePayments } from '@/features/fees/hooks/useFees';
 import type { Payment } from '@/features/fees/types/fee.types';
 import { studentName } from '@/features/fees/utils/fee.utils';
 import { formatDate } from '@/lib/format';
+import { useDebouncedValue } from '@/lib/hooks/useDebouncedValue';
 
 const PAGE_SIZE = 25;
 
@@ -21,21 +22,24 @@ export function PaymentsTab({ canEdit }: { canEdit: boolean }) {
   const [page, setPage] = useState(1);
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
+  const [text, setText] = useState('');
+  const q = useDebouncedValue(text.trim(), 300);
   const [recording, setRecording] = useState(false);
   const [receiptId, setReceiptId] = useState<string | null>(null);
   const [voiding, setVoiding] = useState<Payment | null>(null);
 
-  const list = usePayments({ page, pageSize: PAGE_SIZE, from, to });
+  const list = usePayments({ page, pageSize: PAGE_SIZE, from, to, q });
   const totalPages = list.data ? Math.max(1, Math.ceil(list.data.total / PAGE_SIZE)) : 1;
 
   return (
-    <Card padded={false} title="Payments" icon={CreditCard} tone="emerald" actions={<div className="flex flex-wrap items-center gap-2"><SheetActions compact fileName="Payments" columns={PAYMENT_EXPORT} rows={() => allPages((p, size) => feeService.payments({ page: p, pageSize: size, from, to }))} importSpec={canEdit ? PAYMENT_IMPORT : undefined} />{canEdit && <Button icon={Plus} onClick={() => setRecording(true)}>Record payment</Button>}</div>}>
+    <Card padded={false} title="Payments" icon={CreditCard} tone="emerald" actions={<div className="flex flex-wrap items-center gap-2"><SheetActions compact fileName="Payments" columns={PAYMENT_EXPORT} rows={() => allPages((p, size) => feeService.payments({ page: p, pageSize: size, from, to, q }))} importSpec={canEdit ? PAYMENT_IMPORT : undefined} />{canEdit && <Button icon={Plus} onClick={() => setRecording(true)}>Record payment</Button>}</div>}>
       <div className="flex flex-wrap items-end gap-3 border-b border-slate-200 p-4 dark:border-white/5">
+        <SearchInput label="Search payments" value={text} onChange={(v) => { setText(v); setPage(1); }} placeholder="Search student, admission no., receipt or reference…" />
         <div className="w-44"><Field label="From"><Input type="date" value={from} onChange={(e) => { setFrom(e.target.value); setPage(1); }} /></Field></div>
         <div className="w-44"><Field label="To"><Input type="date" value={to} min={from} onChange={(e) => { setTo(e.target.value); setPage(1); }} /></Field></div>
       </div>
       {list.isLoading && <div className="px-5"><Spinner /></div>}
-      {list.data?.items.length === 0 && <EmptyState icon={CreditCard} title="No payments in this range" tone="emerald" />}
+      {list.data?.items.length === 0 && <EmptyState icon={CreditCard} title={q ? 'No payment matches this search' : 'No payments in this range'} tone="emerald" />}
       {!!list.data?.items.length && (
         <div className="overflow-x-auto">
           <table className="w-full text-base">

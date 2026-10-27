@@ -1,3 +1,4 @@
+import { LATE_START_GRACE_MINUTES } from '@/features/timetable/constants';
 import type { TodaySlot } from '@/features/timetable/services/timetableService';
 import type { SlotState } from '@/features/timetable/types/timetable.types';
 
@@ -10,7 +11,8 @@ export function isoWeekdayToday(): number {
 /** State of one of today's periods from its session and the school's current minute. */
 export function slotState(slot: TodaySlot, nowMinute: number): SlotState {
   if (slot.session) return slot.session.status;
-  return nowMinute >= slot.endMinute ? 'missed' : 'scheduled';
+  if (nowMinute >= slot.endMinute) return 'missed';
+  return nowMinute >= slot.startMinute + LATE_START_GRACE_MINUTES ? 'late' : 'scheduled';
 }
 
 /** Deterministic colour per subject so a subject looks the same across the week. */

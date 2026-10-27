@@ -1,7 +1,7 @@
 import type { SchoolRoleKey } from '@schoolerp/shared';
 import { BadgeCheck, KeyRound, Mail, ShieldCheck, ShieldOff, UserCheck, UserCog, UserPlus, UserX, Users } from 'lucide-react';
 import { useState } from 'react';
-import { Badge, Button, Card, ConfirmDialog, DataTable, EmptyState, FilterBar, FilterSlot, IconButton, PageHeader, Pagination, SearchInput, Select, Spinner, StatCard, type Column } from '@/components/ui';
+import { Avatar, Badge, Button, Card, type Column, ConfirmDialog, DataTable, EmptyState, FilterBar, FilterSlot, IconButton, PageHeader, Pagination, SearchInput, Select, Spinner, StatCard } from '@/components/ui';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { allPages, ExportMenu } from '@/components/shared/ExportMenu';
 import type { ExportColumn } from '@/lib/spreadsheet';
@@ -9,10 +9,13 @@ import { CredentialsModal } from '@/features/users/components/CredentialsModal';
 import { EditRolesModal } from '@/features/users/components/EditRolesModal';
 import { EmailEditModal } from '@/features/users/components/EmailEditModal';
 import { GrantAccessModal } from '@/features/users/components/GrantAccessModal';
+import { SharedAccessCard } from '@/features/users/components/SharedAccessCard';
+import { PhotoRequestsCard } from '@/features/photos/PhotoRequestsCard';
 import { loginStatus, PERSON_LABEL, usersService, useUsers, useUsersAction, useUsersSummary, type Credentials, type PersonType, type SchoolLogin, type UserStatusFilter } from '@/features/users/users';
 import { compactNumber } from '@/lib/format';
 
 const ROLE_FILTER: { key: SchoolRoleKey; label: string }[] = [
+  { key: 'principal', label: 'Principal' },
   { key: 'school_admin', label: 'School Admin' },
   { key: 'accounts', label: 'Accounts' },
   { key: 'teacher', label: 'Teacher' },
@@ -65,6 +68,8 @@ export function UsersPage() {
     {
       header: 'Person',
       cell: (u) => (
+        <div className="flex min-w-0 items-center gap-3">
+        <Avatar photoKey={u.photoKey} name={`${u.firstName} ${u.lastName}`} />
         <div className="min-w-0">
           <div className="font-semibold text-slate-900 dark:text-white">{u.firstName} {u.lastName}{u.id === myId && <span className="ml-1.5 text-xs font-normal text-slate-400">(you)</span>}</div>
           <div className="font-mono text-sm font-semibold tracking-wide text-slate-700 dark:text-slate-200">{u.loginId}</div>
@@ -72,6 +77,7 @@ export function UsersPage() {
             {u.email ?? 'No email'}
             {u.email && (u.emailVerified ? <BadgeCheck size={14} className="text-emerald-600" aria-label="Verified" /> : <span className="text-xs text-amber-600">(not verified)</span>)}
           </div>
+        </div>
         </div>
       ),
     },
@@ -105,6 +111,9 @@ export function UsersPage() {
         <StatCard label="Waiting for first sign-in" value={summary?.pending ?? '–'} icon={KeyRound} tone="amber" hint="Temporary password not changed yet" />
         <StatCard label="Disabled" value={summary?.disabled ?? '–'} icon={ShieldOff} tone="rose" />
       </div>
+
+      <PhotoRequestsCard />
+      <SharedAccessCard onCreated={(c) => setCredentials({ c, title: 'Access shared' })} />
 
       <Card padded={false}>
         <FilterBar>

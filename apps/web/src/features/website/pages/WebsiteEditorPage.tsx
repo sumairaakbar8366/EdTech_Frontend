@@ -1,4 +1,4 @@
-import { ExternalLink, Globe, ImagePlus, Images, Palette, Save, Star, Trash2 } from 'lucide-react';
+import { Banknote, ClipboardList, ExternalLink, Globe, ImagePlus, Images, Palette, Save, Star, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { AreaLink } from '@/app/router/area';
 import { Alert, Badge, Button, Card, ConfirmDialog, Field, Input, PageHeader, Select, Spinner, TextArea } from '@/components/ui';
@@ -9,7 +9,7 @@ import { appRootUrl } from '@/config/site';
 import { SocialFields } from '@/features/website/components/SocialFields';
 import { EMPTY_SOCIAL } from '@/features/website/social';
 
-const EMPTY: WebsiteSettings = { published: true, tagline: '', about: '', principalName: '', principalMessage: '', phone: '', email: '', address: '', mapUrl: '', ...EMPTY_SOCIAL, admissionsOpen: true, careersOpen: true, heroMediaId: null };
+const EMPTY: WebsiteSettings = { published: true, tagline: '', about: '', principalName: '', principalMessage: '', phone: '', email: '', address: '', mapUrl: '', ...EMPTY_SOCIAL, admissionsOpen: true, careersOpen: true, heroMediaId: null, feesPublic: false, feeNote: '' };
 
 function Toggle({ label, hint, checked, onChange }: { label: string; hint: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -82,10 +82,25 @@ export function WebsiteEditorPage() {
               <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">Add your school's own accounts. They appear on your website and help Google connect them to your school. Leave a field empty to hide it.</p>
               <SocialFields value={f} onChange={(v) => setF({ ...f, ...v })} />
             </Card>
+            <Card title="Fees on the website" icon={Banknote}>
+              <div className="grid gap-3">
+                <Toggle label="Show the fee structure to parents" hint="Lists each class’s admission, monthly and other fees on the website, and the chosen class’s fees on the admission form" checked={f.feesPublic} onChange={(v) => setF({ ...f, feesPublic: v })} />
+                <Field label="Note shown with the fees (optional)" hint="e.g. sibling discount, payment due dates, what the admission fee covers"><TextArea rows={3} maxLength={2000} value={f.feeNote ?? ''} onChange={text('feeNote')} /></Field>
+                <div className="flex flex-wrap justify-between gap-2">
+                  <AreaLink to="/finance" className="inline-flex items-center gap-1.5 text-sm font-semibold text-orange-700 hover:underline dark:text-orange-300"><Banknote size={15} /> Set class fees in Finance → Fee structures</AreaLink>
+                  <Button type="submit" icon={Save} loading={save.isPending}>Save</Button>
+                </div>
+                <p className="text-xs text-slate-500">Active fee structures of the current and upcoming sessions are shown.</p>
+              </div>
+            </Card>
             <Card title="Switches" icon={Globe}>
               <div className="grid gap-3">
                 <Toggle label="Website is online" hint="Turn off to show a short “being updated” page" checked={f.published} onChange={(v) => setF({ ...f, published: v })} />
                 <Toggle label="Accept admission applications online" hint="They arrive in Admissions as “Submitted”, marked as from the website" checked={f.admissionsOpen} onChange={(v) => setF({ ...f, admissionsOpen: v })} />
+                <AreaLink to="/website/admission-form" className="flex items-center gap-3 rounded-lg border border-dashed border-orange-300 p-3 hover:bg-orange-50 dark:border-orange-400/30 dark:hover:bg-orange-400/5">
+                  <ClipboardList size={18} className="shrink-0 text-orange-600 dark:text-orange-300" />
+                  <span><span className="block font-semibold text-orange-700 dark:text-orange-300">Design the admission form</span><span className="block text-sm text-slate-500">Choose the fields, what is mandatory and which documents applicants upload</span></span>
+                </AreaLink>
                 <Toggle label="Show open jobs and accept applications" hint="Open posts from Staff → Hiring are listed; applications go to the pipeline" checked={f.careersOpen} onChange={(v) => setF({ ...f, careersOpen: v })} />
                 <div className="flex flex-wrap justify-between gap-2 pt-1">
                   <AreaLink to="/settings" className="inline-flex items-center gap-1.5 text-sm font-semibold text-orange-700 hover:underline dark:text-orange-300"><Palette size={15} /> Theme colour and logo (Settings)</AreaLink>

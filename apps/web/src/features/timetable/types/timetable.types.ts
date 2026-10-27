@@ -13,7 +13,7 @@ export interface TimetableSlot {
   startTime: string;
   endTime: string;
   subject: { id: string; name: string; code: string };
-  employee: { id: string; firstName: string; lastName: string; employeeNo: string };
+  employee: { id: string; firstName: string; lastName: string; employeeNo: string; photoKey?: string | null };
   room: { id: string; name: string } | null;
   section: { id: string; name: string; schoolClass: { id: string; name: string; level: number }; campus: { id: string; code: string } };
 }
@@ -28,4 +28,5 @@ export interface ClassSession {
   topic: string | null;
 }
 
-export type SlotState = 'scheduled' | 'live' | 'completed' | 'missed' | 'cancelled';
+/** `late`: the period has begun (past the grace minutes) but the teacher has not started it. */
+export type SlotState = 'scheduled' | 'live' | 'late' | 'completed' | 'missed' | 'cancelled';

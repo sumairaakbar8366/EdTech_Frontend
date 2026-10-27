@@ -1,19 +1,23 @@
-import { Plus } from 'lucide-react';
+import { MousePointerClick, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Button, Card, ConfirmDialog, Field, FilterBar, Select, Spinner } from '@/components/ui';
+import { Button, Card, ConfirmDialog, Field, FilterBar, SearchSelect, Spinner } from '@/components/ui';
 import { useClasses } from '@/features/academics/hooks/useAcademics';
-import { AddPeriodModal } from '@/features/timetable/components/builder/AddPeriodModal';
+import { useCan } from '@/features/auth/usePermissions';
+import { AddPeriodModal, type PeriodPreset } from '@/features/timetable/components/builder/AddPeriodModal';
 import { WeekGrid } from '@/features/timetable/components/WeekGrid';
 import { useSectionTimetable, useTimetableAction } from '@/features/timetable/hooks/useTimetable';
 import { timetableService } from '@/features/timetable/services/timetableService';
 import type { TimetableSlot } from '@/features/timetable/types/timetable.types';
 import { DAY_NAMES } from '@/lib/format';
 
-/** Pick a section, then add or remove its weekly periods. */
+/** Pick a section, then add, change (click a period) or remove its weekly periods. */
 export function TimetableBuilder() {
   const classes = useClasses();
   const [sectionId, setSectionId] = useState('');
+  const canEdit = useCan()('timetable.edit');
   const [adding, setAdding] = useState(false);
+  const [preset, setPreset] = useState<PeriodPreset | null>(null);
+  const [editing, setEditing] = useState<TimetableSlot | null>(null);
   const [removing, setRemoving] = useState<TimetableSlot | null>(null);
   useEffect(() => {
     if (!sectionId && classes.data?.[0]?.sections[0]) setSectionId(classes.data[0].sections[0].id);
@@ -28,21 +32,37 @@ export function TimetableBuilder() {
         <FilterBar align="end">
           <div className="w-72">
             <Field label="Section">
-              <Select value={sectionId} onChange={(e) => setSectionId(e.target.value)}>
-                {classes.data?.map((c) => (
-                  <optgroup key={c.id} label={c.name}>{c.sections.map((s) => <option key={s.id} value={s.id}>{c.name} – {s.name} ({s.campus.code})</option>)}</optgroup>
-                ))}
-              </Select>
+              <SearchSelect
+                value={sectionId}
+                onChange={(v) => v && setSectionId(v)}
+                placeholder="Search class or section…"
+                options={(classes.data ?? []).flatMap((c) => c.sections.map((s) => ({ value: s.id, label: `${c.name} – ${s.name}`, detail: s.campus.name })))}
+                emptyText="No section matches"
+              />
             </Field>
           </div>
-          <div className="ml-auto"><Button icon={Plus} disabled={!sectionId} onClick={() => setAdding(true)}>Add period</Button></div>
+          {canEdit && (
+            <>
+              <p className="hidden items-center gap-1.5 text-sm text-slate-500 lg:inline-flex"><MousePointerClick size={15} /> Click a period to change its teacher, room or time</p>
+              <div className="ml-auto"><Button icon={Plus} disabled={!sectionId} onClick={() => { setPreset(null); setAdding(true); }}>Add period</Button></div>
+            </>
+          )}
         </FilterBar>
         <div className="p-4">
           {slots.isLoading && <Spinner />}
-          {slots.data && <WeekGrid slots={slots.data} show="teacher" onDelete={setRemoving} />}
+          {slots.data && (
+            <WeekGrid
+              slots={slots.data}
+              show="teacher"
+              onDelete={canEdit ? setRemoving : undefined}
+              onEdit={canEdit ? setEditing : undefined}
+              onAdd={canEdit ? (at) => { setPreset(at); setAdding(true); } : undefined}
+            />
+          )}
         </div>
       </Card>
-      {cls && sectionId && <AddPeriodModal open={adding} sectionId={sectionId} cls={cls} onClose={() => setAdding(false)} />}
+      {cls && sectionId && <AddPeriodModal open={adding} sectionId={sectionId} cls={cls} preset={preset} onClose={() => setAdding(false)} />}
+      {cls && sectionId && <AddPeriodModal open={!!editing} sectionId={sectionId} cls={cls} slot={editing} onClose={() => setEditing(null)} />}
       <ConfirmDialog
         open={!!removing}
         title="Remove period?"

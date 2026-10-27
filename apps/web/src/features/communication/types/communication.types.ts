@@ -23,6 +23,8 @@ export interface Announcement {
   title: string;
   body: string;
   targetRoles: SchoolRoleKey[];
+  /** Individually chosen people (empty for role-wide announcements). */
+  targetUserIds?: string[];
   publishedAt: string;
 }
 

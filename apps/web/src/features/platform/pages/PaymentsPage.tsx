@@ -123,7 +123,7 @@ export function PaymentsPage() {
       }>
         {list.isLoading && <div className="p-6"><Spinner /></div>}
         {list.data?.length === 0 && <p className="p-6 text-sm text-slate-500">No payments here.</p>}
-        {!!list.data?.length && <DataTable columns={cols} rows={list.data} rowKey={(p) => p.id} />}
+        {!!list.data?.length && <DataTable columns={cols} rows={list.data} rowKey={(p) => p.id} searchText={(p) => [p.school?.name, p.school?.slug, p.tier?.name, p.payerName, p.reference, p.submittedByName, p.status]} searchPlaceholder="Search school, payer or reference…" />}
       </Card>
       <div className="grid gap-6 xl:grid-cols-2"><PricesCard /><DomainPriceCard /></div>
       <BankSettingsCard />

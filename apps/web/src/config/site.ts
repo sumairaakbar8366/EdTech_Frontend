@@ -14,7 +14,7 @@ export function isMainDomain(hostname = window.location.hostname): boolean {
 }
 
 /** First path segments that belong to the public site, never a school. */
-const SITE_PATHS = new Set(['', 'login', 'access', 'signup', 'pay', 'sso']);
+const SITE_PATHS = new Set(['', 'login', 'access', 'signup', 'pay', 'sso', 'guide', 'tour']);
 
 export type AppLocation =
   | { app: 'site' }

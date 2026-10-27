@@ -1,6 +1,6 @@
 import { Check, Pencil } from 'lucide-react';
 import { AreaLink } from '@/app/router/area';
-import { Button, StatusBadge } from '@/components/ui';
+import { Avatar, Button, StatusBadge } from '@/components/ui';
 import { ADMISSION_LABEL, ADMISSION_STEPS, ADMISSION_TONE } from '@/features/admissions/constants';
 import type { AdmissionApplication } from '@/features/admissions/types/admission.types';
 import { formatDate } from '@/lib/format';
@@ -11,6 +11,7 @@ export function AdmissionHeader({ application: a, canEdit, onEdit }: { applicati
   return (
     <div className="surface mb-6 rounded-xl p-5 animate-fade-up">
       <div className="flex flex-wrap items-center gap-4">
+        <Avatar photoKey={a.photoKey} name={`${a.firstName} ${a.lastName}`} size="lg" ring />
         <div className="min-w-0 flex-1">
           <div className="text-base tabular-nums text-slate-500">{a.applicationNo} · received {formatDate(a.createdAt)}</div>
           <h1 className="font-display text-3xl font-bold uppercase tracking-wide text-slate-900 dark:text-white">{a.firstName} {a.lastName}</h1>

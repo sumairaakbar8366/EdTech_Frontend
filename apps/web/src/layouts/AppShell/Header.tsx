@@ -5,9 +5,9 @@ import { RoleSwitcher } from '@/layouts/AppShell/RoleSwitcher';
 import type { AreaOption } from '@/layouts/AppShell/types';
 
 /** Top bar: menu button (mobile), school + page title, role switcher and theme toggle. */
-export function Header({ title, pageTitle, areas, actions, onOpenMenu }: { title: string; pageTitle: string; areas: readonly AreaOption[]; actions?: ReactNode; onOpenMenu: () => void }) {
+export function Header({ title, pageTitle, areas, actions, onOpenMenu, className = '' }: { title: string; pageTitle: string; areas: readonly AreaOption[]; actions?: ReactNode; onOpenMenu: () => void; className?: string }) {
   return (
-    <header className="relative z-20 flex items-center gap-3 border-b border-(--surface-border) bg-(--surface-bg) px-4 py-2.5 sm:px-8">
+    <header className={`relative z-20 flex items-center gap-3 border-b border-(--surface-border) bg-(--surface-bg) px-4 py-2.5 sm:px-8 ${className}`}>
       <button onClick={onOpenMenu} className="rounded-lg p-1.5 text-slate-600 hover:bg-slate-500/10 lg:hidden dark:text-slate-300" aria-label="Open menu">
         <Menu size={20} />
       </button>

@@ -23,7 +23,7 @@ export function useResetOnRestore(reset: () => void) {
   }, [reset]);
 }
 
-/** Full-screen loader with the EdTech logo bouncing, e.g. while signing in. */
+/** Full-screen loader with the Skool EdTech logo bouncing, e.g. while signing in. */
 export function BrandLoader({ show, label }: { show: boolean; label: string }) {
   return (
     <MotionConfig reducedMotion="user">
@@ -43,7 +43,7 @@ export function BrandLoader({ show, label }: { show: boolean; label: string }) {
                 src={BRAND_LOGO_SRC}
                 alt=""
                 draggable={false}
-                className="brand-logo-3d h-36 w-36 rounded-3xl bg-white object-contain sm:h-44 sm:w-44"
+                className="brand-logo-3d h-36 w-36 rounded-3xl bg-white object-contain p-3 sm:h-44 sm:w-44 sm:p-3.5"
                 animate={{ y: [0, -44, 0], scaleY: [0.94, 1.03, 0.94], scaleX: [1.04, 0.98, 1.04] }}
                 transition={{ duration: 0.9, repeat: Infinity, ease: ['easeOut', 'easeIn'], times: [0, 0.5, 1] }}
               />

@@ -7,6 +7,7 @@ export const STUDENTS_KEY = ['students'] as const;
 export const useStudentList = (q: StudentListQuery) =>
   useQuery({ queryKey: [...STUDENTS_KEY, 'list', q], queryFn: () => studentService.list(q), placeholderData: keepPreviousData });
 export const useStudentSummary = (enabled = true) => useQuery({ queryKey: [...STUDENTS_KEY, 'summary'], queryFn: studentService.summary, enabled });
+export const useChildrenOverview = () => useQuery({ queryKey: [...STUDENTS_KEY, 'my-children', 'overview'], queryFn: studentService.childrenOverview });
 export const useMyChildren = (enabled = true) => useQuery({ queryKey: [...STUDENTS_KEY, 'my-children'], queryFn: studentService.myChildren, enabled });
 
 /** Detail by mode: an admin's view of any student, the student's own record, or a parent's child. */

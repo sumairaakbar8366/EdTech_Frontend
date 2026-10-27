@@ -127,7 +127,7 @@ export function SchoolDetailPage() {
 
       <div className="grid gap-6 xl:grid-cols-2">
         <Card title="Payments to us" icon={CreditCard} padded={false}>
-          {s.payments.length === 0 ? <p className="p-5 text-sm text-slate-500">No payments yet.</p> : <DataTable columns={payCols} rows={s.payments} rowKey={(p) => p.id} />}
+          {s.payments.length === 0 ? <p className="p-5 text-sm text-slate-500">No payments yet.</p> : <DataTable columns={payCols} rows={s.payments} rowKey={(p) => p.id} searchText={(p) => [p.tier?.name, p.method, p.status, p.purpose]} searchPlaceholder="Search plan, method or status…" />}
         </Card>
         <Card title="Recent sign-ins" icon={History} padded={false}>
           {s.logins.length === 0 ? <p className="p-5 text-sm text-slate-500">Nobody has signed in yet.</p> : (

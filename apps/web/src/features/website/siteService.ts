@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { SocialLinks } from '@/features/website/social';
 import { api } from '@/services/api/http';
 
-/** The public SchoolERP site's contact details and social accounts (set by the owner). */
+/** The public Skool EdTech site's contact details and social accounts (set by the owner). */
 export interface SiteSettings extends SocialLinks {
   contactEmail: string | null;
   phone: string | null;

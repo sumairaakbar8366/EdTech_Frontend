@@ -16,7 +16,7 @@ export interface LeaveRequest {
   status: LeaveStatus;
   decisionNote: string | null;
   leaveType: { id: string; name: string; code: string; isPaid: boolean };
-  employee: { id: string; firstName: string; lastName: string; employeeNo: string; designation: string };
+  employee: { id: string; firstName: string; lastName: string; employeeNo: string; designation: string; photoKey?: string | null };
 }
 
 export interface LeaveBalance {

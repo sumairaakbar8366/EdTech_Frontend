@@ -75,7 +75,10 @@
 
 :root {
   color-scheme: light;
-  font-size: 15px;
+  /* The design is made for laptop screens (up to 1440px wide). Wider screens scale it up evenly
+     (everything is sized in rem), so a large monitor shows the same page, not a small one far away:
+     15px up to 1440px wide, 20px at 1920px, at most 24px. */
+  font-size: clamp(15px, 1.0417vw, 24px);
   --brand-primary: #64798e;
   /* Greyish blue: the structural colour (sidebar, banner, headings). Orange: actions and highlights. */
   --ink: #2f3e52;
@@ -136,11 +139,57 @@ h1, h2, h3 {
 .dashboard-link-tile:hover { transform: translateY(-2px); border-color: #f3a46a; box-shadow: 0 6px 16px -6px rgb(15 23 42 / 0.12); }
 [data-theme='dark'] .dashboard-link-tile:hover { border-color: #b4581e; }
 
+/* Raised card (every Card / StatCard): soft blue rim, top light, layered drop shadow. On dashboards (.dash) it lifts with an orange rim on hover. */
+.card-3d {
+  border-radius: 1rem;
+  border-color: #c3d6ef;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    0 1px 2px rgb(15 23 42 / 0.06),
+    0 4px 8px -2px rgb(15 23 42 / 0.08),
+    0 12px 24px -10px rgb(15 23 42 / 0.16);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+.dash .card-3d:hover {
+  transform: translateY(-2px);
+  border-color: #f5b98a;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    0 2px 4px rgb(15 23 42 / 0.06),
+    0 8px 16px -4px rgb(15 23 42 / 0.1),
+    0 20px 32px -12px rgb(15 23 42 / 0.22);
+}
+[data-theme='dark'] .card-3d {
+  border-color: #2e4766;
+  background-image: linear-gradient(180deg, #1b2330 0%, #161d27 100%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 4px 10px -2px rgb(0 0 0 / 0.4), 0 14px 28px -12px rgb(0 0 0 / 0.55);
+}
+[data-theme='dark'] .dash .card-3d:hover {
+  border-color: #8a4a1f;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 8px 16px -4px rgb(0 0 0 / 0.45), 0 22px 36px -14px rgb(0 0 0 / 0.6);
+}
+
 /* Dark smoky-grey sidebar with light text, in both themes. */
 .app-sidebar {
   background: linear-gradient(180deg, var(--app-sidebar-bg) 0%, var(--app-sidebar-bg-deep) 100%);
   box-shadow: inset -1px 0 0 rgb(255 255 255 / 0.06);
   color: #e2e8f0;
+}
+
+/* The floating rail flows out of the screen's left edge: concave curves join it to the edge above and below. */
+@media (min-width: 1024px) {
+  .rail-flare::before,
+  .rail-flare::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 24px;
+    height: 24px;
+    pointer-events: none;
+  }
+  .rail-flare::before { top: -24px; background: radial-gradient(circle at 100% 0, transparent 23.5px, var(--app-sidebar-bg) 24px); }
+  .rail-flare::after { bottom: -24px; background: radial-gradient(circle at 100% 100%, transparent 23.5px, var(--app-sidebar-bg-deep) 24px); }
 }
 
 /* The logo file raised like a 3D tile (its own colours untouched). */
@@ -290,33 +339,34 @@ h1, h2, h3 {
   background: var(--landing-panel) !important;
 }
 .landing header .text-\[\#14213d\],
-.landing .text-slate-900,
-.landing .text-slate-800,
-.landing .text-slate-700 { color: var(--landing-text) !important; }
-.landing .text-slate-600,
-.landing .text-slate-500,
-.landing .text-slate-400 { color: var(--landing-muted) !important; }
-.landing .text-white { color: var(--landing-text) !important; }
-.landing .text-primary-800,
-.landing .text-primary-700,
-.landing .text-primary-600 { color: #52667b !important; }
-.landing .text-magenta-600,
-.landing .text-magenta-700 { color: #cf5500 !important; }
-:root[data-theme='dark'] .landing .text-primary-800,
-:root[data-theme='dark'] .landing .text-primary-700,
-:root[data-theme='dark'] .landing .text-primary-600 { color: #b8c4d1 !important; }
-:root[data-theme='dark'] .landing .text-magenta-600,
-:root[data-theme='dark'] .landing .text-magenta-700 { color: #ff8333 !important; }
-.landing .bg-white,
-.landing .bg-white\/95,
-.landing .bg-white\/90,
-.landing .bg-white\/85,
-.landing .bg-slate-50,
-.landing .bg-slate-100,
-.landing .bg-primary-50,
-.landing .bg-primary-100 { background-color: var(--landing-panel-raised) !important; }
-.landing .bg-white\/8 { background-color: color-mix(in srgb, var(--landing-text) 6%, transparent) !important; }
-.landing .bg-white\/5 { background-color: color-mix(in srgb, var(--landing-text) 3.5%, transparent) !important; }
+/* The walkthrough player (.tour-player) keeps its own fixed design: these overrides skip it. */
+.landing .text-slate-900:not(.tour-player *),
+.landing .text-slate-800:not(.tour-player *),
+.landing .text-slate-700:not(.tour-player *) { color: var(--landing-text) !important; }
+.landing .text-slate-600:not(.tour-player *),
+.landing .text-slate-500:not(.tour-player *),
+.landing .text-slate-400:not(.tour-player *) { color: var(--landing-muted) !important; }
+.landing .text-white:not(.tour-player *) { color: var(--landing-text) !important; }
+.landing .text-primary-800:not(.tour-player *),
+.landing .text-primary-700:not(.tour-player *),
+.landing .text-primary-600:not(.tour-player *) { color: #52667b !important; }
+.landing .text-magenta-600:not(.tour-player *),
+.landing .text-magenta-700:not(.tour-player *) { color: #cf5500 !important; }
+:root[data-theme='dark'] .landing .text-primary-800:not(.tour-player *),
+:root[data-theme='dark'] .landing .text-primary-700:not(.tour-player *),
+:root[data-theme='dark'] .landing .text-primary-600:not(.tour-player *) { color: #b8c4d1 !important; }
+:root[data-theme='dark'] .landing .text-magenta-600:not(.tour-player *),
+:root[data-theme='dark'] .landing .text-magenta-700:not(.tour-player *) { color: #ff8333 !important; }
+.landing .bg-white:not(.tour-player *),
+.landing .bg-white\/95:not(.tour-player *),
+.landing .bg-white\/90:not(.tour-player *),
+.landing .bg-white\/85:not(.tour-player *),
+.landing .bg-slate-50:not(.tour-player *),
+.landing .bg-slate-100:not(.tour-player *),
+.landing .bg-primary-50:not(.tour-player *),
+.landing .bg-primary-100:not(.tour-player *) { background-color: var(--landing-panel-raised) !important; }
+.landing .bg-white\/8:not(.tour-player *) { background-color: color-mix(in srgb, var(--landing-text) 6%, transparent) !important; }
+.landing .bg-white\/5:not(.tour-player *) { background-color: color-mix(in srgb, var(--landing-text) 3.5%, transparent) !important; }
 .landing main > section:not(#top),
 .landing #roles,
 .landing #numbers,
@@ -340,26 +390,26 @@ h1, h2, h3 {
 .landing #plans a { border-radius: 0 !important; }
 .landing .surface > *,
 .landing .dashboard-link-tile > * { color: inherit; }
-.landing .border-slate-100,
-.landing .border-slate-200,
-.landing .border-primary-100,
-.landing .border-primary-200 { border-color: var(--landing-border) !important; }
-.landing .bg-brand {
+.landing .border-slate-100:not(.tour-player *),
+.landing .border-slate-200:not(.tour-player *),
+.landing .border-primary-100:not(.tour-player *),
+.landing .border-primary-200:not(.tour-player *) { border-color: var(--landing-border) !important; }
+.landing .bg-brand:not(.tour-player *) {
   background: var(--landing-accent) !important;
   color: #ffffff !important;
   box-shadow: none !important;
 }
-.landing .bg-magenta-500,
-.landing .bg-violet-500 { background-color: var(--landing-accent) !important; color: #ffffff !important; }
-.landing .bg-magenta-600,
-.landing .bg-violet-600 { background-color: var(--landing-accent-hover) !important; color: #ffffff !important; }
-.landing .bg-brand.text-white,
-.landing .bg-magenta-500.text-white,
-.landing .bg-magenta-600.text-white,
-.landing .bg-violet-500.text-white,
-.landing .bg-violet-600.text-white,
-.landing .bg-orange-500.text-white,
-.landing .bg-\[\#2f3e52\].text-white { color: #ffffff !important; }
+.landing .bg-magenta-500:not(.tour-player *),
+.landing .bg-violet-500:not(.tour-player *) { background-color: var(--landing-accent) !important; color: #ffffff !important; }
+.landing .bg-magenta-600:not(.tour-player *),
+.landing .bg-violet-600:not(.tour-player *) { background-color: var(--landing-accent-hover) !important; color: #ffffff !important; }
+.landing .bg-brand.text-white:not(.tour-player *),
+.landing .bg-magenta-500.text-white:not(.tour-player *),
+.landing .bg-magenta-600.text-white:not(.tour-player *),
+.landing .bg-violet-500.text-white:not(.tour-player *),
+.landing .bg-violet-600.text-white:not(.tour-player *),
+.landing .bg-orange-500.text-white:not(.tour-player *),
+.landing .bg-\[\#2f3e52\].text-white:not(.tour-player *) { color: #ffffff !important; }
 .landing .shadow-glow { box-shadow: none !important; }
 .landing #top {
   background: var(--landing-bg) !important;
@@ -459,10 +509,13 @@ h1, h2, h3 {
 table { font-variant-numeric: tabular-nums; }
 
 /* Printing a receipt: only the .print-area content is printed. */
+/* Printing a receipt, payslip or report card prints only its .print-area; a whole page meant for
+   printing (.print-document, e.g. the user guide) prints as it is, on white. */
 @media print {
-  body * { visibility: hidden !important; }
-  .print-area, .print-area * { visibility: visible !important; color: #000 !important; }
+  body:not(:has(.print-document)) * { visibility: hidden !important; }
+  body:not(:has(.print-document)) .print-area, body:not(:has(.print-document)) .print-area * { visibility: visible !important; color: #000 !important; }
   .print-area { position: fixed; inset: 0; padding: 24px; background: #fff; }
+  body:has(.print-document) { background: #fff !important; }
 }
 
 /* Mandatory fields: a red asterisk after the label of any Field whose control is required. */
@@ -473,3 +526,6 @@ table { font-variant-numeric: tabular-nums; }
 }
 :root[data-theme='dark'] .field-required > label::after,
 :root[data-theme='dark'] .field:has(input[required], select[required], textarea[required]) > label::after { color: #f87171; }
+
+/* Live classes TV: the thin bar that fills while a slide is shown. */
+@keyframes slide-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }

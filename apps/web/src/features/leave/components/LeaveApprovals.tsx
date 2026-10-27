@@ -1,6 +1,6 @@
 import { Check, Plane, X } from 'lucide-react';
 import { useState } from 'react';
-import { Button, Card, EmptyState, Field, IconTile, Select, Spinner, StatusBadge } from '@/components/ui';
+import { Avatar, Button, Card, EmptyState, Field, Select, Spinner, StatusBadge } from '@/components/ui';
 import { LEAVE_TONE, daysLabel, leaveService, useLeaveAction, useLeaveRequests, type LeaveRequest, type LeaveStatus } from '@/features/leave/leave';
 import { formatDate } from '@/lib/format';
 
@@ -8,7 +8,7 @@ function LeaveRequestCard({ request: l, canDecide, onDecide }: { request: LeaveR
   return (
     <Card>
       <div className="flex items-start gap-3">
-        <IconTile icon={Plane} tone={l.leaveType.isPaid ? 'sky' : 'slate'} />
+        <Avatar photoKey={l.employee.photoKey} name={`${l.employee.firstName} ${l.employee.lastName}`} size="md" />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2"><span className="text-lg font-bold">{l.employee.firstName} {l.employee.lastName}</span><StatusBadge status={l.status} tones={LEAVE_TONE} /></div>
           <div className="text-base text-slate-600 dark:text-slate-300">{l.leaveType.name} · {formatDate(l.startDate)} – {formatDate(l.endDate)} · <strong>{daysLabel(l.days)}</strong></div>
