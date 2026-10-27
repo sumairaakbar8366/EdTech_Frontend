@@ -6,11 +6,11 @@ import type { ShellNavItem } from '@/layouts/AppShell/types';
 import { SIDEBAR_MAX, SIDEBAR_MIN, type useSidebarState } from '@/layouts/AppShell/useSidebarState';
 
 type SidebarState = ReturnType<typeof useSidebarState>;
-/** "panel": edge-to-edge, expands on hover. "floating": an inset rounded rail, only as tall as its menu and centred vertically, that opens on hover and pins open with its edge toggle. */
+/** "panel": edge-to-edge, expands on hover. "floating": a rail attached to the screen's left edge, curved on its right and flaring out of the edge, only as tall as its menu and centred vertically; it opens on hover and pins open with its edge toggle. */
 export type SidebarVariant = 'panel' | 'floating';
 
 /**
- * EdTech brand header, main menu, user card and the drag handle. On desktop: an icon rail that expands on hover
+ * Skool EdTech brand header, main menu, user card and the drag handle. On desktop: an icon rail that expands on hover
  * and can be pinned open. Slides in as a drawer on small screens.
  */
 export function Sidebar({ nav, userName, userDetail, state, variant = 'panel' }: { nav: readonly ShellNavItem[]; userName: string; userDetail: string; state: SidebarState; variant?: SidebarVariant }) {
@@ -24,9 +24,11 @@ export function Sidebar({ nav, userName, userDetail, state, variant = 'panel' }:
       <aside
         {...state.hoverHandlers}
         className={`app-sidebar fixed inset-y-0 left-0 z-40 flex w-[var(--sidebar-size)] flex-col overflow-hidden lg:translate-x-0 ${ease} ${
-          inset ? 'lg:bottom-auto lg:left-3 lg:top-1/2 lg:-translate-y-1/2 lg:max-h-[min(34rem,calc(100dvh-12rem))] lg:rounded-2xl lg:shadow-xl lg:shadow-slate-950/25 lg:[&>nav]:flex-[0_1_auto]' : ''
+          inset ? 'rail-flare lg:bottom-auto lg:left-0 lg:top-1/2 lg:-translate-y-1/2 lg:max-h-[min(34rem,calc(100dvh-12rem))] lg:overflow-visible lg:rounded-l-none lg:rounded-r-[1.75rem] lg:shadow-xl lg:shadow-slate-950/25 lg:[&>div>nav]:flex-[0_1_auto]' : ''
         } ${floating ? 'shadow-2xl shadow-slate-950/40' : ''} ${open ? 'translate-x-0' : '-translate-x-full'}`}
       >
+        {/* The contents clip here, so the rail itself can draw its edge curves outside its box. */}
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:rounded-r-[inherit]">
         <div className={`relative flex items-center gap-3 ${inset ? 'py-3' : 'py-5'} ${compact ? 'justify-center px-2' : 'px-5'}`}>
           {compact ? <BrandMark tone="dark" size={inset ? 'sm' : 'md'} /> : <BrandLockup tone="dark" className="flex-1" />}
           {!compact && !inset && (
@@ -47,6 +49,7 @@ export function Sidebar({ nav, userName, userDetail, state, variant = 'panel' }:
 
         <SidebarNav nav={nav} compact={compact} onNavigate={() => setOpen(false)} />
         <SidebarUser name={userName} detail={userDetail} compact={compact} />
+        </div>
 
         {pinned && !inset && (
           <div
@@ -69,7 +72,7 @@ export function Sidebar({ nav, userName, userDetail, state, variant = 'panel' }:
           aria-expanded={pinned}
           aria-label={pinned ? 'Unpin menu' : 'Keep menu open'}
           title={pinned ? 'Unpin menu' : 'Keep menu open'}
-          style={{ left: 'calc(0.75rem + var(--sidebar-size) - 0.875rem)' }}
+          style={{ left: 'calc(var(--sidebar-size) - 0.875rem)' }}
           className={`fixed top-1/2 z-50 -translate-y-1/2 hidden h-7 w-7 items-center justify-center rounded-full bg-orange-500 text-white shadow-md ring-4 ring-(--page-bg) transition-[left,background-color] duration-300 ease-in-out hover:bg-orange-600 lg:flex`}
         >
           {pinned ? <ChevronLeft size={15} /> : <ChevronRight size={15} />}

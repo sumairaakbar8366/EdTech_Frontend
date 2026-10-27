@@ -24,9 +24,9 @@ interface Meta { title: string; description: string; url: string; image?: string
 
 const SITE_PATHS = new Set(['login', 'access', 'signup', 'pay', 'sso', 'console']);
 const CACHE_MS = 5 * 60_000;
-const HOME_TITLE = 'EdTech: School Management Software in Pakistan | Free Trial';
+const HOME_TITLE = 'Skool EdTech: School Management Software in Pakistan | Free Trial';
 const HOME_DESCRIPTION =
-  'EdTech runs your whole school online: admissions, attendance, fees, exams and results, timetable, payroll, and parent, student and teacher portals. Start a free trial today.';
+  'Skool EdTech runs your whole school online: admissions, attendance, fees, exams and results, timetable, payroll, and parent, student and teacher portals. Start a free trial today.';
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1).replace(/\s+\S*$/, '')}…` : s);
@@ -62,7 +62,7 @@ export function seoPlugin(opts: { origin: string; api: string }): Plugin {
     const app = {
       '@context': 'https://schema.org',
       '@type': 'SoftwareApplication',
-      name: 'EdTech',
+      name: 'Skool EdTech',
       applicationCategory: 'BusinessApplication',
       operatingSystem: 'Web',
       url: `${opts.origin}/`,
@@ -99,9 +99,14 @@ export function seoPlugin(opts: { origin: string; api: string }): Plugin {
   const metaFor = async (path: string): Promise<Meta> => {
     const segs = path.split('/').filter(Boolean);
     const first = segs[0]?.toLowerCase() ?? '';
-    const hidden = (title = 'EdTech'): Meta => ({ title, description: HOME_DESCRIPTION, url: `${opts.origin}${path}`, index: false });
+    const hidden = (title = 'Skool EdTech'): Meta => ({ title, description: HOME_DESCRIPTION, url: `${opts.origin}${path}`, index: false });
     if (!segs.length) return homeMeta();
-    if (SITE_PATHS.has(first)) return hidden(first === 'console' ? 'EdTech Platform Console' : 'Sign in | EdTech');
+    if (first === 'guide' || first === 'tour') {
+      return first === 'guide'
+        ? { title: 'User guide: how to use Skool EdTech step by step', description: 'Set up your school on Skool EdTech: sign up with Google, add classes, terms, rooms and staff, design your admission form, publish fees, import from Excel and run admissions to enrollment.', url: `${opts.origin}/guide`, index: true }
+        : { title: 'How Skool EdTech works: video walkthrough', description: 'Watch every step of running a school on Skool EdTech, from Google sign-up to admissions, fees, attendance and the parent portal.', url: `${opts.origin}/tour`, index: true };
+    }
+    if (SITE_PATHS.has(first)) return hidden(first === 'console' ? 'Skool EdTech Platform Console' : 'Sign in | Skool EdTech');
     if (isValidSchoolSlug(first)) {
       const school = await schoolMeta(first);
       if (!school) return hidden();
@@ -118,7 +123,7 @@ export function seoPlugin(opts: { origin: string; api: string }): Plugin {
       `<meta name="robots" content="${m.index ? 'index, follow, max-image-preview:large' : 'noindex, nofollow'}" />`,
       ...(m.index ? [`<link rel="canonical" href="${esc(m.url)}" />`] : []),
       `<meta property="og:type" content="website" />`,
-      `<meta property="og:site_name" content="EdTech" />`,
+      `<meta property="og:site_name" content="Skool EdTech" />`,
       `<meta property="og:title" content="${esc(m.title)}" />`,
       `<meta property="og:description" content="${esc(m.description)}" />`,
       `<meta property="og:url" content="${esc(m.url)}" />`,

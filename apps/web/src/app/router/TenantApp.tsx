@@ -12,6 +12,7 @@ import { WelcomePage } from '@/features/auth/pages/WelcomePage';
 import { OpenLinkPage } from '@/features/auth/pages/OpenLinkPage';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { SchoolSitePage } from '@/features/website/pages/SchoolSitePage';
+import { AdmissionApplyPage } from '@/features/website/pages/AdmissionApplyPage';
 import { useTenant } from '@/features/tenancy/useTenant';
 import { ApiError } from '@/services/api/http';
 import { marketingOrigin } from '@/config/site';
@@ -71,6 +72,8 @@ function SignedInRoutes({ tenant }: { tenant: Tenant }) {
     <Routes>
       {/* A school's address is its public website; the console opens its dashboard (or the main /login). */}
       <Route path="/" element={tenant.kind === 'school' ? <SchoolSitePage /> : me ? <Navigate to="/dashboard" replace /> : <ToMainLogin />} />
+      {/* The website's "Apply now": the school's own admission form, open to everyone. */}
+      {tenant.kind === 'school' && <Route path="/apply" element={<AdmissionApplyPage />} />}
       <Route path="/login" element={tenant.kind === 'school' ? <LoginPage tenant={tenant} /> : me ? <Navigate to="/dashboard" replace /> : <ToMainLogin />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage tenant={tenant} />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />

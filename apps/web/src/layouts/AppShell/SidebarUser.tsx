@@ -1,4 +1,5 @@
-import { LogOut, UserCog } from 'lucide-react';
+import { LifeBuoy, LogOut, UserCog } from 'lucide-react';
+import { marketingOrigin } from '@/config/site';
 import { useState } from 'react';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { AccountModal } from '@/features/auth/components/AccountModal';
@@ -36,6 +37,11 @@ export function SidebarUser({ name, detail, compact }: { name: string; detail: s
             <div className="truncate text-sm font-semibold">{name}</div>
             <div className="truncate font-mono text-xs text-slate-300">{detail}</div>
           </div>
+        )}
+        {me?.scope === 'school' && (
+          <a href={`${marketingOrigin()}/guide`} target="_blank" rel="noreferrer" className="rounded-lg p-2 text-slate-300 transition hover:bg-white/10 hover:text-white" aria-label="Help and user guide" title="Help: user guide and video">
+            <LifeBuoy size={16} />
+          </a>
         )}
         {me?.scope === 'school' && (
           <button onClick={() => setAccount(true)} className="rounded-lg p-2 text-slate-300 transition hover:bg-white/10 hover:text-white" aria-label="My account" title="My account: User ID, email, password">

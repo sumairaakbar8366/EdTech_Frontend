@@ -17,18 +17,22 @@ interface Part {
   spring?: boolean;
 }
 
-/** Each part is the logo file clipped to one piece; the edges between E, cap and T follow the white gaps in the artwork. */
+/**
+ * Each part is the logo file clipped to one piece; together they cover the whole square (the artwork's
+ * background is shaded, so every pixel must belong to a piece). The edges between S, cap and T follow
+ * the white gaps in the artwork.
+ */
 const PARTS: Part[] = [
-  { key: 'e', clip: poly([[355, 395], [612, 395], [668, 442], [668, 705], [355, 705]]), from: { x: '-45%', opacity: 0 }, delay: 0, spring: true },
-  { key: 't', clip: poly([[668, 450], [845, 405], [858, 405], [858, 705], [668, 705]]), from: { x: '45%', opacity: 0 }, delay: 0.4, spring: true },
-  { key: 'cap', clip: poly([[510, 285], [915, 285], [915, 510], [858, 510], [858, 405], [845, 405], [668, 450], [668, 442], [612, 395], [510, 395]]), from: { y: '-55%', rotate: -14, opacity: 0 }, delay: 0.85, spring: true },
-  { key: 'ed', clip: poly([[280, 735], [575, 735], [575, 890], [280, 890]]), from: { y: '12%', opacity: 0 }, delay: 1.45 },
-  { key: 'tech', clip: poly([[575, 735], [990, 735], [990, 890], [575, 890]]), from: { y: '12%', opacity: 0 }, delay: 1.7 },
-  { key: 'tagline', clip: poly([[280, 900], [990, 900], [990, 965], [280, 965]]), from: { opacity: 0, scale: 0.92 }, delay: 2.0 },
+  { key: 's', clip: poly([[0, 190], [455, 190], [702, 295], [702, 865], [0, 865]]), from: { x: '-45%', opacity: 0 }, delay: 0, spring: true },
+  { key: 't', clip: poly([[702, 295], [820, 345], [1100, 222], [1100, 520], [1254, 520], [1254, 865], [702, 865]]), from: { x: '45%', opacity: 0 }, delay: 0.4, spring: true },
+  { key: 'cap', clip: poly([[0, 0], [1254, 0], [1254, 520], [1100, 520], [1100, 222], [820, 345], [702, 295], [455, 190], [0, 190]]), from: { y: '-55%', rotate: -14, opacity: 0 }, delay: 0.85, spring: true },
+  { key: 'skool', clip: poly([[0, 865], [569, 865], [569, 1070], [0, 1070]]), from: { y: '12%', opacity: 0 }, delay: 1.45 },
+  { key: 'edtech', clip: poly([[569, 865], [1254, 865], [1254, 1070], [569, 1070]]), from: { y: '12%', opacity: 0 }, delay: 1.7 },
+  { key: 'tagline', clip: poly([[0, 1070], [1254, 1070], [1254, 1254], [0, 1254]]), from: { opacity: 0, scale: 0.92 }, delay: 2.0 },
 ];
 
 /**
- * The EdTech logo built up piece by piece: the E slides in, then the T, the cap lands on top, and the
+ * The Skool EdTech logo built up piece by piece: the S slides in, then the T, the cap lands on top, and the
  * name and tagline follow. Uses the logo file as-is (one layer per piece, multiplied onto white).
  */
 export function AnimatedBrandLogo({ className = '' }: { className?: string }) {
@@ -47,7 +51,7 @@ export function AnimatedBrandLogo({ className = '' }: { className?: string }) {
             src={BRAND_LOGO_SRC}
             alt=""
             draggable={false}
-            className="absolute inset-0 h-full w-full object-contain mix-blend-multiply"
+            className="absolute inset-[7%] h-[86%] w-[86%] object-contain mix-blend-multiply"
             style={{ clipPath: p.clip }}
             initial={p.from}
             animate={{ x: 0, y: 0, rotate: 0, scale: 1, opacity: 1 }}

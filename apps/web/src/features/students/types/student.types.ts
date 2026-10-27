@@ -1,3 +1,4 @@
+import type { FormAnswer } from '@/features/website/admissionForm';
 import { type Gender, type Relation, type SectionRef } from '@/types/common';
 
 // --- Students, guardians, admissions -----------------------------------------------
@@ -59,7 +60,7 @@ export interface StudentDetail {
     academicYear: { id: string; name: string; isCurrent: boolean };
     section: SectionRef;
   }[];
-  admissionApplication: { id: string; applicationNo: string } | null;
+  admissionApplication: { id: string; applicationNo: string; source?: 'office' | 'website'; createdAt?: string; formAnswers?: FormAnswer[] } | null;
 }
 
 export interface StudentSummary {

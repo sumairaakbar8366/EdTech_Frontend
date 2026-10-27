@@ -7,6 +7,7 @@ import { CtaSection } from '@/features/marketing/components/CtaSection';
 import { FeatureSlideshow } from '@/features/marketing/components/FeatureSlideshow';
 import { FindSchoolModal } from '@/features/marketing/components/FindSchoolModal';
 import { HeroSection } from '@/features/marketing/components/HeroSection';
+import { HowItWorksSection } from '@/features/marketing/components/HowItWorksSection';
 import { LandingHeader } from '@/features/marketing/components/LandingHeader';
 import { MetricsSection } from '@/features/marketing/components/MetricsSection';
 import { ModulesSection } from '@/features/marketing/components/ModulesSection';
@@ -42,6 +43,7 @@ export function LandingPage() {
         <SectionNav />
         <main>
           <HeroSection demoHref={DEMO_HREF} onStartTrial={openTrial} />
+          <HowItWorksSection />
           <FeatureSlideshow />
           <RolesSection />
           <ModulesSection />
@@ -63,6 +65,7 @@ export function LandingPage() {
           )}
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-6 text-sm text-slate-500 sm:px-8 dark:text-slate-400">
             <BrandLockup size="sm" />
+            <span className="flex gap-5"><a href="/guide" className="hover:text-primary-600">User guide</a><a href="#tour" className="hover:text-primary-600">How it works</a></span>
             <span>© {new Date().getFullYear()} {PRODUCT_NAME}. All rights reserved.</span>
             <a href={platformOrigin()} className="hover:text-primary-600">Platform console</a>
           </div>

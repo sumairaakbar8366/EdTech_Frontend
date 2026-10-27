@@ -1,4 +1,5 @@
 import { type CampusRef, type Gender, type Relation } from '@/types/common';
+import type { FormAnswer } from '@/features/website/admissionForm';
 
 export type AdmissionStatus =
   | 'submitted'
@@ -30,6 +31,8 @@ export interface AdmissionApplication {
   guardianEmail: string | null;
   address: string | null;
   notes: string | null;
+  /** Answers to the school's own admission form fields (website applications). */
+  formAnswers?: FormAnswer[];
   status: AdmissionStatus;
   createdAt: string;
   academicYear: { id: string; name: string };

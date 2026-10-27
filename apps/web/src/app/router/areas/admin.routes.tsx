@@ -1,5 +1,6 @@
 import { BillingPage } from '@/features/billing/pages/BillingPage';
 import { WebsiteEditorPage } from '@/features/website/pages/WebsiteEditorPage';
+import { AdmissionFormBuilderPage } from '@/features/website/pages/AdmissionFormBuilderPage';
 import { MessagesPage } from '@/features/communication/pages/MessagesPage';
 import type { AreaRoutes } from '@/app/router/types';
 import { AcademicsPage } from '@/features/academics/pages/AcademicsPage';
@@ -57,6 +58,7 @@ export const adminRoutes: AreaRoutes = (can) => [
   { path: 'exams/:id', capability: 'exams.view', element: <ExamDetailPage canEdit={can('exams.manage')} canEnter={can('results.enter')} canPublish={can('results.publish')} /> },
   { path: 'exams/:id/marks', capability: 'results.enter', element: <MarksheetPage /> },
   { path: 'website', capability: 'settings.manage', element: <WebsiteEditorPage /> },
+  { path: 'website/admission-form', capability: 'settings.manage', element: <AdmissionFormBuilderPage /> },
   { path: 'users-and-access', capability: 'settings.manage', element: <UsersPage /> },
   { path: 'activity', capability: 'audit.view', element: <ActivityPage /> },
   { path: 'plans-and-billing', capability: 'settings.manage', element: <BillingPage /> },

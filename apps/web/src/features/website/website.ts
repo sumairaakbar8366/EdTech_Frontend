@@ -3,6 +3,7 @@ import { useAction } from '@/lib/hooks/useAction';
 import { api, apiUrl, upload } from '@/services/api/http';
 import type { SiteTier } from '@/features/website/siteImagery';
 import type { SocialLinks } from '@/features/website/social';
+import type { AdmissionForm } from '@/features/website/admissionForm';
 
 // School public website: types, service and hooks.
 
@@ -24,7 +25,15 @@ export interface PublicSite {
   sessions: { id: string; name: string; isCurrent: boolean }[];
   jobs: { id: string; title: string; staffType: 'teaching' | 'non_teaching'; department: string | null; description: string | null; openings: number; closingDate: string | null; campus: { name: string } }[];
   media: { id: string; category: MediaCategory; caption: string | null }[];
+  /** The school's own admission form, filled in on /apply. */
+  admissionForm: AdmissionForm;
+  /** Published fee structures of the open sessions (null when the school does not publish fees). */
+  fees: PublicFees | null;
 }
+
+export type FeeFrequency = 'one_time' | 'monthly' | 'termly' | 'annual';
+export interface PublicFeeStructure { id: string; name: string; sessionId: string; classId: string; items: { name: string; amount: string; frequency: FeeFrequency }[] }
+export interface PublicFees { currency: string; note: string | null; structures: PublicFeeStructure[] }
 
 export type MediaCategory = 'campus' | 'students' | 'events' | 'achievements';
 export const CATEGORY_LABEL: Record<MediaCategory, string> = { campus: 'Campus', students: 'Students', events: 'Events & functions', achievements: 'Achievements' };
@@ -42,6 +51,8 @@ export interface WebsiteSettings extends SocialLinks {
   admissionsOpen: boolean;
   careersOpen: boolean;
   heroMediaId: string | null;
+  feesPublic: boolean;
+  feeNote: string | null;
 }
 
 export interface WebsiteMedia { id: string; category: MediaCategory; caption: string | null; fileName: string; createdAt: string }
