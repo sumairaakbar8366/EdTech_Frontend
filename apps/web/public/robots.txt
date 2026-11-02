@@ -1,4 +1,4 @@
-# EdTech: search engines may list the home page and each school's public website
+# Skool EdTech: search engines may list the home page and each school's public website
 # (/<school>). Sign-in pages, the owner console and every dashboard stay out of search.
 User-agent: *
 Allow: /$

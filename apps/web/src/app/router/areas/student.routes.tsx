@@ -1,3 +1,4 @@
+import { ComplaintsPage } from '@/features/complaints/ComplaintsPage';
 import { MyRequestsPage } from '@/features/document-requests/pages/MyRequestsPage';
 import type { AreaRoutes } from '@/app/router/types';
 import { StudentAttendancePage } from '@/features/attendance/pages/StudentAttendancePage';
@@ -32,6 +33,7 @@ export const studentRoutes: AreaRoutes = () => [
   { path: 'results', capability: 'results.view', element: <ResultsPage /> },
   { path: 'fees', capability: 'fees.own', element: <MyFeesPage /> },
   { path: 'notifications', capability: 'communication.any', element: <NotificationsPage /> },
+  { path: 'complaints', capability: 'complaints.own', element: <ComplaintsPage handler={false} /> },
   { path: 'documents', element: <MyDocumentsPage /> },
   { path: 'document-requests', capability: 'documents.request', element: <MyRequestsPage /> },
 ];

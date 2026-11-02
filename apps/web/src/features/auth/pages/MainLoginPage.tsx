@@ -33,6 +33,8 @@ export function MainLoginPage() {
     setBusy(false);
     setLeaving(false);
   }, []));
+  const [codeStep, setCodeStep] = useState<{ verificationId: string; email: string } | null>(null);
+  const [code, setCode] = useState('');
   const [forgot, setForgot] = useState(false);
   const [school, setSchool] = useState('');
 
@@ -47,9 +49,26 @@ export function MainLoginPage() {
         await holdLoader(startedAt);
         return window.location.assign(r.continueUrl);
       }
+      if ('twoFactor' in r) { setCodeStep(r.twoFactor); setCode(''); return; }
       setChoices(r.choose);
     } catch (e) {
       setError(e instanceof ApiError && e.status === 429 ? 'Too many attempts. Please wait a minute and try again.' : e instanceof ApiError && e.status < 500 ? e.message : 'Something went wrong. Please try again.');
+    } finally {
+      setBusy(false);
+    }
+  };
+  const verifyCode = async () => {
+    if (!codeStep) return;
+    setBusy(true);
+    setError(null);
+    const startedAt = performance.now();
+    try {
+      const r = await marketingService.verifyOwner({ verificationId: codeStep.verificationId, code: code.trim() });
+      setLeaving(true);
+      await holdLoader(startedAt);
+      window.location.assign(r.continueUrl);
+    } catch (e) {
+      setError(e instanceof ApiError && e.status < 500 ? e.message : 'Something went wrong. Please try again.');
     } finally {
       setBusy(false);
     }
@@ -73,7 +92,20 @@ export function MainLoginPage() {
         <div className="absolute right-4 top-4"><ThemeToggle /></div>
         <div className="w-full max-w-md">
           <div className="surface rounded-2xl p-6 shadow-depth-3 sm:p-8">
-            {choices ? (
+            {codeStep ? (
+              <form onSubmit={(e) => { e.preventDefault(); void verifyCode(); }} className="space-y-4">
+                <div className="text-center">
+                  <h1 className="text-xl font-bold text-slate-900 dark:text-white">Check your email</h1>
+                  <p className="mt-1 text-sm text-slate-500">We sent a 6-digit code to {codeStep.email}. It expires in 10 minutes.</p>
+                </div>
+                {error && <Alert>{error}</Alert>}
+                <Field label="Sign-in code">
+                  <Input autoFocus required inputMode="numeric" autoComplete="one-time-code" maxLength={6} pattern="\d{6}" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} placeholder="123456" className="text-center tracking-[0.4em]" />
+                </Field>
+                <Button type="submit" icon={LogIn} loading={busy} className="w-full py-3" disabled={code.length !== 6}>Verify and sign in</Button>
+                <button type="button" onClick={() => { setCodeStep(null); setCode(''); setError(null); }} className="w-full text-center text-sm font-semibold text-slate-600 hover:underline dark:text-slate-300">← Back to sign in</button>
+              </form>
+            ) : choices ? (
               <SchoolChoice choices={choices} busy={busy} error={error} onPick={(s) => void signIn(s)} onBack={() => { setChoices(null); setError(null); }} />
             ) : forgot ? (
               <div className="space-y-4">
@@ -122,7 +154,7 @@ export function MainLoginPage() {
             )}
           </div>
           <p className="mt-5 flex items-center justify-center gap-1.5 text-center text-sm text-slate-500">
-            <Building2 size={15} /> New school? <Link to="/access?mode=signup" className="font-semibold text-primary-700 hover:underline dark:text-primary-300">Start a free trial</Link>
+            <Building2 size={15} /> New school? <Link to="/register" className="font-semibold text-primary-700 hover:underline dark:text-primary-300">Register your school</Link>
           </p>
         </div>
       </div>

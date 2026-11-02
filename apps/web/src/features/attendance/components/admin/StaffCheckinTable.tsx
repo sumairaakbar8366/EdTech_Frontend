@@ -46,5 +46,5 @@ export function StaffCheckinTable({ records, showDate, canReview, onReview }: Pr
         ),
     },
   ];
-  return <DataTable columns={columns} rows={records} rowKey={(r) => r.id} />;
+  return <DataTable columns={columns} rows={records} rowKey={(r) => r.id} searchText={(r) => [r.employee?.firstName, r.employee?.lastName, r.employee?.designation, r.employee?.campus.code]} searchPlaceholder="Search staff, designation or campus…" />;
 }

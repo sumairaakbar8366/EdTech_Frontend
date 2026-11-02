@@ -5,6 +5,7 @@ import { useRooms } from '@/features/academics/hooks/useAcademics';
 import type { SchoolClass } from '@/features/academics/types/academics.types';
 import { useTeacherOptions, useTimetableAction } from '@/features/timetable/hooks/useTimetable';
 import { timetableService, type TeacherOption } from '@/features/timetable/services/timetableService';
+import type { TimetableSlot } from '@/features/timetable/types/timetable.types';
 import { DAY_NAMES } from '@/lib/format';
 import { onSubmit } from '@/lib/forms';
 
@@ -13,12 +14,20 @@ function rank(t: TeacherOption) {
   return (t.busyWith ? 100 : 0) + (t.onLeave ? 50 : 0) + (t.assigned ? 0 : t.teachesSubject ? 1 : 2) + (t.sameCampus ? 0 : 5);
 }
 
+/** Where a new period goes when the admin clicked an empty block of the week grid. */
+export interface PeriodPreset {
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+}
+
 /**
- * Adds a weekly period for one section. The admin picks the teacher and sees who is free at that
- * time; a teacher who is already teaching elsewhere then is refused with a warning, and choosing
- * someone other than the section's subject teacher is confirmed first.
+ * Adds a weekly period for one section, or edits one (`slot`): e.g. when a teacher is absent the admin
+ * clicks the period in the grid and gives it to someone free, or moves it to another room or time.
+ * The admin sees who is free at that time; a teacher who is already teaching elsewhere then is refused
+ * with a warning, and choosing someone other than the section's subject teacher is confirmed first.
  */
-export function AddPeriodModal({ open, sectionId, cls, onClose }: { open: boolean; sectionId: string; cls: SchoolClass; onClose: () => void }) {
+export function AddPeriodModal({ open, sectionId, cls, onClose, slot = null, preset = null }: { open: boolean; sectionId: string; cls: SchoolClass; onClose: () => void; slot?: TimetableSlot | null; preset?: PeriodPreset | null }) {
   const rooms = useRooms(open);
   const section = cls.sections.find((s) => s.id === sectionId);
   const [f, setF] = useState({ dayOfWeek: '1', startTime: '08:00', endTime: '08:40', subjectId: '', roomId: '', employeeId: '' });
@@ -28,13 +37,17 @@ export function AddPeriodModal({ open, sectionId, cls, onClose }: { open: boolea
 
   useEffect(() => {
     if (open) {
-      setF({ dayOfWeek: '1', startTime: '08:00', endTime: '08:40', subjectId: '', roomId: '', employeeId: '' });
+      setF(
+        slot
+          ? { dayOfWeek: String(slot.dayOfWeek), startTime: slot.startTime, endTime: slot.endTime, subjectId: slot.subjectId, roomId: slot.roomId ?? '', employeeId: slot.employeeId }
+          : { dayOfWeek: String(preset?.dayOfWeek ?? 1), startTime: preset?.startTime ?? '08:00', endTime: preset?.endTime ?? '08:40', subjectId: '', roomId: '', employeeId: '' },
+      );
       setSearch('');
     }
-  }, [open]);
+  }, [open, slot, preset]);
 
   const timeOk = f.startTime < f.endTime;
-  const query = { sectionId, subjectId: f.subjectId, dayOfWeek: Number(f.dayOfWeek), startTime: f.startTime, endTime: f.endTime };
+  const query = { sectionId, subjectId: f.subjectId, dayOfWeek: Number(f.dayOfWeek), startTime: f.startTime, endTime: f.endTime, ...(slot && { excludeSlotId: slot.id }) };
   const options = useTeacherOptions(query, open && !!f.subjectId && timeOk);
   const data = options.data;
   const teachers = useMemo(() => {
@@ -55,10 +68,14 @@ export function AddPeriodModal({ open, sectionId, cls, onClose }: { open: boolea
   }, [data]);
 
   const save = useTimetableAction(
-    () => timetableService.addSlot({ sectionId, subjectId: f.subjectId, employeeId: f.employeeId, roomId: f.roomId || null, dayOfWeek: Number(f.dayOfWeek), startTime: f.startTime, endTime: f.endTime }),
-    'Period added',
+    () => {
+      const body = { sectionId, subjectId: f.subjectId, employeeId: f.employeeId, roomId: f.roomId || null, dayOfWeek: Number(f.dayOfWeek), startTime: f.startTime, endTime: f.endTime };
+      return slot ? timetableService.updateSlot(slot.id, body) : timetableService.addSlot(body);
+    },
+    slot ? 'Period updated' : 'Period added',
     onClose,
   );
+  const verb = slot ? 'Save changes' : 'Add period';
   const choose = (t: TeacherOption) => (t.busyWith ? setClash(t) : setF({ ...f, employeeId: t.id }));
   const submit = () => {
     if (assigned && picked && !picked.assigned) setConfirmOther(true);
@@ -74,9 +91,9 @@ export function AddPeriodModal({ open, sectionId, cls, onClose }: { open: boolea
       <Modal
         open={open && !clash && !confirmOther}
         size="xl"
-        title="Add period"
+        title={slot ? `Edit period · ${DAY_NAMES[slot.dayOfWeek]} ${slot.startTime}–${slot.endTime}` : 'Add period'}
         onClose={onClose}
-        footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" form="period-form" disabled={blocked} loading={save.isPending}>Add period</Button></>}
+        footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" form="period-form" disabled={blocked} loading={save.isPending}>{verb}</Button></>}
       >
         <form id="period-form" onSubmit={onSubmit(submit)} className="space-y-4">
           {/* Where this period goes: shown up front so it is never added to the wrong section. */}
@@ -106,6 +123,11 @@ export function AddPeriodModal({ open, sectionId, cls, onClose }: { open: boolea
             </Field>
           </div>
 
+          {slot && (
+            <p className="text-sm text-slate-500">
+              Currently <strong className="text-slate-700 dark:text-slate-200">{slot.subject.name}</strong> with <strong className="text-slate-700 dark:text-slate-200">{slot.employee.firstName} {slot.employee.lastName}</strong>{slot.room ? <> in {slot.room.name}</> : null}. Pick another teacher below if they are absent, or change the room, day or time.
+            </p>
+          )}
           {!timeOk && <Alert>The period must end after it starts.</Alert>}
           {data?.sectionBusy && <Alert>{cls.name}-{section?.name} already has {data.sectionBusy} at this time. Choose another time.</Alert>}
 
@@ -192,7 +214,7 @@ export function AddPeriodModal({ open, sectionId, cls, onClose }: { open: boolea
         open={confirmOther}
         title="Are you sure?"
         onClose={() => setConfirmOther(false)}
-        footer={<><Button variant="secondary" onClick={() => setConfirmOther(false)}>Back</Button><Button loading={save.isPending} onClick={() => { setConfirmOther(false); save.mutate(undefined); }}>Yes, add period</Button></>}
+        footer={<><Button variant="secondary" onClick={() => setConfirmOther(false)}>Back</Button><Button loading={save.isPending} onClick={() => { setConfirmOther(false); save.mutate(undefined); }}>{slot ? 'Yes, save' : 'Yes, add period'}</Button></>}
       >
         <p className="text-base text-slate-700 dark:text-slate-200">
           <strong>{assigned?.name}</strong> is the {subjectName} teacher of {cls.name}-{section?.name}. Give this period to <strong>{picked?.name}</strong> instead? Only this period changes; {assigned?.name} stays the subject teacher.

@@ -13,8 +13,8 @@ export function TeacherDashboard() {
   const can = useCan();
   const slides = useTeacherHeroSlides();
   return (
-    <div className="space-y-6">
-      <DashboardHero slides={slides} image="/images/dashboard-teacher.png" />
+    <div className="dash space-y-6">
+      <DashboardHero slides={slides} />
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           {can('attendance.mark') ? <TodayClassesWidget /> : can('timetable.view') && <TodayTimetableWidget to="/my-timetable" />}

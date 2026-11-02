@@ -1,4 +1,4 @@
-import type { Child, CreateStudentPayload, GuardianHit, PromotionCandidate, UpdateStudentPayload } from '@/features/students/types/student.types';
+import type { ChildOverview, Child, CreateStudentPayload, GuardianHit, PromotionCandidate, UpdateStudentPayload } from '@/features/students/types/student.types';
 import type { StudentDetail, StudentListItem, StudentStatus, StudentSummary } from '@/features/students/types/student.types';
 import type { ApiCredentials } from '@/features/users/users';
 import { api } from '@/services/api/http';
@@ -54,6 +54,8 @@ export const studentService = {
     api<{ promoted: number; toAcademicYear: string }>('/students/promote', { method: 'POST', body }),
 
   myChildren: () => api<Child[]>('/students/my-children'),
+  /** Per child: attendance %, fees due and the latest published result. */
+  childrenOverview: () => api<ChildOverview[]>('/students/my-children/overview'),
 };
 
 export interface TaughtSection {

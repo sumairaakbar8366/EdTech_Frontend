@@ -9,6 +9,7 @@ import { useStudentsAction } from '@/features/students/hooks/useStudents';
 import { studentService } from '@/features/students/services/studentService';
 import type { StudentDetail } from '@/features/students/types/student.types';
 import { onSubmit } from '@/lib/forms';
+import { CustomAnswersCard } from '@/features/forms/components/CustomAnswersCard';
 
 /** The student's parents/guardians: primary contact, parent logins, add and remove. */
 export function ParentsTab({ student, editable }: { student: StudentDetail; editable: boolean }) {
@@ -39,6 +40,7 @@ export function ParentsTab({ student, editable }: { student: StudentDetail; edit
           />
         ))}
       </div>
+      {student.guardians.map((link) => <CustomAnswersCard key={link.guardianId} subject="guardian" id={link.guardianId} editable={editable} title={`Additional details · ${link.guardian.firstName} ${link.guardian.lastName}`} />)}
       {editable && <Button icon={Plus} onClick={() => setAdding(true)}>Add parent / guardian</Button>}
       {editable && <AddGuardianModal open={adding} studentId={student.id} onClose={() => setAdding(false)} />}
       <ConfirmDialog

@@ -46,7 +46,7 @@ export function CtaSection({ demoHref, onFindSchool, onStartTrial }: { demoHref:
       >
         <span className="inline-block border-l-2 border-orange-500 bg-primary-50 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary-700 dark:bg-primary-500/10 dark:text-primary-200">Get started</span>
         <h2 className="mx-auto mt-3 max-w-2xl font-display font-semibold">See {PRODUCT_NAME} with your own school’s data</h2>
-        <p className="mx-auto mt-3 max-w-2xl text-base leading-7 text-slate-600 dark:text-primary-100">Sign up with your own email and your school is ready in two minutes: a free one-month trial with every module and every role, no card needed.</p>
+        <p className="mx-auto mt-3 max-w-2xl text-base leading-7 text-slate-600 dark:text-primary-100">Apply to join, prove who you are, and once our team has verified your school it is ready: a free trial with every module and every role, sized to your school, no card needed.</p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
           <Magnetic>
             <button type="button" onClick={onStartTrial} className="focus-ring group inline-flex items-center gap-2 border border-orange-500 bg-magenta-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-magenta-600">

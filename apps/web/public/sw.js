@@ -1,6 +1,6 @@
-// SchoolERP service worker: shows push notifications and opens the right page when one is clicked.
+// Skool EdTech service worker: shows push notifications and opens the right page when one is clicked.
 self.addEventListener('push', (event) => {
-  let data = { title: 'SchoolERP', body: '', url: '/' };
+  let data = { title: 'Skool EdTech', body: '', url: '/' };
   try {
     data = { ...data, ...event.data.json() };
   } catch {
@@ -9,8 +9,8 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: '/favicon.svg',
-      badge: '/favicon.svg',
+      icon: '/brand/apple-touch-icon.png',
+      badge: '/brand/favicon-64.png',
       data: { url: data.url },
     }),
   );

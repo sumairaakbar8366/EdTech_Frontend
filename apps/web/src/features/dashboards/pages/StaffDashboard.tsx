@@ -11,8 +11,8 @@ export function StaffDashboard() {
   const can = useCan();
   const slides = useStaffHeroSlides();
   return (
-    <div className="space-y-6">
-      <DashboardHero slides={slides} image="/images/marketing/campus-archway-800.webp" />
+    <div className="dash space-y-6">
+      <DashboardHero slides={slides} />
       <div className="grid gap-6 lg:grid-cols-3">
         {can('attendance.own') && <MyCheckInWidget />}
         {can('leave.own') && <LeaveBalanceWidget />}

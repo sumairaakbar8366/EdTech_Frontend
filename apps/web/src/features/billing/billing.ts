@@ -16,6 +16,8 @@ export interface SubscriptionState {
   graceEndsAt: string | null;
   daysLeft: number | null;
   features: PlanFeature[];
+  usage?: { metric: string; level: 'near' | 'over'; used: number; limit: number; graceEndsAt: string | null }[];
+  usagePaused?: boolean;
 }
 
 export interface Plan {

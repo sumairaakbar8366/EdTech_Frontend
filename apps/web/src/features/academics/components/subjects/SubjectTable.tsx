@@ -26,5 +26,5 @@ export function SubjectTable({ subjects, readOnly, onEdit, onDelete }: { subject
           ),
         }]),
   ];
-  return <DataTable columns={columns} rows={subjects} rowKey={(s) => s.id} rowClassName={() => 'transition-colors hover:bg-slate-500/5'} />;
+  return <DataTable columns={columns} rows={subjects} rowKey={(s) => s.id} searchText={(s) => [s.name, s.code]} searchPlaceholder="Search subject or code…" rowClassName={() => 'transition-colors hover:bg-slate-500/5'} />;
 }

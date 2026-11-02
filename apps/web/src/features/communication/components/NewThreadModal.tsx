@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert, Button, Field, Input, Modal, Select, Spinner, TextArea } from '@/components/ui';
+import { Alert, Button, Field, Input, Modal, SearchSelect, Spinner, TextArea } from '@/components/ui';
 import { useCommunicationAction, useContacts } from '@/features/communication/hooks/useCommunication';
 import { communicationService } from '@/features/communication/services/communicationService';
 import { errorMessage } from '@/lib/errors';
@@ -27,23 +27,30 @@ export function NewThreadModal({ open, onClose, onStarted }: { open: boolean; on
     toastErrors: false,
   });
   return (
-    <Modal open={open} title="New message" onClose={onClose} size="lg" footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" form="new-thread" loading={start.isPending} disabled={!recipientId}>Send</Button></>}>
+    <Modal open={open} title="New message" onClose={onClose} size="lg" footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" form="new-thread" loading={start.isPending} disabled={!recipientId || !studentId}>Send</Button></>}>
       {contacts.isLoading && <Spinner />}
       {contacts.data?.length === 0 && <Alert tone="info">There is nobody to message yet: teachers are listed once your child is enrolled in a section with assigned teachers.</Alert>}
       {!!contacts.data?.length && (
         <form id="new-thread" onSubmit={onSubmit(() => start.mutate(undefined))} className="grid gap-4 sm:grid-cols-2">
           {start.error && <div className="sm:col-span-2"><Alert>{errorMessage(start.error, 'Could not send the message.')}</Alert></div>}
-          <Field label="About">
-            <Select required value={studentId} onChange={(e) => { setStudentId(e.target.value); setRecipientId(''); }}>
-              <option value="">Choose a student</option>
-              {contacts.data.map((c) => <option key={c.studentId} value={c.studentId}>{c.studentName}{c.section ? ` · ${c.section}` : ''}</option>)}
-            </Select>
+          <Field label="About" required>
+            <SearchSelect
+              value={studentId}
+              onChange={(v) => { setStudentId(v); setRecipientId(''); }}
+              placeholder="Search student by name or class…"
+              options={contacts.data.map((c) => ({ value: c.studentId, label: c.studentName, detail: c.section ?? undefined }))}
+              emptyText="No student matches"
+            />
           </Field>
-          <Field label="To">
-            <Select required value={recipientId} disabled={!student} onChange={(e) => setRecipientId(e.target.value)}>
-              <option value="">{!student ? 'Choose a student first' : !student.contacts.length ? 'No one available' : 'Choose…'}</option>
-              {student?.contacts.map((c) => <option key={c.userId} value={c.userId}>{c.name} · {c.detail}</option>)}
-            </Select>
+          <Field label="To" required>
+            <SearchSelect
+              value={recipientId}
+              disabled={!student}
+              onChange={setRecipientId}
+              placeholder={!student ? 'Choose a student first' : !student.contacts.length ? 'No one available' : 'Search by name or subject…'}
+              options={student?.contacts.map((c) => ({ value: c.userId, label: c.name, detail: c.detail })) ?? []}
+              emptyText="Nobody matches"
+            />
           </Field>
           <div className="sm:col-span-2"><Field label="Subject"><Input required maxLength={150} value={subject} onChange={(e) => setSubject(e.target.value)} /></Field></div>
           <div className="sm:col-span-2"><Field label="Message"><TextArea required maxLength={5000} rows={5} value={body} onChange={(e) => setBody(e.target.value)} /></Field></div>

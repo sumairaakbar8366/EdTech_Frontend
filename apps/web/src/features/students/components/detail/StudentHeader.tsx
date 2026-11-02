@@ -1,5 +1,6 @@
 import { ArrowRightLeft, KeyRound, Pencil, RefreshCcw } from 'lucide-react';
 import { Badge, Button, StatusBadge } from '@/components/ui';
+import { EditablePhoto } from '@/features/photos/EditablePhoto';
 import { STUDENT_STATUS_LABEL, STUDENT_STATUS_TONE } from '@/features/students/constants';
 import type { StudentDetail } from '@/features/students/types/student.types';
 
@@ -19,7 +20,7 @@ interface Props {
 export function StudentHeader({ student: s, current, editable, onMove, onLogin, onStatus, onEdit }: Props) {
   return (
     <div className="surface mb-6 flex flex-wrap items-center gap-5 rounded-xl p-5 animate-fade-up">
-      <span className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-xl font-display text-2xl font-bold text-white ${s.gender === 'female' ? 'bg-rose-500' : 'bg-emerald-600'}`}>{s.firstName[0]}{s.lastName[0]}</span>
+      <EditablePhoto photoKey={s.photoKey} name={`${s.firstName} ${s.lastName}`} kind="students" id={s.id} editable={editable} />
       <div className="min-w-0 flex-1">
         <h1 className="font-display text-3xl font-bold uppercase tracking-wide text-slate-900 dark:text-white">{s.firstName} {s.lastName}</h1>
         <div className="mt-1 flex flex-wrap items-center gap-2 text-base text-slate-600 dark:text-slate-300">

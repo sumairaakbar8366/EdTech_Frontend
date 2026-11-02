@@ -1,7 +1,7 @@
 import { ExternalLink, Mail, MapPin, Phone } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { AreaLink } from '@/app/router/area';
-import { Badge } from '@/components/ui';
+import { Avatar, Badge } from '@/components/ui';
 import { STAGES } from '@/features/hiring/constants';
 import type { ApplicationDetail, StatusLog } from '@/features/hiring/types/hiring.types';
 import { formatDate } from '@/lib/format';
@@ -56,6 +56,7 @@ export function CandidateProfile({ app }: { app: ApplicationDetail }) {
   const years = age(app.dateOfBirth);
   return (
     <div className="space-y-4">
+      <Avatar photoKey={app.photoKey} name={`${app.firstName} ${app.lastName}`} size="lg" ring />
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-base text-slate-600 dark:text-slate-300">
         <Badge tone={stage?.tone ?? 'rose'}>{STAGE_LABEL[app.status]}</Badge>
         <span>For <strong>{app.jobPost.title}</strong> · {app.jobPost.campus.name}</span>

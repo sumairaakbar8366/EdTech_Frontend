@@ -3,9 +3,13 @@ import { TenantApp } from '@/app/router/TenantApp';
 import { appLocation } from '@/config/site';
 import { MainLoginPage } from '@/features/auth/pages/MainLoginPage';
 import { SsoCallbackPage, SsoStartPage } from '@/features/auth/pages/SsoPages';
-import { AccessPage } from '@/features/marketing/pages/AccessPage';
+import { RegisterSchoolPage } from '@/features/registration/RegisterSchoolPage';
+import { ScholarshipOfferPage } from '@/features/sponsorship/ScholarshipOfferPage';
 import { CheckoutPage } from '@/features/marketing/pages/CheckoutPage';
 import { LandingPage } from '@/features/marketing/pages/LandingPage';
+import { GuidePage } from '@/features/marketing/pages/GuidePage';
+import { WatchPage } from '@/features/marketing/pages/WatchPage';
+import { TourPage } from '@/features/marketing/pages/TourPage';
 import { setApiBase } from '@/services/api/http';
 
 /**
@@ -25,8 +29,16 @@ export function App() {
         <Route path="/" element={<LandingPage />} />
         {/* One sign-in for the owner and every school; it continues in the right dashboard. */}
         <Route path="/login" element={<MainLoginPage />} />
-        <Route path="/access" element={<AccessPage />} />
-        <Route path="/signup" element={<Navigate to="/access?mode=signup" replace />} />
+        {/* How it works: the walkthrough video and the written user guide. */}
+        <Route path="/tour" element={<TourPage />} />
+        <Route path="/watch/:id" element={<WatchPage />} />
+        <Route path="/guide" element={<GuidePage />} />
+        {/* Applying to join: the owner's team verifies the application by hand, then approves it. */}
+        <Route path="/register" element={<RegisterSchoolPage />} />
+        <Route path="/access" element={<Navigate to="/login" replace />} />
+        <Route path="/signup" element={<Navigate to="/register" replace />} />
+        {/* A scholarship offer: the private page a school opens from the email. */}
+        <Route path="/scholarship/:token" element={<ScholarshipOfferPage />} />
         {/* "Continue with Google": the Google round trip always runs on the main site. */}
         <Route path="/sso/start" element={<SsoStartPage />} />
         <Route path="/sso/callback" element={<SsoCallbackPage />} />

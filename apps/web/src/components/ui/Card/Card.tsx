@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { IconTile } from '@/components/ui/IconTile/IconTile';
 import type { Tone } from '@/components/ui/tones';
 
-/** Solid card with an optional titled header bar and actions; fades in once when scrolled into view. */
+/** Raised card with an optional titled header bar and actions; fades in once when scrolled into view. */
 export function Card({
   title,
   icon,
@@ -29,7 +29,7 @@ export function Card({
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: '-4% 0px' }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
-      className={`surface tone-card overflow-hidden rounded-xl ${className}`}
+      className={`surface card-3d tone-card overflow-hidden ${className}`}
     >
       {(title || actions) && (
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-(--surface-border) px-6 py-4">

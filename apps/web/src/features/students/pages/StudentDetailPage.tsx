@@ -6,6 +6,7 @@ import { Card, EmptyState, Spinner, Tabs } from '@/components/ui';
 import { DocumentsPanel } from '@/features/documents/components/DocumentsPanel';
 import { ClassHistoryCard } from '@/features/students/components/detail/ClassHistoryCard';
 import { OverviewTab } from '@/features/students/components/detail/OverviewTab';
+import { FormAnswersCard } from '@/features/admissions/components/detail/FormAnswersCard';
 import { ParentsTab } from '@/features/students/components/detail/ParentsTab';
 import { MoveSectionModal, StudentLoginModal, StudentStatusModal } from '@/features/students/components/detail/StudentAdminModals';
 import { StudentHeader } from '@/features/students/components/detail/StudentHeader';
@@ -49,6 +50,9 @@ export function StudentDetailPage({ mode, canEdit = false }: { mode: Mode; canEd
       <StudentHeader student={s} current={current} editable={editable} onMove={() => setDialog('move')} onLogin={() => setDialog('login')} onStatus={() => setDialog('status')} onEdit={() => setDialog('edit')} />
       <Tabs tabs={TABS} value={tab} onChange={setTab} />
       {tab === 'overview' && <OverviewTab student={s} editable={editable} />}
+      {tab === 'overview' && mode === 'admin' && !!s.admissionApplication?.formAnswers?.length && (
+        <div className="mt-6"><FormAnswersCard answers={s.admissionApplication.formAnswers} title={`Admission form answers · ${s.admissionApplication.applicationNo}`} /></div>
+      )}
       {tab === 'parents' && <ParentsTab student={s} editable={editable} />}
       {tab === 'classes' && <ClassHistoryCard student={s} />}
       {tab === 'documents' && <DocumentsPanel ownerType="student" ownerId={s.id} canEdit={editable} categories={STUDENT_DOC_CATEGORIES} />}

@@ -58,7 +58,7 @@ export const feeService = {
   generateInvoices: (body: { academicYearId?: string; classId: string; sectionId?: string; periodLabel: string; issueDate: string; dueDate: string; frequencies: Frequency[] }) =>
     api<{ created: number; skipped: number }>('/fees/invoices/generate', { method: 'POST', body }),
 
-  payments: (q: { page: number; pageSize: number; from?: string; to?: string }) => api<Paged<Payment>>(`/fees/payments?${qs(q)}`),
+  payments: (q: { page: number; pageSize: number; from?: string; to?: string; q?: string }) => api<Paged<Payment>>(`/fees/payments?${qs(q)}`),
   recordPayment: (body: { studentId: string; amount: string; method: PaymentMethod; reference: string | null; notes: string | null }) =>
     api<{ paymentId: string; receiptNo: string }>('/fees/payments', { method: 'POST', body }),
   voidPayment: (id: string, note: string) => api(`/fees/payments/${id}/void`, { method: 'POST', body: { note } }),

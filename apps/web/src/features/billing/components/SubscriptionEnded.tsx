@@ -16,11 +16,11 @@ export function SubscriptionEnded({ state, isAdmin }: { state: SubscriptionState
     <div className="mx-auto max-w-2xl py-10">
       <div className="surface rounded-2xl p-8 text-center">
         <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400"><Lock size={28} /></span>
-        <h1 className="mt-4 text-2xl font-bold text-slate-900 dark:text-white">{trial ? 'Your free trial has ended' : 'Your subscription has ended'}</h1>
+        <h1 className="mt-4 text-2xl font-bold text-slate-900 dark:text-white">{state.usagePaused ? 'Your school has outgrown its plan' : trial ? 'Your free trial has ended' : 'Your subscription has ended'}</h1>
         {isAdmin ? (
           <>
             <p className="mt-2 text-base text-slate-600 dark:text-slate-300">
-              The school is locked until a plan is chosen. Your data is safe: nothing has been deleted, and paying unlocks everything immediately for every user.
+              {state.usagePaused ? 'The school is paused because it has more students, staff or files than the plan includes. Choose a bigger plan to continue.' : 'The school is locked until a plan is chosen.'} Your data is safe: nothing has been deleted, and paying unlocks everything immediately for every user.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <AreaLink to="/billing" className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-5 py-2.5 text-base font-bold text-white hover:bg-orange-700">Choose a plan &amp; pay</AreaLink>
@@ -30,7 +30,7 @@ export function SubscriptionEnded({ state, isAdmin }: { state: SubscriptionState
         ) : (
           <>
             <p className="mt-2 text-base text-slate-600 dark:text-slate-300">
-              Your school’s {PRODUCT_NAME} subscription needs to be renewed. Please contact your school office; as soon as they renew, you can continue where you left off.
+              {state.usagePaused ? `Your school has grown past its ${PRODUCT_NAME} plan. Please contact your school office; as soon as the plan is changed,` : `Your school’s ${PRODUCT_NAME} subscription needs to be renewed. Please contact your school office; as soon as they renew,`} you can continue where you left off.
             </p>
             <div className="mt-6 flex justify-center"><Button variant="secondary" icon={LogOut} onClick={() => void logout()}>Sign out</Button></div>
           </>

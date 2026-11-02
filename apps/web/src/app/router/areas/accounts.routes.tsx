@@ -1,3 +1,4 @@
+import { ComplaintsPage } from '@/features/complaints/ComplaintsPage';
 import type { AreaRoutes } from '@/app/router/types';
 import { AccountsDashboard } from '@/features/dashboards/pages/AccountsDashboard';
 import { FinancePage } from '@/features/fees/pages/FinancePage';
@@ -24,6 +25,7 @@ export const accountsRoutes: AreaRoutes = (can) => {
     { path: 'payroll', capability: 'payroll.view', element: <PayrollPage key="payroll" canEdit={can('payroll.process')} /> },
     { path: 'payroll/runs/:id', capability: 'payroll.view', element: <RunDetailPage canEdit={can('payroll.process')} canApprove={can('payroll.approve')} /> },
     { path: 'notifications', capability: 'communication.any', element: <NotificationsPage /> },
+    { path: 'complaints', capability: 'complaints.own', element: <ComplaintsPage handler={false} /> },
     { path: 'financial-reports', capability: 'reports.finance', element: <ReportsPage financeOnly /> },
 ];
 };

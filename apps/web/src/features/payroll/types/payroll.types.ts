@@ -8,6 +8,7 @@ export interface EmployeeRef {
   designation: string;
   staffType: 'teaching' | 'non_teaching';
   userId: string | null;
+  photoKey?: string | null;
 }
 
 export interface SalaryComponent {

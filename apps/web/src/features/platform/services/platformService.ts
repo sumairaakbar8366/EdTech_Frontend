@@ -1,4 +1,4 @@
-import type { SchoolApplication, SchoolSummary, Tier, TierFilter, TierPayload } from '@/features/platform/types/platform.types';
+import type { SchoolSummary, Tier, TierFilter, TierPayload } from '@/features/platform/types/platform.types';
 import { api } from '@/services/api/http';
 
 export interface OnboardSchoolPayload {
@@ -23,6 +23,4 @@ export const platformService = {
   /** Creates the tenant, its trial subscription, first campus and first school admin. */
   onboardSchool: (body: OnboardSchoolPayload) => api<{ school: { name: string } }>('/platform/schools', { method: 'POST', body }),
   setSchoolStatus: (id: string, status: SchoolSummary['status']) => api(`/platform/schools/${id}/status`, { method: 'PATCH', body: { status } }),
-  applications: () => api<SchoolApplication[]>('/platform/school-applications'),
-  reviewApplication: (id: string, status: 'approved' | 'rejected') => api(`/platform/school-applications/${id}`, { method: 'PATCH', body: { status } }),
 };

@@ -7,6 +7,7 @@ import { AppShell } from '@/layouts/AppShell/AppShell';
 import { Spinner } from '@/components/ui';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { SupportBanner } from '@/features/billing/components/SupportBanner';
+import { TrialAdvert } from '@/features/billing/components/TrialAdvert';
 import type { ComponentProps } from 'react';
 
 /**
@@ -31,5 +32,5 @@ export function SchoolShell({ area, isAdmin, ...props }: ComponentProps<typeof A
   void area;
   // The school's theme colour is a plan feature; without it the standard colours apply.
   const brandColor = sub?.features.includes('theme') ? props.brandColor : null;
-  return <AppShell {...props} brandColor={brandColor} nav={nav} banner={<>{support && <SupportBanner name={support.name} />}<SubscriptionBanner state={sub} isAdmin={isAdmin} /></>} override={locked} />;
+  return <AppShell {...props} tourArea={area} brandColor={brandColor} nav={nav} banner={<>{support && <SupportBanner name={support.name} />}<SubscriptionBanner state={sub} isAdmin={isAdmin} /><TrialAdvert state={sub} area={area} /></>} override={locked} />;
 }

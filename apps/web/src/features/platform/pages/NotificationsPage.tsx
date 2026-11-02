@@ -1,4 +1,4 @@
-import { Bell, Building2, CheckCheck, ClipboardList, KeyRound, type LucideIcon, UserSearch, Wallet } from 'lucide-react';
+import { Gauge, Bell, Building2, CheckCheck, ClipboardList, KeyRound, type LucideIcon, UserSearch, Wallet } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { Alert, Badge, Button, Card, EmptyState, PageHeader, Pagination, Spinner, Tabs } from '@/components/ui';
@@ -9,6 +9,7 @@ import { useAction } from '@/lib/hooks/useAction';
 
 const KIND: Record<OwnerNotificationKind, { label: string; icon: LucideIcon }> = {
   school_signup: { label: 'Sign-up', icon: Building2 },
+  school_usage: { label: 'Plan size', icon: Gauge },
   school_application: { label: 'Application', icon: ClipboardList },
   payment_received: { label: 'Payment', icon: Wallet },
   password_reset_request: { label: 'Password reset', icon: KeyRound },

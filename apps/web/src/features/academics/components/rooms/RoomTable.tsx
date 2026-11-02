@@ -19,5 +19,5 @@ export function RoomTable({ rooms, readOnly, onEdit, onDelete }: { rooms: Room[]
           ),
         }]),
   ];
-  return <DataTable columns={columns} rows={rooms} rowKey={(r) => r.id} rowClassName={() => 'transition-colors hover:bg-slate-500/5'} />;
+  return <DataTable columns={columns} rows={rooms} rowKey={(r) => r.id} searchText={(r) => [r.name, r.campus.name]} searchPlaceholder="Search room or campus…" rowClassName={() => 'transition-colors hover:bg-slate-500/5'} />;
 }

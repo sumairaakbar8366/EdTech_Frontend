@@ -1,3 +1,4 @@
+import { ComplaintsPage } from '@/features/complaints/ComplaintsPage';
 import { MyRequestsPage } from '@/features/document-requests/pages/MyRequestsPage';
 import type { AreaRoutes } from '@/app/router/types';
 import { ChildrenAttendancePage } from '@/features/attendance/pages/ChildrenAttendancePage';
@@ -30,6 +31,7 @@ export const parentRoutes: AreaRoutes = () => [
   { path: 'fees', capability: 'fees.own', element: <MyFeesPage /> },
   { path: 'receipts', capability: 'fees.own', element: <MyFeesPage key="receipts" focus="receipts" /> },
   { path: 'notifications', capability: 'communication.any', element: <NotificationsPage /> },
+  { path: 'complaints', capability: 'complaints.own', element: <ComplaintsPage handler={false} /> },
   { path: 'teacher-communication', capability: 'communication.converse', element: <MessagesPage title="Teacher Communication" sub="Write to your children's teachers" /> },
   { path: 'documents', element: <ChildrenDocumentsPage /> },
   { path: 'document-requests', capability: 'documents.request', element: <MyRequestsPage /> },

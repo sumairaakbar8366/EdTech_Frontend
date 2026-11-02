@@ -1,10 +1,13 @@
-import { BellRing, Check, FileSpreadsheet, FileText, Globe, KeyRound, Landmark, MapPin, Palette, type LucideIcon } from 'lucide-react';
+import { Award, BellRing, Check, Crown, FileSpreadsheet, FileText, Globe, KeyRound, Landmark, MapPin, Palette, PlayCircle, ShieldAlert, ShieldCheck, type LucideIcon } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useEffect, useState, type ReactNode } from 'react';
 import { SectionHeading } from '@/features/marketing/components/Reveal';
 
+
 interface Special {
   key: string;
+  /** Shown in the main film (the button scrolls to it). */
+  clip?: string;
   icon: LucideIcon;
   title: string;
   text: string;
@@ -23,6 +26,62 @@ const Frame = ({ children, label }: { children: ReactNode; label: string }) => (
 );
 
 const SPECIALS: Special[] = [
+  {
+    key: 'register', clip: 'master', icon: ShieldCheck, title: 'Only genuine schools get in',
+    text: 'A school applies online and proves who it is. Our own team verifies the CNIC, NTN and school by hand, and only then is the school created, with its login emailed to the owner.',
+    points: ['Email and WhatsApp codes before anything is saved', 'Nothing is created until our team approves', 'The first sign-in must choose a new password', 'Free trial sized to the school'],
+    visual: () => (
+      <Frame label="Application · Greenfield Public School">
+        {['Email verified', 'Mobile verified', 'CNIC and NTN checked by our team', 'Approved: login sent by email'].map((t, i) => (
+          <motion.div key={t} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 + i * 0.45 }} className="mb-2 flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-white/10"><Check size={15} className="text-emerald-500" /> {t}</motion.div>
+        ))}
+      </Frame>
+    ),
+  },
+  {
+    key: 'scholarships', clip: 'master', icon: Award, title: 'Scholarships and sponsors',
+    text: 'Sponsors fund students. Your own marks, attendance and fee records find who qualifies, and you decide who is put forward. Nothing is shared until you confirm.',
+    points: ['Choose the classes, from grade 9 to undergraduate', 'Yearly or semester cycles', 'Merit and need worked out from live data', 'Sponsors, offers and awards tracked end to end'],
+    visual: () => (
+      <Frame label="Scholarship candidates">
+        {[['Mahnoor Raza', 'Grade 1 B', 85], ['Sufyan Ali', 'Grade 1 A', 70], ['Hamdan Sheikh', 'Grade 3 B', 70]].map(([n, c, sc], i) => (
+          <motion.div key={String(n)} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + i * 0.4 }} className="mb-2 flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-white/10"><span><b>{n}</b> <span className="text-slate-500">{c}</span></span><span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs font-bold text-orange-700">{sc}</span></motion.div>
+        ))}
+      </Frame>
+    ),
+  },
+  {
+    key: 'complaints', clip: 'master', icon: ShieldAlert, title: 'Complaints that stay safe',
+    text: 'Parents, students and staff can raise a concern, anonymously if they wish. They choose who it goes to, and the right person answers and resolves it.',
+    points: ['Send to the principal, a teacher, or the parents of a class', 'Anonymous: handlers never see the name', 'Filters, search and a record of every answer', 'Open complaints on the principal’s dashboard'],
+    visual: () => (
+      <Frame label="Complaints">
+        <div className="rounded-lg border border-slate-200 p-3 text-sm dark:border-white/10"><div className="font-semibold">Van arrives late every morning</div><div className="mt-1 text-xs text-slate-500">From a parent (anonymous) · Transport</div><motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 1.6, repeat: Infinity }} className="mt-3 inline-block rounded-md bg-emerald-600 px-3 py-1 text-xs font-bold text-white">Mark resolved</motion.div></div>
+      </Frame>
+    ),
+  },
+  {
+    key: 'forms', clip: 'master', icon: FileText, title: 'Design your own forms',
+    text: 'Teacher, staff, student, parent and access forms are yours to shape. Add any field the school needs, from a CNIC to a document upload, and it appears everywhere that person is added.',
+    points: ['Text, numbers, dates, choices and document uploads', 'Sections and help text', 'Required or optional, with limits', 'One place for the principal or admin'],
+    visual: () => (
+      <Frame label="Forms · Add a field">
+        <div className="space-y-2 text-sm">{['B-Form copy · Document upload', 'Blood group · Choice', 'Father’s occupation · Text'].map((t, i) => <motion.div key={t} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 + i * 0.4 }} className="rounded-lg border border-slate-200 px-3 py-2 dark:border-white/10">{t}</motion.div>)}</div>
+      </Frame>
+    ),
+  },
+  {
+    key: 'leadership', clip: 'master', icon: Crown, title: 'Principal, director, vice principal',
+    text: 'Give the principal a login in one step: their login and a strong one-time password are emailed after their email is verified. Paid plans add directors, vice principals and more, each with a dashboard the admin shapes.',
+    points: ['Pick the role, or name your own', 'Choose what each dashboard shows', 'Change it later as roles change', 'A warning when the school outgrows its plan'],
+    visual: () => (
+      <Frame label="Principal & leadership">
+        {[['Principal', 'Full dashboard'], ['Director', 'No live classes'], ['Vice Principal', 'No payroll or fees']].map(([r, d], i) => (
+          <motion.div key={r} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + i * 0.4 }} className="mb-2 flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-white/10"><b>{r}</b><span className="text-xs text-slate-500">{d}</span></motion.div>
+        ))}
+      </Frame>
+    ),
+  },
   {
     key: 'website', icon: Globe, title: 'A website for every school, built automatically',
     text: 'The moment a school joins, it gets a public website made from its own data: classes, campuses, teachers, open jobs. The admin adds texts and photos; parents apply online.',
@@ -161,6 +220,7 @@ export function SpecialFeaturesSection() {
               <div>
                 <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{s.title}</h3>
                 <p className="mt-3 leading-7 text-slate-600 dark:text-slate-300">{s.text}</p>
+                {s.clip && <a href="#tour" className="mt-4 inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-bold uppercase text-white shadow-glow hover:brightness-110"><PlayCircle size={16} /> See it in the main film</a>}
                 <ul className="mt-4 space-y-2">{s.points.map((p) => <li key={p} className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200"><Check size={16} className="mt-0.5 shrink-0 text-orange-500" /> {p}</li>)}</ul>
               </div>
               <div className="self-center">{s.visual()}</div>

@@ -4,8 +4,9 @@ import { Megaphone, MessagesSquare, Send, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { Alert, Button, Card, Field, Input, PageHeader, TextArea } from '@/components/ui';
 import { AnnouncementList } from '@/features/communication/components/AnnouncementList';
+import { PeoplePicker } from '@/features/communication/components/PeoplePicker';
 import { useCommunicationAction } from '@/features/communication/hooks/useCommunication';
-import { communicationService } from '@/features/communication/services/communicationService';
+import { communicationService, type PersonOption } from '@/features/communication/services/communicationService';
 import { errorMessage } from '@/lib/errors';
 import { onSubmit } from '@/lib/forms';
 
@@ -14,12 +15,14 @@ export function CommunicationPage() {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [roles, setRoles] = useState<string[]>([]);
-  const send = useCommunicationAction(() => communicationService.announce({ title, body, targetRoles: roles }), {
+  const [people, setPeople] = useState<PersonOption[]>([]);
+  const send = useCommunicationAction(() => communicationService.announce({ title, body, targetRoles: roles, targetUserIds: people.map((p) => p.id) }), {
     success: (r) => `Announcement sent to ${r.recipients} ${r.recipients === 1 ? 'person' : 'people'}`,
     onDone: () => {
       setTitle('');
       setBody('');
       setRoles([]);
+      setPeople([]);
     },
     toastErrors: false,
   });
@@ -43,7 +46,7 @@ export function CommunicationPage() {
             <fieldset>
               <legend className="mb-1 text-sm font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">Send to</legend>
               <div className="flex flex-wrap gap-2">
-                <button type="button" onClick={() => setRoles([])} className={`rounded-lg px-3 py-1.5 text-sm font-semibold ring-1 transition ${roles.length === 0 ? 'bg-primary-500/15 text-primary-700 ring-primary-400 dark:text-primary-200' : 'text-slate-600 ring-slate-300 dark:text-slate-300 dark:ring-white/10'}`}>
+                <button type="button" onClick={() => { setRoles([]); setPeople([]); }} className={`rounded-lg px-3 py-1.5 text-sm font-semibold ring-1 transition ${roles.length === 0 && people.length === 0 ? 'bg-primary-500/15 text-primary-700 ring-primary-400 dark:text-primary-200' : 'text-slate-600 ring-slate-300 dark:text-slate-300 dark:ring-white/10'}`}>
                   Everyone
                 </button>
                 {SCHOOL_ROLES.filter((r) => r.key !== 'school_admin').map((r) => (
@@ -52,6 +55,11 @@ export function CommunicationPage() {
                   </button>
                 ))}
               </div>
+            </fieldset>
+            <fieldset>
+              <legend className="mb-1 text-sm font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">Or specific people</legend>
+              <PeoplePicker value={people} onChange={setPeople} />
+              <p className="mt-1 text-xs text-slate-500">{roles.length || people.length ? `Goes to ${[roles.length ? `${roles.length} role${roles.length === 1 ? '' : 's'}` : '', people.length ? `${people.length} ${people.length === 1 ? 'person' : 'people'}` : ''].filter(Boolean).join(' and ')}.` : 'Goes to everyone in the school.'}</p>
             </fieldset>
             <Button type="submit" icon={Send} loading={send.isPending} className="w-full">Publish announcement</Button>
             <p className="text-xs text-slate-500">Delivered in-app now. Email, SMS and WhatsApp delivery switch on once those providers are connected.</p>

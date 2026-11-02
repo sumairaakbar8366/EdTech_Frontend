@@ -13,7 +13,7 @@ export const useAwards = () => useQuery({ queryKey: [...FEES_KEY, 'awards'], que
 export const useInvoices = (q: { page: number; pageSize: number; q?: string; status?: InvoiceStatus | '' }) =>
   useQuery({ queryKey: [...FEES_KEY, 'invoices', q], queryFn: () => feeService.invoices(q), placeholderData: keepPreviousData });
 export const useInvoice = (id: string | null) => useQuery({ queryKey: [...FEES_KEY, 'invoice', id], queryFn: () => feeService.invoice(id!), enabled: !!id });
-export const usePayments = (q: { page: number; pageSize: number; from?: string; to?: string }) =>
+export const usePayments = (q: { page: number; pageSize: number; from?: string; to?: string; q?: string }) =>
   useQuery({ queryKey: [...FEES_KEY, 'payments', q], queryFn: () => feeService.payments(q), placeholderData: keepPreviousData });
 export const useReceipt = (paymentId: string | null) => useQuery({ queryKey: [...FEES_KEY, 'receipt', paymentId], queryFn: () => feeService.receipt(paymentId!), enabled: !!paymentId });
 export const useStatement = (studentId: string | null | undefined) =>

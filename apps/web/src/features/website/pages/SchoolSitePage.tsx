@@ -1,21 +1,20 @@
-import { ArrowRight, Briefcase, Building2, CalendarDays, CheckCircle2, ClipboardList, FileCheck2, GraduationCap, LogIn, Mail, MapPin, Menu, PhoneCall, Phone, Quote, Send, UserCheck, Users, X } from 'lucide-react';
+import { ArrowRight, Briefcase, Building2, CalendarDays, ClipboardList, FileCheck2, GraduationCap, LogIn, Mail, MapPin, Menu, PhoneCall, Phone, Quote, Send, UserCheck, Users, X } from 'lucide-react';
 import { JobApplyModal } from '@/features/website/components/JobApplyModal';
 import { SiteArtwork } from '@/features/website/components/SiteArtwork';
 import { SiteGallery } from '@/features/website/components/SiteGallery';
+import { SiteFees } from '@/features/website/components/SiteFees';
 import { motion } from 'motion/react';
 import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router';
-import { Alert, Button, CompactNumber, Field, FullPageMessage, Input, Select, TextArea } from '@/components/ui';
+import { Button, CompactNumber, FullPageMessage } from '@/components/ui';
 import { useForcedLightTheme } from '@/app/providers/ThemeProvider';
 import { userAreas } from '@/app/router/SchoolRoutes';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useTenant } from '@/features/tenancy/useTenant';
-import { mediaUrl, usePublicSite, websiteService, type PublicSite } from '@/features/website/website';
+import { mediaUrl, usePublicSite, type PublicSite } from '@/features/website/website';
 import { siteImagery, siteStyle } from '@/features/website/siteImagery';
 import { paletteVars, sitePalette } from '@/features/website/sitePalette';
-import { errorMessage } from '@/lib/errors';
 import { apiAsset } from '@/services/api/http';
-import { onSubmit } from '@/lib/forms';
 import '@/features/website/school-site.css';
 import { SocialLinks } from '@/features/website/components/SocialLinks';
 import { socialEntries } from '@/features/website/social';
@@ -49,71 +48,6 @@ const Backdrop = ({ src }: { src: string }) => (
 const Panel = ({ children, className = '' }: { children: ReactNode; className?: string }) => (
   <div className={`rounded-md border border-(--site-line) border-t-(--site-accent) border-t-[3px] bg-white shadow-[0_1px_2px_rgb(15_23_42/0.04),0_8px_24px_-12px_rgb(15_23_42/0.12)] ${className}`}>{children}</div>
 );
-
-function AdmissionForm({ site }: { site: PublicSite }) {
-  const blank = { academicYearId: site.sessions.find((s) => !s.isCurrent)?.id ?? site.sessions[0]?.id ?? '', classId: '', campusId: site.campuses[0]?.id ?? '', firstName: '', lastName: '', gender: '', dateOfBirth: '', previousSchool: '', guardianFirstName: '', guardianLastName: '', guardianRelation: 'father', guardianPhone: '', guardianEmail: '', address: '', notes: '', website: '' };
-  const [f, setF] = useState(blank);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState<string | null>(null);
-  const set = (k: keyof typeof f) => (e: { target: { value: string } }) => setF({ ...f, [k]: e.target.value });
-  const submit = async () => {
-    setBusy(true);
-    setError(null);
-    try {
-      const body = Object.fromEntries(Object.entries(f).map(([k, v]) => [k, v === '' && !['website'].includes(k) ? null : v]));
-      const r = await websiteService.applyAdmission({ ...body, firstName: f.firstName, lastName: f.lastName, classId: f.classId, campusId: f.campusId, dateOfBirth: f.dateOfBirth, guardianFirstName: f.guardianFirstName, guardianLastName: f.guardianLastName, guardianPhone: f.guardianPhone, guardianRelation: f.guardianRelation });
-      setDone(r.applicationNo);
-      setF(blank);
-    } catch (e) {
-      setError(errorMessage(e, 'Could not send the application. Please check the form and try again.'));
-    } finally {
-      setBusy(false);
-    }
-  };
-  if (done) {
-    return (
-      <Panel className="p-8 text-center sm:p-10">
-        <CheckCircle2 size={40} className="mx-auto text-emerald-600" />
-        <h3 className="site-serif mt-3 text-2xl font-semibold text-slate-900">Application received</h3>
-        <p className="mt-2 text-slate-600">Your application number is <strong className="font-mono">{done}</strong>. The school office will contact you on the phone number you gave.</p>
-        <Button className="mt-6" variant="secondary" onClick={() => setDone(null)}>Apply for another child</Button>
-      </Panel>
-    );
-  }
-  const heading = (text: string) => <h3 className="border-b border-(--site-line) pb-2 text-sm font-bold uppercase tracking-[0.14em] text-slate-500 sm:col-span-2">{text}</h3>;
-  return (
-    <Panel>
-      <form onSubmit={onSubmit(() => void submit())} className="grid gap-4 p-6 sm:grid-cols-2 sm:p-8">
-        {error && <div className="sm:col-span-2"><Alert>{error}</Alert></div>}
-        <input type="text" tabIndex={-1} autoComplete="off" value={f.website} onChange={set('website')} className="hidden" aria-hidden />
-        {heading('Student')}
-        {site.sessions.length > 1 && (
-          <Field label="Session"><Select required value={f.academicYearId} onChange={set('academicYearId')}>{site.sessions.map((s) => <option key={s.id} value={s.id}>{s.name}{s.isCurrent ? ' (current)' : ''}</option>)}</Select></Field>
-        )}
-        <Field label="Class applying for"><Select required value={f.classId} onChange={set('classId')}><option value="">Choose a class</option>{site.classes.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</Select></Field>
-        {site.campuses.length > 1 && <Field label="Campus"><Select required value={f.campusId} onChange={set('campusId')}>{site.campuses.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</Select></Field>}
-        <Field label="First name"><Input required maxLength={100} value={f.firstName} onChange={set('firstName')} /></Field>
-        <Field label="Last name"><Input required maxLength={100} value={f.lastName} onChange={set('lastName')} /></Field>
-        <Field label="Date of birth"><Input type="date" required value={f.dateOfBirth} onChange={set('dateOfBirth')} /></Field>
-        <Field label="Gender"><Select value={f.gender} onChange={set('gender')}><option value="">Prefer not to say</option><option value="male">Male</option><option value="female">Female</option></Select></Field>
-        <div className="sm:col-span-2"><Field label="Previous school (if any)"><Input maxLength={150} value={f.previousSchool} onChange={set('previousSchool')} /></Field></div>
-        <div className="mt-2 sm:col-span-2">{heading('Parent / guardian')}</div>
-        <Field label="First name"><Input required maxLength={100} value={f.guardianFirstName} onChange={set('guardianFirstName')} /></Field>
-        <Field label="Last name"><Input required maxLength={100} value={f.guardianLastName} onChange={set('guardianLastName')} /></Field>
-        <Field label="Relationship"><Select value={f.guardianRelation} onChange={set('guardianRelation')}><option value="father">Father</option><option value="mother">Mother</option><option value="guardian">Guardian</option><option value="grandparent">Grandparent</option><option value="other">Other</option></Select></Field>
-        <Field label="Mobile number"><Input required type="tel" maxLength={32} pattern="[+0-9 \(\)\-]{10,}" title="e.g. 0300 1234567" value={f.guardianPhone} onChange={set('guardianPhone')} /></Field>
-        <Field label="Email (optional)"><Input type="email" maxLength={254} value={f.guardianEmail} onChange={set('guardianEmail')} /></Field>
-        <Field label="Address"><Input maxLength={500} value={f.address} onChange={set('address')} /></Field>
-        <div className="sm:col-span-2"><Field label="Anything we should know? (optional)"><TextArea rows={3} maxLength={3000} value={f.notes} onChange={set('notes')} /></Field></div>
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-(--site-line) pt-5 sm:col-span-2">
-          <p className="max-w-md text-sm text-slate-500">The office reviews every application and calls you to arrange documents and an interview.</p>
-          <Button type="submit" icon={Send} loading={busy} className="bg-(--site-accent)!">Send application</Button>
-        </div>
-      </form>
-    </Panel>
-  );
-}
 
 const ADMISSION_STEPS = [
   { Icon: ClipboardList, title: 'Apply online', text: 'Complete the form. There is no need to visit the school to apply.' },
@@ -154,10 +88,12 @@ export function SchoolSitePage() {
     );
   }
 
+  const showFees = !!s.fees?.structures.length;
   const nav = [
     ['about', 'About'],
     ...(s.media.length ? [['gallery', 'Gallery']] : []),
     ...(s.admissionsOpen ? [['admissions', 'Admissions']] : []),
+    ...(showFees ? [['fees', 'Fees']] : []),
     ...(s.careersOpen ? [['careers', 'Careers']] : []),
     ['contact', 'Contact'],
   ];
@@ -171,6 +107,7 @@ export function SchoolSitePage() {
   ];
   const classRange = s.classes.length > 1 ? `${s.classes[0]!.name} to ${s.classes[s.classes.length - 1]!.name}` : s.classes[0]?.name;
   const hasContact = s.contact.phone || s.contact.email || s.contact.address;
+  const requiredDocs = s.admissionForm.fields.filter((f) => f.type === 'file');
   const crest = (size: string) =>
     s.school.logoUrl ? (
       <img src={apiAsset(s.school.logoUrl)} alt="" className={`${size} shrink-0 rounded object-contain`} />
@@ -203,7 +140,7 @@ export function SchoolSitePage() {
           <nav className="ml-auto hidden items-center gap-7 lg:flex">
             {nav.map(([id, label]) => <a key={id} href={`#${id}`} className="text-sm font-semibold text-slate-600 transition-colors hover:text-(--site-accent)">{label}</a>)}
           </nav>
-          {s.admissionsOpen && <a href="#admissions" className="hidden items-center gap-2 rounded bg-(--site-accent) px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 lg:inline-flex">Apply now</a>}
+          {s.admissionsOpen && <Link to="/apply" className="hidden items-center gap-2 rounded bg-(--site-accent) px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 lg:inline-flex">Apply now</Link>}
           <Link to={portalHref} className="ml-auto inline-flex items-center gap-2 rounded border border-(--site-line) px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 sm:hidden"><LogIn size={15} /> Portal</Link>
           <button onClick={() => setMenu(!menu)} className="rounded p-2 text-slate-600 hover:bg-slate-100 lg:hidden" aria-label="Menu" aria-expanded={menu}>{menu ? <X size={22} /> : <Menu size={22} />}</button>
         </div>
@@ -232,9 +169,9 @@ export function SchoolSitePage() {
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-slate-200 sm:text-xl">{s.tagline}</p>
             <div className="mt-10 flex flex-wrap gap-3">
               {s.admissionsOpen && (
-                <a href="#admissions" className="inline-flex items-center gap-2 rounded bg-white px-6 py-3 font-semibold text-slate-900 shadow-lg transition hover:bg-slate-100">
+                <Link to="/apply" className="inline-flex items-center gap-2 rounded bg-white px-6 py-3 font-semibold text-slate-900 shadow-lg transition hover:bg-slate-100">
                   Apply for admission <ArrowRight size={18} className="text-(--site-accent)" />
-                </a>
+                </Link>
               )}
               <a href="#about" className="inline-flex items-center gap-2 rounded px-6 py-3 font-semibold text-white ring-1 ring-white/40 transition hover:bg-white/10">Discover the school</a>
             </div>
@@ -259,9 +196,9 @@ export function SchoolSitePage() {
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-slate-600 sm:text-xl">{s.tagline}</p>
             <div className="mt-10 flex flex-wrap gap-3">
               {s.admissionsOpen && (
-                <a href="#admissions" className="inline-flex items-center gap-2 rounded bg-(--site-accent) px-6 py-3 font-semibold text-white shadow-md transition hover:brightness-110">
+                <Link to="/apply" className="inline-flex items-center gap-2 rounded bg-(--site-accent) px-6 py-3 font-semibold text-white shadow-md transition hover:brightness-110">
                   Apply for admission <ArrowRight size={18} />
-                </a>
+                </Link>
               )}
               <a href="#about" className="inline-flex items-center gap-2 rounded bg-white px-6 py-3 font-semibold text-slate-800 ring-1 ring-(--site-line) transition hover:bg-slate-50">Discover the school</a>
             </div>
@@ -391,8 +328,40 @@ export function SchoolSitePage() {
                   ))}
                 </ol>
               </Reveal>
-              <Reveal><AdmissionForm site={s} /></Reveal>
+              <Reveal>
+                <Panel className="flex h-full flex-col p-8 sm:p-10">
+                  <h3 className="site-serif text-2xl font-semibold text-slate-900">Ready to apply?</h3>
+                  <p className="mt-3 text-lg leading-relaxed text-slate-600">{s.admissionForm.intro ?? 'Fill in the online application form in a few minutes. Keep the child’s details and a recent photo at hand.'}</p>
+                  {requiredDocs.length > 0 && (
+                    <div className="mt-6">
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Documents to keep ready</p>
+                      <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+                        {requiredDocs.map((d) => <li key={d.id} className="flex items-center gap-2 text-slate-700"><FileCheck2 size={16} className="shrink-0 text-(--site-accent)" /> {d.label}{d.required ? '' : ' (if available)'}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                  <div className="mt-8 flex flex-wrap items-center gap-4 border-t border-(--site-line) pt-6">
+                    <Link to="/apply" className="inline-flex items-center gap-2 rounded bg-(--site-accent) px-6 py-3 font-semibold text-white shadow-md transition hover:brightness-110">
+                      <Send size={17} /> Apply now
+                    </Link>
+                    {showFees ? <a href="#fees" className="text-sm font-semibold text-(--site-accent) hover:underline">See the fee structure</a> : <span className="text-sm text-slate-500">No need to visit the school to apply.</span>}
+                  </div>
+                </Panel>
+              </Reveal>
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Fees */}
+      {showFees && (
+        <section id="fees" className="scroll-mt-24 border-y border-(--site-line) bg-white py-24">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <Reveal><SectionTitle kicker="Fees" title="Fee structure" sub="What each class costs: the admission fee, monthly tuition and other charges." /></Reveal>
+            <Reveal><SiteFees site={s} /></Reveal>
+            {s.admissionsOpen && (
+              <div className="mt-8"><Link to="/apply" className="inline-flex items-center gap-2 rounded bg-(--site-accent) px-6 py-3 font-semibold text-white shadow-md transition hover:brightness-110">Apply for admission <ArrowRight size={18} /></Link></div>
+            )}
           </div>
         </section>
       )}

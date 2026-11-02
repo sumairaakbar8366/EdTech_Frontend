@@ -3,10 +3,11 @@ import type { SocialProvider } from '@/features/marketing/services/marketingServ
 
 // "Continue with Google" as a full-page redirect (OpenID Connect, implicit id_token). Google only
 // accepts registered addresses, and every school has its own, so the round trip always runs on the
-// main site: /sso/start → Google → /sso/callback, which then signs the person up
-// or hands them to their school with a one-time ticket.
+// main site: /sso/start → Google → /sso/callback, which hands the person to their school with a
+// one-time ticket, or returns a proof of their email to the registration / access-request page.
 
-export type SsoPurpose = 'signup' | 'login';
+/** register: proving the owner's email while registering a school; access: a person asking a school for a login. */
+export type SsoPurpose = 'register' | 'access' | 'login';
 
 export interface SsoRequest {
   provider: SocialProvider;

@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { IconButton } from '@/components/ui/Button/IconButton';
 
@@ -27,18 +27,6 @@ export function Modal({
   const panel = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
-  const [hasRequired, setHasRequired] = useState(false);
-
-  // Forms with mandatory fields explain the asterisk in the footer.
-  useEffect(() => {
-    if (!open || !panel.current) return;
-    const check = () => setHasRequired(!!panel.current?.querySelector('input[required], select[required], textarea[required]'));
-    check();
-    const observer = new MutationObserver(check);
-    observer.observe(panel.current, { subtree: true, childList: true, attributes: true, attributeFilter: ['required'] });
-    return () => observer.disconnect();
-  }, [open]);
-
   useEffect(() => {
     if (!open) return;
     const previous = document.activeElement as HTMLElement | null;
@@ -72,7 +60,7 @@ export function Modal({
           <IconButton icon={X} label="Close" onClick={onClose} />
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">{children}</div>
-        {footer && <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-slate-200 bg-slate-50 px-5 py-3 rounded-b-xl dark:border-white/10 dark:bg-white/2">{hasRequired && <span className="mr-auto text-xs text-slate-500 dark:text-slate-400"><span className="text-rose-600">*</span> Required</span>}{footer}</div>}
+        {footer && <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-slate-200 bg-slate-50 px-5 py-3 rounded-b-xl dark:border-white/10 dark:bg-white/2">{footer}</div>}
       </div>
     </div>,
     document.body,

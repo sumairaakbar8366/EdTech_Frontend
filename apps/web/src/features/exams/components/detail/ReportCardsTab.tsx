@@ -1,29 +1,33 @@
 import { Award, FileText, Pencil } from 'lucide-react';
 import { useState } from 'react';
-import { Badge, Button, Card, EmptyState, IconButton, Input, Modal, Select, Spinner } from '@/components/ui';
+import { Badge, Button, Card, EmptyState, IconButton, Input, Modal, SearchInput, Select, Spinner } from '@/components/ui';
 import { ReportCardModal } from '@/features/exams/components/ReportCardModal';
 import { useExamsAction, useReportCards } from '@/features/exams/hooks/useExams';
 import { examService } from '@/features/exams/services/examService';
 import type { ExamDetail, ReportCardRow } from '@/features/exams/types/exam.types';
 import { compactNumber } from '@/lib/format';
+import { matchesText } from '@/lib/textMatch';
 
 /** Generated report cards ranked per section, with remarks and the printable card. */
 export function ReportCardsTab({ exam, canEdit }: { exam: ExamDetail; canEdit: boolean }) {
   const [sectionId, setSectionId] = useState('');
+  const [text, setText] = useState('');
+  const [result, setResult] = useState<'' | 'pass' | 'fail'>('');
   const [viewing, setViewing] = useState<string | null>(null);
   const [remarksFor, setRemarksFor] = useState<ReportCardRow | null>(null);
   const [remarks, setRemarks] = useState('');
   const cards = useReportCards(exam.id);
   const saveRemarks = useExamsAction(() => examService.saveRemarks(remarksFor!.id, remarks || null), { success: 'Remarks saved', onDone: () => setRemarksFor(null) });
   const sections = [...new Map((cards.data ?? []).map((c) => [c.section.id, `${c.section.schoolClass.name} · ${c.section.name}`])).entries()];
-  const shown = (cards.data ?? []).filter((c) => !sectionId || c.section.id === sectionId);
-  const passed = shown.filter((c) => c.passed).length;
+  const inSection = (cards.data ?? []).filter((c) => !sectionId || c.section.id === sectionId);
+  const passed = inSection.filter((c) => c.passed).length;
+  const shown = inSection.filter((c) => (!result || c.passed === (result === 'pass')) && matchesText(text, c.student.firstName, c.student.lastName, c.student.admissionNo, c.grade));
   if (cards.isLoading) return <Spinner />;
   if (!cards.data?.length) return <Card><EmptyState icon={Award} title="No report cards yet" tone="fuchsia">{canEdit ? 'Enter marks, then use "Generate report cards".' : 'Report cards appear once the administrator generates them.'}</EmptyState></Card>;
   return (
     <Card
       padded={false}
-      title={`${compactNumber(shown.length)} report cards · ${compactNumber(passed)} passed`}
+      title={`${compactNumber(inSection.length)} report cards · ${compactNumber(passed)} passed`}
       icon={Award}
       tone="fuchsia"
       actions={
@@ -35,6 +39,17 @@ export function ReportCardsTab({ exam, canEdit }: { exam: ExamDetail; canEdit: b
         </div>
       }
     >
+      <div className="flex flex-wrap items-center gap-3 border-b border-slate-200 p-4 dark:border-white/5">
+        <SearchInput label="Search report cards" value={text} onChange={setText} placeholder="Search student, admission no. or grade…" />
+        <div className="w-36">
+          <Select aria-label="Result" value={result} onChange={(e) => setResult(e.target.value as '' | 'pass' | 'fail')}>
+            <option value="">Pass and fail</option>
+            <option value="pass">Passed</option>
+            <option value="fail">Failed</option>
+          </Select>
+        </div>
+      </div>
+      {shown.length === 0 && <p className="px-5 py-4 text-sm text-slate-500">No report card matches.</p>}
       <div className="overflow-x-auto">
         <table className="w-full text-base">
           <thead>

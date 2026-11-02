@@ -1,20 +1,23 @@
 import { Pencil, Users, Wallet } from 'lucide-react';
 import { useState } from 'react';
-import { Badge, Card, CompactNumber, EmptyState, IconButton, Spinner } from '@/components/ui';
+import { Badge, Card, CompactNumber, EmptyState, IconButton, SearchInput, Spinner } from '@/components/ui';
 import { SalaryStructureModal } from '@/features/payroll/components/structures/SalaryStructureModal';
 import { useSalaryStructures } from '@/features/payroll/hooks/usePayroll';
 import type { StaffSalary } from '@/features/payroll/types/payroll.types';
 import { employeeName, monthlyGross } from '@/features/payroll/utils/payroll.utils';
 import { formatDate } from '@/lib/format';
+import { matchesText } from '@/lib/textMatch';
 
 /** Every current employee with their active salary structure. */
 export function SalaryStructuresTab({ canEdit }: { canEdit: boolean }) {
   const [editing, setEditing] = useState<StaffSalary | null>(null);
   const staff = useSalaryStructures();
+  const [text, setText] = useState('');
   return (
     <Card padded={false} title="Salary structures" icon={Wallet} tone="primary">
       {staff.isLoading && <div className="px-5"><Spinner /></div>}
       {staff.data?.length === 0 && <EmptyState icon={Users} title="No current staff" tone="sky" />}
+      {!!staff.data?.length && <div className="border-b border-slate-200 p-4 dark:border-white/5"><SearchInput label="Search employees" value={text} onChange={setText} placeholder="Search employee, number or designation…" /></div>}
       {!!staff.data?.length && (
         <div className="overflow-x-auto">
           <table className="w-full text-base">
@@ -29,7 +32,7 @@ export function SalaryStructuresTab({ canEdit }: { canEdit: boolean }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200/70 dark:divide-white/5">
-              {staff.data.map((s) => (
+              {staff.data.filter((s) => matchesText(text, employeeName(s), s.employeeNo, s.designation)).map((s) => (
                 <tr key={s.id}>
                   <td className="px-5 py-3">
                     <div className="font-semibold text-slate-800 dark:text-slate-100">{employeeName(s)}</div>

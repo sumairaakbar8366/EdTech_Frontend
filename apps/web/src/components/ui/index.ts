@@ -1,5 +1,6 @@
 // Design system: generic, business-agnostic UI. Feature components compose these.
 export { Alert } from '@/components/ui/Alert/Alert';
+export { Avatar } from '@/components/ui/Avatar/Avatar';
 export { Badge } from '@/components/ui/Badge/Badge';
 export { Button, type ButtonVariant } from '@/components/ui/Button/Button';
 export { IconButton } from '@/components/ui/Button/IconButton';
@@ -13,13 +14,15 @@ export { FormSection } from '@/components/ui/FormSection/FormSection';
 export { FullPageMessage } from '@/components/ui/FullPageMessage/FullPageMessage';
 export { IconTile } from '@/components/ui/IconTile/IconTile';
 export { InfoItem } from '@/components/ui/InfoItem/InfoItem';
-export { Input } from '@/components/ui/Input/Input';
+export { LiveDot } from '@/components/ui/LiveDot/LiveDot';
+export { Input, PasswordToggle } from '@/components/ui/Input/Input';
 export { Spinner } from '@/components/ui/LoadingState/Spinner';
 export { ConfirmDialog } from '@/components/ui/Modal/ConfirmDialog';
 export { Modal } from '@/components/ui/Modal/Modal';
 export { PageHeader } from '@/components/ui/PageHeader/PageHeader';
 export { Pagination } from '@/components/ui/Pagination/Pagination';
 export { SearchInput } from '@/components/ui/SearchInput/SearchInput';
+export { SearchSelect, type SearchOption } from '@/components/ui/SearchSelect/SearchSelect';
 export { Select } from '@/components/ui/Select/Select';
 export { StatCard } from '@/components/ui/StatCard/StatCard';
 export { StatusBadge } from '@/components/ui/StatusBadge/StatusBadge';

@@ -6,6 +6,7 @@ import { Card, EmptyState, Spinner } from '@/components/ui';
 import { ApplicationFormModal } from '@/features/admissions/components/ApplicationFormModal';
 import { AdmissionHeader } from '@/features/admissions/components/detail/AdmissionHeader';
 import { ApplicantCard } from '@/features/admissions/components/detail/ApplicantCard';
+import { FormAnswersCard } from '@/features/admissions/components/detail/FormAnswersCard';
 import { AssessmentsCard } from '@/features/admissions/components/detail/AssessmentsCard';
 import { DecisionCard } from '@/features/admissions/components/detail/DecisionCard';
 import { EnrollCard } from '@/features/admissions/components/detail/EnrollCard';
@@ -33,7 +34,14 @@ export function AdmissionDetailPage({ canEdit }: { canEdit: boolean }) {
       <div className="grid gap-6 xl:grid-cols-3">
         <div className="space-y-6 xl:col-span-2">
           <ApplicantCard application={a} />
-          <DocumentsPanel ownerType="admission_application" ownerId={a.id} canEdit={canEdit && !closed} categories={ADMISSION_DOC_CATEGORIES} title="Application documents" />
+          {!!a.formAnswers?.length && <FormAnswersCard answers={a.formAnswers} />}
+          {a.status === 'enrolled' && a.student ? (
+            <Card title="Application documents" icon={ClipboardCheck} tone="slate">
+              <p className="text-slate-600 dark:text-slate-300">The documents moved to the student’s record on enrollment. <AreaLink to={`/students/${a.student.id}`} className="font-semibold text-primary-600 hover:underline dark:text-primary-300">Open {a.student.admissionNo}</AreaLink></p>
+            </Card>
+          ) : (
+            <DocumentsPanel ownerType="admission_application" ownerId={a.id} canEdit={canEdit && !closed} categories={ADMISSION_DOC_CATEGORIES} title="Application documents" />
+          )}
           <AssessmentsCard application={a} canEdit={canEdit} closed={closed} />
         </div>
         <div className="space-y-6">

@@ -1,3 +1,4 @@
+import { ComplaintsPage } from '@/features/complaints/ComplaintsPage';
 import type { AreaRoutes } from '@/app/router/types';
 import { ClassAttendancePage } from '@/features/attendance/pages/ClassAttendancePage';
 import { LeavePage } from '@/features/leave/pages/LeavePage';
@@ -38,6 +39,7 @@ export const teacherRoutes: AreaRoutes = (can) => [
   { path: 'salary-payslips', capability: 'payroll.own', element: <MyPayslipsPage /> },
   { path: 'profile', capability: 'staff.own', element: <StaffDetailPage own canEdit={false} canEditAcademics={false} /> },
   { path: 'notifications', capability: 'communication.any', element: <NotificationsPage /> },
+  { path: 'complaints', capability: 'complaints.own', element: <ComplaintsPage handler={false} /> },
   { path: 'my-students', capability: 'students.view', element: <MyStudentsPage /> },
   { path: 'messages', capability: 'communication.converse', element: <MessagesPage sub="Conversations with your students' parents" /> },
 ];

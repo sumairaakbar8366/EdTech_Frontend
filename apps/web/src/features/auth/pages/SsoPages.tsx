@@ -6,19 +6,21 @@ import { schoolOrigin } from '@/config/site';
 import { AuthCard } from '@/features/auth/components/AuthCard';
 import { useAuthConfig } from '@/features/auth/components/SocialButtons';
 import { SchoolChoice } from '@/features/auth/components/SchoolChoice';
-import { PROVIDER_LABEL, readSsoCallback, redirectToProvider, type SsoResult } from '@/features/auth/sso';
-import { ProviderSignupFinish } from '@/features/marketing/components/QuickSignup';
+import { PROVIDER_LABEL, readSsoCallback, redirectToProvider, type SsoPurpose, type SsoResult } from '@/features/auth/sso';
 import { marketingService, type SocialProvider } from '@/features/marketing/services/marketingService';
+import { packGoogleReturn, registrationService } from '@/features/registration/registration';
+import { api } from '@/services/api/http';
 import { errorMessage } from '@/lib/errors';
 
 const isProvider = (p: string | null): p is SocialProvider => p === 'google';
+const toPurpose = (p: string | null): SsoPurpose => (p === 'login' || p === 'access' ? p : 'register');
 
 /** Main site, /sso/start: sends the person to Google (see features/auth/sso.ts). */
 export function SsoStartPage() {
   const [params] = useSearchParams();
   const config = useAuthConfig();
   const provider = params.get('provider');
-  const purpose = params.get('purpose') === 'login' ? 'login' : 'signup';
+  const purpose = toPurpose(params.get('purpose'));
   const school = params.get('school') ?? undefined;
   const clientId = isProvider(provider) ? config.data?.googleClientId : null;
   const problem = !isProvider(provider)
@@ -47,18 +49,20 @@ export function SsoStartPage() {
   );
 }
 
-/** Main site, /sso/callback: finishes a sign-up here, or hands a sign-in to the person's school. */
+/**
+ * Main site, /sso/callback: signs the person in at their school, or (registering a school / asking a
+ * school for access) turns Google's answer into a proof of their email and returns them to that page.
+ */
 export function SsoCallbackPage() {
   const [result] = useState<SsoResult>(() => readSsoCallback());
   const [error, setError] = useState<string | null>(result.ok ? null : result.message);
   const [choices, setChoices] = useState<{ school: string; name: string }[] | null>(null);
   const [busy, setBusy] = useState(false);
-  /** Signed in with Google but has no account yet: continue into the free trial. */
-  const [trial, setTrial] = useState(false);
+  /** Signed in with Google but no account uses this email. */
+  const [noAccount, setNoAccount] = useState(false);
   const started = useRef(false);
   const request = result.request;
 
-  // A sign-in: exchange Google's token for a one-time link into the school (or pick one of several).
   const ticket = (school?: string) => {
     if (!result.ok) return;
     setBusy(true);
@@ -66,34 +70,43 @@ export function SsoCallbackPage() {
     marketingService
       .socialTicket({ provider: result.request.provider, credential: result.credential, nonce: result.nonce, school })
       .then(
-        (r) => ('continueUrl' in r ? window.location.replace(r.continueUrl) : 'noAccount' in r ? setTrial(true) : setChoices(r.choose)),
+        (r) => ('continueUrl' in r ? window.location.replace(r.continueUrl) : 'noAccount' in r ? setNoAccount(true) : 'choose' in r ? setChoices(r.choose) : undefined),
         (e) => setError(errorMessage(e, 'You could not be signed in. Please try again.')),
       )
       .finally(() => setBusy(false));
   };
+
   useEffect(() => {
-    if (!result.ok || result.request.purpose !== 'login' || started.current) return;
+    if (!result.ok || started.current) return;
     started.current = true;
-    ticket(result.request.school);
+    const { purpose, school, provider } = result.request;
+    if (purpose === 'login') return ticket(school);
+    // Prove the email, then go back to where the person was filling a form.
+    const prove = purpose === 'register'
+      ? registrationService.google({ provider, credential: result.credential, nonce: result.nonce }).then((g) => `/register#${packGoogleReturn({ email: g.email, name: `${g.firstName} ${g.lastName}`.trim(), proof: g.proof })}`)
+      : api<{ email: string; firstName: string; lastName: string; proof: string }>(`/s/${school}/public/access/google`, { method: 'POST', body: { provider, credential: result.credential, nonce: result.nonce } }).then((g) => `${schoolOrigin(school!)}/request-access#${packGoogleReturn({ email: g.email, name: `${g.firstName} ${g.lastName}`.trim(), proof: g.proof })}`);
+    setBusy(true);
+    prove.then((url) => window.location.replace(url), (e) => { setError(errorMessage(e, 'Google could not be verified. Please try again.')); setBusy(false); });
   }, [result]);
 
-  const signup = request?.purpose !== 'login' || trial;
   return (
     <AuthCard
-      icon={signup ? UserPlus : LogIn}
-      title={signup ? 'Start your free trial' : 'Signing you in'}
-      sub={trial ? 'No account uses this Google email yet. Create your school on a free trial.' : !error && result.ok && !signup ? 'Opening your school…' : undefined}
+      icon={request?.purpose === 'login' ? LogIn : UserPlus}
+      title={request?.purpose === 'login' ? 'Signing you in' : 'Verifying your Google account'}
+      sub={noAccount ? 'No account uses this Google email yet.' : !error && result.ok ? 'One moment…' : undefined}
       back={false}
     >
-      {choices ? (
+      {noAccount ? (
+        <div className="space-y-3 text-sm text-slate-600 dark:text-slate-300">
+          <p>If you run a school, <a href="/register" className="font-semibold text-orange-700 hover:underline dark:text-orange-300">register it here</a> (we verify it first). If you are a teacher, student, parent or staff member, open your school’s sign-in page and choose “Request access”: once the administrator approves, your User ID and password are emailed to you.</p>
+        </div>
+      ) : choices ? (
         <SchoolChoice choices={choices} busy={busy} error={error} onPick={(s) => ticket(s)} />
       ) : error ? (
         <div className="space-y-4">
           <Alert>{error}</Alert>
-          <BackLink school={request?.school} purpose={signup ? 'signup' : 'login'} />
+          <BackLink school={request?.school} purpose={request?.purpose ?? 'register'} />
         </div>
-      ) : result.ok && signup ? (
-        <ProviderSignupFinish provider={result.request.provider} credential={result.credential} nonce={result.nonce} email={result.profile.email} name={result.profile.name} />
       ) : (
         <Spinner />
       )}
@@ -101,10 +114,7 @@ export function SsoCallbackPage() {
   );
 }
 
-function BackLink({ school, purpose }: { school?: string; purpose: 'signup' | 'login' }) {
-  return purpose === 'login' ? (
-    <a href={school ? `${schoolOrigin(school)}/login` : '/login'} className="font-semibold text-orange-700 hover:underline dark:text-orange-300">← Back to sign in</a>
-  ) : (
-    <a href="/access?mode=signup" className="font-semibold text-orange-700 hover:underline dark:text-orange-300">← Back to the free trial</a>
-  );
+function BackLink({ school, purpose }: { school?: string; purpose: SsoPurpose }) {
+  const [href, label] = purpose === 'login' ? [school ? `${schoolOrigin(school)}/login` : '/login', '← Back to sign in'] : purpose === 'access' && school ? [`${schoolOrigin(school)}/request-access`, '← Back to the access request'] : ['/register', '← Back to registration'];
+  return <a href={href} className="font-semibold text-orange-700 hover:underline dark:text-orange-300">{label}</a>;
 }

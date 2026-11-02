@@ -141,7 +141,7 @@ export function HeroSection({ demoHref, onStartTrial }: { demoHref: string; onSt
             </motion.a>
           </motion.div>
           <motion.ul initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-600">
-            {['1-month full-featured trial', 'No card needed to start', 'Set up with your own data'].map((t) => (
+            {['Free trial, every feature', 'Verified schools only', 'No card needed to start'].map((t) => (
               <li key={t} className="inline-flex items-center gap-1.5"><CircleCheck size={14} className="text-primary-700" /> {t}</li>
             ))}
           </motion.ul>

@@ -1,31 +1,50 @@
 import { ArrowLeft, MessagesSquare, Plus, Send } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
+import { matchesText } from '@/lib/textMatch';
 import { useSearchParams } from 'react-router';
-import { Button, Card, EmptyState, PageHeader, Spinner, TextArea } from '@/components/ui';
+import { Button, Card, EmptyState, PageHeader, SearchInput, Spinner, TextArea } from '@/components/ui';
 import { NewThreadModal } from '@/features/communication/components/NewThreadModal';
 import { useCommunicationAction, useThread, useThreads } from '@/features/communication/hooks/useCommunication';
 import { communicationService } from '@/features/communication/services/communicationService';
 import { timeAgo } from '@/features/communication/utils/notificationLinks';
 import { onSubmit } from '@/lib/forms';
+import { ComplaintThread } from '@/features/complaints/ComplaintThread';
+import { MyComplaintsList } from '@/features/complaints/ComplaintsPage';
+import { NewComplaintModal } from '@/features/complaints/NewComplaintModal';
+import { useCan } from '@/features/auth/usePermissions';
 
 /** Parent ↔ teacher conversations (parent "Teacher Communication", teacher "Messages"). */
 export function MessagesPage({ title = 'Messages', sub = 'Private conversations about a student' }: { title?: string; sub?: string }) {
   const [params, setParams] = useSearchParams();
+  // "Messages | Complaints": the person's own complaints are a filter of their conversations.
+  const can = useCan();
+  if (params.get('filter') === 'complaints' && can('complaints.own')) return <ComplaintsFilter title={title} sub={sub} onMessages={() => setParams({}, { replace: true })} params={params} setParams={setParams} />;
+  return <Conversations title={title} sub={sub} />;
+}
+
+function Conversations({ title, sub }: { title: string; sub: string }) {
+  const [params, setParams] = useSearchParams();
+  const can = useCan();
   const active = params.get('thread');
   const [composing, setComposing] = useState(false);
   const threads = useThreads();
+  const [text, setText] = useState('');
+  const shown = threads.data?.filter((t) => matchesText(text, t.subject, t.student.firstName, t.student.lastName, ...t.others.map((o) => o.name), t.lastMessage?.body));
   const select = (id: string | null) => setParams(id ? { thread: id } : {}, { replace: true });
 
   return (
     <div>
       <PageHeader title={title} sub={sub} icon={MessagesSquare} tone="rose" actions={<Button icon={Plus} onClick={() => setComposing(true)}>New message</Button>} />
+      {can('complaints.own') && <FilterChips value="messages" onChange={() => setParams({ filter: 'complaints' }, { replace: true })} />}
       <div className="grid gap-4 lg:grid-cols-[22rem_1fr]">
         <Card padded={false} className={active ? 'hidden lg:block' : ''}>
           {threads.isLoading && <div className="p-5"><Spinner /></div>}
           {threads.data?.length === 0 && <EmptyState icon={MessagesSquare} title="No conversations yet" tone="rose">Start one with “New message”.</EmptyState>}
+          {!!threads.data?.length && <div className="border-b border-slate-200 p-3 dark:border-white/5"><SearchInput label="Search conversations" value={text} onChange={setText} placeholder="Search name, student or subject…" /></div>}
+          {!!threads.data?.length && shown?.length === 0 && <p className="px-4 py-3 text-sm text-slate-500">No conversation matches.</p>}
           <ul className="divide-y divide-slate-200/70 dark:divide-white/5">
-            {threads.data?.map((t) => (
+            {shown?.map((t) => (
               <li key={t.id}>
                 <button onClick={() => select(t.id)} className={`relative flex w-full flex-col gap-0.5 px-4 py-3 text-left transition-colors hover:bg-primary-500/5 ${t.id === active ? 'bg-primary-500/10' : ''}`}>
                   {t.id === active && <motion.span layoutId="thread-active" className="absolute inset-y-0 left-0 w-1 bg-brand" />}
@@ -95,5 +114,34 @@ function Conversation({ id, onBack }: { id: string; onBack: () => void }) {
         <Button type="submit" icon={Send} loading={reply.isPending} disabled={!body.trim()}>Send</Button>
       </form>
     </Card>
+  );
+}
+
+/** The Messages / Complaints switch under the page title. */
+function FilterChips({ value, onChange }: { value: 'messages' | 'complaints'; onChange: (v: 'messages' | 'complaints') => void }) {
+  return (
+    <div role="tablist" aria-label="Show" className="surface mb-4 inline-flex gap-1 rounded-xl p-1">
+      {([['messages', 'Messages'], ['complaints', 'Complaints']] as const).map(([k, label]) => (
+        <button key={k} role="tab" aria-selected={value === k} onClick={() => onChange(k)} className={`focus-ring rounded-lg px-4 py-1.5 text-base font-bold uppercase tracking-wide ${value === k ? 'bg-brand text-white' : 'text-slate-600 hover:bg-slate-500/10 dark:text-slate-300'}`}>{label}</button>
+      ))}
+    </div>
+  );
+}
+
+/** Complaints filter of the conversations page: the person's own complaints and the replies to them. */
+function ComplaintsFilter({ title, sub, onMessages, params, setParams }: { title: string; sub: string; onMessages: () => void; params: URLSearchParams; setParams: (p: Record<string, string>, o?: { replace: boolean }) => void }) {
+  const active = params.get('open');
+  const [raising, setRaising] = useState(false);
+  const open = (id: string | null) => setParams(id ? { filter: 'complaints', open: id } : { filter: 'complaints' }, { replace: true });
+  return (
+    <div>
+      <PageHeader title={title} sub={sub} icon={MessagesSquare} tone="rose" actions={<Button icon={Plus} onClick={() => setRaising(true)}>Raise a complaint</Button>} />
+      <FilterChips value="complaints" onChange={onMessages} />
+      <div className="grid gap-4 lg:grid-cols-[22rem_1fr]">
+        <Card padded={false} className={active ? 'hidden lg:block' : ''}><MyComplaintsList active={active} onPick={open} /></Card>
+        <div className={active ? '' : 'hidden lg:block'}>{active ? <ComplaintThread key={active} id={active} handler={false} onBack={() => open(null)} /> : <Card><EmptyState icon={MessagesSquare} title="Choose a complaint" tone="rose">Open one to read the replies.</EmptyState></Card>}</div>
+      </div>
+      <NewComplaintModal open={raising} onClose={() => setRaising(false)} onCreated={open} />
+    </div>
   );
 }
