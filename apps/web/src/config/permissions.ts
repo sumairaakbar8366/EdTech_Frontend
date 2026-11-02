@@ -61,6 +61,9 @@ export const CAPABILITIES = {
   'results.enter': ['results', ['crud', 'enter']],
   'results.publish': ['results', ['crud']],
 
+  'complaints.own': ['complaints', ['crud', 'own']],
+  'complaints.handle': ['complaints', ['crud']],
+
   'communication.any': ['communication', ['crud', 'view', 'own']],
   'communication.manage': ['communication', ['crud']],
   'communication.converse': ['communication', ['crud', 'own']],

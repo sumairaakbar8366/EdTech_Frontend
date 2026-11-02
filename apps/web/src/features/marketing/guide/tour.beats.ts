@@ -1,3 +1,4 @@
+import type { LucideIcon } from 'lucide-react';
 import { CHAPTERS } from '@/features/marketing/guide/guide.content';
 import shots from '@/features/marketing/guide/tour.shots.json';
 import voice from '@/features/marketing/guide/tour.voice.json';
@@ -53,8 +54,8 @@ export function areaBox(shot: ShotId, area: Area | undefined): Box | null {
  */
 export const TOUR_BEATS: Record<string, TourBeat[]> = {
   signup: [
-    { shot: 'signup', say: "Welcome! Let's set up a school from scratch. Choose Free trial, and continue with Google. No card needed.", caption: 'Open the main website, choose “Free trial” and click “Continue with Google”. No forms, no card.', focus: ['Free trial', 'Continue with Google', 'Continue with email'], click: 'Continue with Google' },
-    { shot: 'signup', say: "Type your school's name, and the code Google sends to your Gmail. That's it. Your school is ready.", caption: 'Type your school’s name and the code Google sends to your Gmail. Your school is ready.', focus: ['Sign in', 'Continue with email'] },
+    { shot: 'signup', say: "Welcome! To join, choose Register and prove who you are with Google and WhatsApp.", caption: 'Open the main website, choose “Register” and verify your email and mobile number.', focus: ['Register', 'Continue with Google', 'Continue with email'], click: 'Continue with Google' },
+    { shot: 'signup', say: "Give your details and the school's. Our team verifies them, and once approved your school is ready.", caption: 'Give your details and the school’s. Once the team approves it, your school is created.', focus: ['Sign in', 'Continue with email'] },
   ],
   dashboard: [
     { shot: 'b-dashboard-empty', say: "Meet Bright Future School. It's brand new, and completely empty. Everything is set up from this menu.", caption: 'Meet Bright Future School: brand new and completely empty. Everything is set up from the menu.', focus: [12, 196, 1390, 320], click: 'Academics' },
@@ -137,3 +138,17 @@ export const voiceUrl = (key: string) => `/guide/voice/${key}.mp3`;
 
 /** Chapters the video shows (some are in the written guide only). */
 export const VIDEO_CHAPTERS = CHAPTERS.filter((c) => TOUR_BEATS[c.id]?.length);
+
+/** A run of beats the player plays as one video (or one chapter of a longer one). */
+export interface Clip {
+  id: string;
+  title: string;
+  icon: LucideIcon;
+  summary: string;
+  /** Shown on its title card instead of "Step n of m" (a short video on its own). */
+  kicker?: string;
+  beats: TourBeat[];
+}
+
+/** The full walkthrough: one clip per chapter. */
+export const DEFAULT_CLIPS: Clip[] = VIDEO_CHAPTERS.map((c) => ({ id: c.id, title: c.title, icon: c.icon, summary: c.summary, beats: TOUR_BEATS[c.id]! }));

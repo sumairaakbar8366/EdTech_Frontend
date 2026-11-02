@@ -225,8 +225,8 @@ export function LoginPage({ tenant }: { tenant: Tenant }) {
             </Button>
             {!isPlatform && (
               <p className="text-center text-sm text-slate-500 dark:text-slate-400">
-                No account? Your school office creates staff, student and parent logins.{' '}
-                <a href={`${marketingOrigin()}/access?mode=signup`} className="font-semibold text-primary-600 hover:underline dark:text-primary-300">New school? Sign up</a>
+                No login yet? <Link to="/request-access" className="font-semibold text-primary-600 hover:underline dark:text-primary-300">Request access</Link>: your school’s administrator approves, then your User ID and password are emailed to you.{' '}
+                <a href={`${marketingOrigin()}/register`} className="font-semibold text-primary-600 hover:underline dark:text-primary-300">New school? Register</a>
               </p>
             )}
             </div>

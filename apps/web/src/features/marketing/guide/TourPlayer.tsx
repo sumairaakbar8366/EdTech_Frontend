@@ -1,16 +1,18 @@
 import { Maximize2, Pause, Play, RotateCcw, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { shotUrl, TOUR_BEATS, VIDEO_CHAPTERS, VOICE_MS, voiceUrl, type TourBeat } from '@/features/marketing/guide/tour.beats';
+import { DEFAULT_CLIPS, shotUrl, VOICE_MS, voiceUrl, type Clip, type ShotId, type TourBeat } from '@/features/marketing/guide/tour.beats';
 import { beatTiming, STAGE_H, STAGE_W, TITLE_MS, TourStage, VOICE_AT } from '@/features/marketing/guide/TourStage';
 
 /** Below this stage scale, captions move under the video so they stay readable. */
 const SMALL = 0.62;
 
-/** Every beat on one timeline; a chapter's first beat starts with its title card. */
-const TIMELINE = (() => {
-  const flat = VIDEO_CHAPTERS.flatMap((c, ci) => TOUR_BEATS[c.id]!.map((b, bi) => ({ ci, bi, b })));
+interface Seg { ci: number; bi: number; b: TourBeat; prev: TourBeat | null; exitZoom: boolean; start: number; lead: number; dur: number }
+
+/** Every beat on one timeline; a clip's first beat starts with its title card. */
+function buildTimeline(clips: Clip[]) {
+  const flat = clips.flatMap((c, ci) => c.beats.map((b, bi) => ({ ci, bi, b })));
   let start = 0;
-  return flat.map(({ ci, bi, b }, i) => {
+  const segs: Seg[] = flat.map(({ ci, bi, b }, i) => {
     const prev: TourBeat | null = i > 0 ? flat[i - 1]!.b : null;
     const next = flat[i + 1];
     const exitZoom = !next || next.b.shot !== b.shot || next.bi === 0;
@@ -19,18 +21,20 @@ const TIMELINE = (() => {
     start += seg.dur;
     return seg;
   });
-})();
-const ALL_SHOTS = [...new Set(TIMELINE.map((s) => s.b.shot))];
+  return { segs, total: start, shots: [...new Set(segs.map((s) => s.b.shot))] as ShotId[], chapterStart: (ci: number) => segs.find((s) => s.ci === ci)!.start };
+}
 
 /** Loads the screenshots (all of them before a recording; otherwise in the background). */
 function preload(urls: string[]) {
   return Promise.all(urls.map((u) => new Promise<void>((done) => { const img = new Image(); img.onload = img.onerror = () => done(); img.src = u; })));
 }
-export const TOUR_TOTAL_MS = TIMELINE.reduce((n, s) => n + s.dur, 0);
+const DEFAULT_TIMELINE = buildTimeline(DEFAULT_CLIPS);
+export const TOUR_TOTAL_MS = DEFAULT_TIMELINE.total;
+/** How long a clip plays, in ms. */
+export const clipMs = (clip: Clip) => buildTimeline([clip]).total;
 /** Where each beat starts and its key moments (for checking frames). */
-export const TOUR_MARKS = TIMELINE.map((s) => ({ id: `${VIDEO_CHAPTERS[s.ci]!.id}.${s.bi}`, start: s.start + s.lead, ...beatTiming(s.b, s.exitZoom) }));
+export const TOUR_MARKS = DEFAULT_TIMELINE.segs.map((s) => ({ id: `${DEFAULT_CLIPS[s.ci]!.id}.${s.bi}`, start: s.start + s.lead, ...beatTiming(s.b, s.exitZoom) }));
 if (typeof window !== 'undefined') (window as unknown as { __tourMarks?: unknown }).__tourMarks = TOUR_MARKS;
-const chapterStart = (ci: number) => TIMELINE.find((s) => s.ci === ci)!.start;
 const fmt = (ms: number) => `${Math.floor(ms / 60000)}:${String(Math.floor((ms % 60000) / 1000)).padStart(2, '0')}`;
 
 declare global {
@@ -41,11 +45,14 @@ declare global {
  * The "How it works" walkthrough: an animated tour of the product in chapters, with captions and a
  * narrator's voice (muted with the speaker button). `record`: plays once, silent, without controls.
  */
-export function TourPlayer({ record = false, at, initialChapter, showChapters = true }: { record?: boolean; at?: number; initialChapter?: string; showChapters?: boolean }) {
+export function TourPlayer({ record = false, at, initialChapter, showChapters = true, clips = DEFAULT_CLIPS, autoPlay = false, cover }: { record?: boolean; at?: number; initialChapter?: string; showChapters?: boolean; clips?: Clip[]; autoPlay?: boolean; cover?: { shot: ShotId; label: string } }) {
+  const timeline = useMemo(() => (clips === DEFAULT_CLIPS ? DEFAULT_TIMELINE : buildTimeline(clips)), [clips]);
+  const { segs: TIMELINE, total: TOUR_TOTAL_MS, shots: ALL_SHOTS, chapterStart } = timeline;
+  const VIDEO_CHAPTERS = clips;
   const startAt = initialChapter ? Math.max(0, VIDEO_CHAPTERS.findIndex((c) => c.id === initialChapter)) : 0;
   const [time, setTime] = useState(() => at ?? (startAt ? chapterStart(startAt) : 0));
-  const [playing, setPlaying] = useState(false);
-  const [started, setStarted] = useState(record || !!initialChapter);
+  const [playing, setPlaying] = useState(autoPlay);
+  const [started, setStarted] = useState(record || !!initialChapter || autoPlay);
   const [scale, setScale] = useState(1);
   const [muted, setMuted] = useState(false);
   /** Bumped on every jump, so the voice restarts at the new position. */
@@ -89,6 +96,7 @@ export function TourPlayer({ record = false, at, initialChapter, showChapters = 
     return () => cancelAnimationFrame(raf);
   }, [playing, record]);
 
+  useEffect(() => { if (record) { const w = window as unknown as { __seekTour?: (ms: number) => void; __tourSegs?: unknown }; w.__seekTour = (ms: number) => setTime(ms); w.__tourSegs = TIMELINE.map((x) => ({ start: x.start + x.lead, dur: x.dur - x.lead, lead: x.lead, first: x.bi === 0, voice: x.b.voice })); } }, [record, TIMELINE]);
   const seg = useMemo(() => TIMELINE.find((s) => time < s.start + s.dur) ?? TIMELINE[TIMELINE.length - 1]!, [time]);
   // On the page, only the screens just ahead are loaded (the whole set is several MB).
   const segIndex = TIMELINE.indexOf(seg);
@@ -136,20 +144,20 @@ export function TourPlayer({ record = false, at, initialChapter, showChapters = 
     <div ref={box} className="relative w-full overflow-hidden bg-[#eef3fb]" style={{ height: STAGE_H * scale }}>
       {/* Hidden under the cover, so nothing shows through it. */}
       <div className="absolute left-0 top-0 origin-top-left" style={{ transform: `scale(${scale})`, visibility: record || (started && !ended) ? 'visible' : 'hidden' }}>
-        <TourStage chapterIndex={seg.ci} beatIndex={seg.bi} t={t} prev={seg.prev} exitZoom={seg.exitZoom} captions={record || scale >= SMALL} />
+        <TourStage clips={clips} chapterIndex={seg.ci} beatIndex={seg.bi} t={t} prev={seg.prev} exitZoom={seg.exitZoom} captions={record || scale >= SMALL} />
       </div>
       {!record && (!started || ended) && (
         <button onClick={toggle} className="group absolute inset-0 z-40 flex flex-col items-center justify-center gap-3 overflow-hidden sm:gap-4" aria-label={ended ? 'Watch again' : 'Play the walkthrough'}>
           {/* A blurred glimpse of the real app behind a light veil. */}
-          <img src={shotUrl('b-dashboard-after')} alt="" aria-hidden className="absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-[6px]" />
+          <img src={shotUrl(cover?.shot ?? 'b-dashboard-after')} alt="" aria-hidden className="absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-[6px]" />
           <span aria-hidden className="absolute inset-0 bg-[linear-gradient(135deg,rgb(238_243_251/0.97),rgb(248_250_252/0.93)_50%,rgb(253_241_230/0.97))]" />
           <span className="relative flex h-20 w-20 items-center justify-center rounded-full text-white transition duration-300 group-hover:scale-105 sm:h-24 sm:w-24" style={{ background: 'radial-gradient(circle at 35% 30%, #ffb366 0%, #ff7a1a 45%, #e85d00 100%)', boxShadow: '0 1px 0 rgb(255 255 255 / 0.6) inset, 0 -6px 12px rgb(160 60 0 / 0.35) inset, 0 14px 28px -8px rgb(232 93 0 / 0.65), 0 4px 0 #c24e00' }}>
             {!ended && <span aria-hidden className="absolute inset-0 animate-ping rounded-full bg-orange-400/30 [animation-duration:2.4s]" />}
             {ended ? <RotateCcw size={36} /> : <Play size={38} className="ml-1 drop-shadow-[0_2px_2px_rgb(0_0_0/0.25)]" fill="currentColor" />}
           </span>
-          <span className="relative text-xl font-bold sm:text-3xl" style={{ color: '#0f172a' }}>{ended ? 'Watch again' : 'Watch how it works'}</span>
+          <span className="relative text-xl font-bold sm:text-3xl" style={{ color: '#0f172a' }}>{ended ? 'Watch again' : cover?.label ?? 'Watch how it works'}</span>
           <span className="relative inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1.5 text-sm font-medium shadow-[0_1px_0_#fff_inset,0_6px_16px_-8px_rgb(15_23_42/0.35)] ring-1 ring-slate-900/5 sm:text-base" style={{ color: '#334155' }}>
-            <Volume2 size={16} className="text-orange-500" /> With voice-over · {VIDEO_CHAPTERS.length} short steps · {fmt(TOUR_TOTAL_MS)}
+            <Volume2 size={16} className="text-orange-500" /> {VIDEO_CHAPTERS.length === 1 ? `With voice-over · ${fmt(TOUR_TOTAL_MS)}` : `With voice-over · ${VIDEO_CHAPTERS.length} short steps · ${fmt(TOUR_TOTAL_MS)}`}
           </span>
         </button>
       )}
@@ -176,7 +184,7 @@ export function TourPlayer({ record = false, at, initialChapter, showChapters = 
             {stage}
             {scale < SMALL && started && !ended && (
               <p className="min-h-[4.5rem] border-t border-slate-200 bg-white px-4 py-3 text-center text-[15px] leading-snug" style={{ color: '#1e293b' }}>
-                {seg.lead && t < 0 ? <><span className="font-semibold" style={{ color: '#ea580c' }}>Step {seg.ci + 1} of {VIDEO_CHAPTERS.length}:</span> {VIDEO_CHAPTERS[seg.ci]!.title}</> : seg.b.caption}
+                {seg.lead && t < 0 ? <><span className="font-semibold" style={{ color: '#ea580c' }}>{VIDEO_CHAPTERS.length > 1 ? `Step ${seg.ci + 1} of ${VIDEO_CHAPTERS.length}:` : ''}</span> {VIDEO_CHAPTERS[seg.ci]!.title}</> : seg.b.caption}
               </p>
             )}
           </div>
@@ -190,8 +198,8 @@ export function TourPlayer({ record = false, at, initialChapter, showChapters = 
             >
               {playing ? <Pause size={18} fill="currentColor" /> : <Play size={18} className="ml-0.5" fill="currentColor" />}
             </button>
-            <button onClick={() => goChapter(seg.ci - 1)} className={key3d} aria-label="Previous step"><SkipBack size={15} /></button>
-            <button onClick={() => goChapter(seg.ci + 1)} className={key3d} aria-label="Next step"><SkipForward size={15} /></button>
+            {VIDEO_CHAPTERS.length > 1 && <button onClick={() => goChapter(seg.ci - 1)} className={key3d} aria-label="Previous step"><SkipBack size={15} /></button>}
+            {VIDEO_CHAPTERS.length > 1 && <button onClick={() => goChapter(seg.ci + 1)} className={key3d} aria-label="Next step"><SkipForward size={15} /></button>}
             <div
               className="group relative h-7 min-w-0 flex-1 cursor-pointer"
               role="slider"

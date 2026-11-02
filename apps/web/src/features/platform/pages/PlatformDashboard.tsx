@@ -6,7 +6,9 @@ import { BarChart } from '@/components/charts/BarChart';
 import { AreaLink } from '@/app/router/area';
 import { METHOD_LABEL, type PaymentMethod } from '@/features/billing/billing';
 import { useFinance, useGrowth } from '@/features/platform/hooks/useConsole';
-import { useSchoolApplications, useSchools, useTiers } from '@/features/platform/hooks/usePlatform';
+import { useQuery } from '@tanstack/react-query';
+import { registrationAdminService } from '@/features/platform/services/registrationAdminService';
+import { useSchools, useTiers } from '@/features/platform/hooks/usePlatform';
 import { compactNumber, formatDate } from '@/lib/format';
 
 const DAY = 86_400_000;
@@ -70,7 +72,7 @@ const viewAll = (to: string) => <AreaLink to={to} className="text-sm font-semibo
 /** Platform owner's home, laid out as a report: where things stand, what needs doing, money, growth and the detail lists. */
 export function PlatformDashboard(_props: { adminName: string }) {
   const schools = useSchools();
-  const applications = useSchoolApplications();
+  const applications = useQuery({ queryKey: ['owner-applications', 'pending', '', 1], queryFn: () => registrationAdminService.applications({ status: 'pending', page: 1 }), refetchInterval: 60_000 });
   const tiers = useTiers();
   const growth = useGrowth();
   const finance = useFinance();
@@ -79,8 +81,7 @@ export function PlatformDashboard(_props: { adminName: string }) {
 
   const list = schools.data ?? [];
   const active = list.filter((s) => s.status === 'active').length;
-  const pending = (applications.data ?? []).filter((a) => a.status === 'pending');
-  const approved = (applications.data ?? []).filter((a) => a.status === 'approved');
+  const pending = applications.data?.items ?? [];
   const trials = list
     .map((s) => ({ s, sub: s.subscriptions[0] }))
     .filter(({ sub }) => sub?.status === 'trialing' && sub.trialEndsAt)
@@ -107,8 +108,7 @@ export function PlatformDashboard(_props: { adminName: string }) {
       <div className="grid gap-5 lg:grid-cols-3">
         <Card title="To do" icon={ListChecks} className="h-full" padded={false}>
           <ul className="space-y-0.5 p-3">
-            <TodoRow label="Applications to review" count={pending.length} detail="Schools asking to join" to="/applications" loading={applications.isLoading} />
-            <TodoRow label="Approved, not set up yet" count={approved.length} detail="Create tenant, plan and first admin" to="/applications" loading={applications.isLoading} />
+            <TodoRow label="Applications to review" count={applications.data?.pending ?? 0} detail="Verify, then approve or decline" to="/applications" loading={applications.isLoading} />
             <TodoRow label="Trials ending this week" count={endingThisWeek.length} detail="Follow up before they lapse" to="/schools" loading={schools.isLoading} />
             <TodoRow label="Plans ending in 14 days" count={f?.endingSoon.length ?? 0} detail="Trials and paid plans up for renewal" to="/payments" loading={finance.isLoading} />
           </ul>
@@ -192,7 +192,7 @@ export function PlatformDashboard(_props: { adminName: string }) {
                 {pending.slice(0, 6).map((a) => (
                   <tr key={a.id}>
                     <td className="max-w-0 px-6 py-2.5 font-semibold text-slate-800 dark:text-slate-100"><div className="truncate" title={a.schoolName}>{a.schoolName}</div></td>
-                    <td className="px-3 py-2.5 text-slate-500">{a.contactFirstName} {a.contactLastName}</td>
+                    <td className="px-3 py-2.5 text-slate-500">{a.ownerFirstName} {a.ownerLastName}</td>
                     <td className="whitespace-nowrap px-6 py-2.5 text-right text-slate-500">{formatDate(a.createdAt)}</td>
                   </tr>
                 ))}

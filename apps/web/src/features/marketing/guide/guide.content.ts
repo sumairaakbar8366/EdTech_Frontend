@@ -50,14 +50,14 @@ export interface Chapter {
 export const CHAPTERS: Chapter[] = [
   {
     id: 'signup',
-    title: 'Create your school with Google',
+    title: 'Apply to join',
     icon: UserPlus,
-    who: 'The school owner or administrator',
-    summary: 'Sign up in under a minute with your Google account. Your school, its own web address and your administrator login are created at once, on a free trial with every feature.',
+    who: 'The school owner or head',
+    summary: 'Only genuine, registered schools get a free trial. You apply with your details and your school’s; our team verifies them by hand, and when the application is approved your school and administrator login are created.',
     steps: [
-      { title: 'Open the sign-up', where: 'Main website → Sign up (top right)', text: 'Click “Sign up”. Choose “Continue with Google” and pick the Google account you want to use as the school administrator.' },
-      { title: 'Name your school and confirm your email', text: 'Type your school’s name. A 6-digit code is sent to your Gmail: enter it to prove the inbox is yours.', tips: ['No card is needed for the free trial.', 'Use an email you check often: password resets and notices go there.'] },
-      { title: 'Note your User ID and school address', text: 'You get a User ID (for example ADM-…) and your school’s address (…/your-school). Click “Open my admin dashboard”.', tips: ['Next time, sign in with “Continue with Google”, or with your User ID or email and password.'] },
+      { title: 'Open the application', where: 'Main website → Register (top right)', text: 'Click “Register”. First prove your email with Google or a 6-digit code, then your mobile number with a WhatsApp code.' },
+      { title: 'Tell us about you and the school', text: 'Your name, role and CNIC, then the school’s name, NTN, registration number, province, city, address and how many students, teachers and staff it has.', tips: ['Your CNIC is used only for verification and is erased once the application is decided.', 'The bigger the school, the longer the free trial.'] },
+      { title: 'Wait for approval', text: 'Our team checks your CNIC, NTN and school, and may contact you. When approved, your User ID and password are emailed to you and you can open your admin dashboard. If something cannot be verified, you receive an email saying what.', tips: ['No card is needed for the free trial.'] },
     ],
   },
   {
@@ -260,6 +260,11 @@ export const CHAPTERS: Chapter[] = [
 
 /** Answers to the questions schools ask most. */
 export const FAQ: { q: string; a: string }[] = [
+  { q: 'How do I register my school?', a: 'Open our website and choose Register. Verify your email and mobile number with the codes we send, enter your details and the school’s, and submit. Our team verifies you by hand, and when you are approved your User ID and password arrive by email.' },
+  { q: 'My application is still waiting.', a: 'Our team checks every application by hand (CNIC, NTN and school), which usually takes a few working days. You will be emailed the result. If you wait longer, contact us with the reference number from your confirmation email.' },
+  { q: 'I was asked to choose a new password the first time I signed in.', a: 'That is on purpose. The password in your email is temporary and was seen by others (the email, and perhaps the administrator). Choose your own, and only you will know it.' },
+  { q: 'How do I give my principal (or a director) access?', a: 'Open Users & Access → Principal & leadership and press “Give principal access”. Enter their name and email, send a code to that email, type what they read to you, and their login is emailed. Directors and vice principals are on paid plans.' },
+  { q: 'I got an email saying my school is close to its plan limit.', a: 'You are using more than 80% of the students, staff or stored files your plan includes. Nothing stops yet. If you pass the limit you have 14 days to change plan under Plans & Billing; only then is access paused, and nothing is deleted.' },
   { q: 'I forgot my password or User ID.', a: 'On your school’s sign-in page use “Forgot password” or “Forgot User ID”. A link or your ID is sent to the email on your account. If you signed up with Google, “Continue with Google” always works.' },
   { q: 'A teacher or parent did not get their login email.', a: 'Ask them to check spam. Then open Users & Access, find the person and use “Reset password”: new sign-in details are issued. Make sure their email is spelled correctly.' },
   { q: 'Someone sees too much (or too little).', a: 'What a person sees depends on their role. Change their roles in Users & Access. A teacher who is also a parent can hold both roles with one login.' },

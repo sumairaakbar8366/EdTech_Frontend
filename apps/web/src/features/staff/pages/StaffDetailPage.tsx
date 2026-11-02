@@ -62,7 +62,7 @@ export function StaffDetailPage({ canEdit, canEditAcademics, own = false }: { ca
       <StaffHeader employee={e} editable={editable} onLogin={() => setDialog('login')} onStatus={() => setDialog('status')} onEdit={() => setDialog('edit')} onReplaceAdmin={canReplace && e.userId !== me.user.id ? () => setReplacing(true) : undefined} />
       {!own && <ServiceRecordCard employeeId={e.id} />}
       <Tabs tabs={tabs} value={tab} onChange={setTab} />
-      {tab === 'overview' && <StaffOverviewTab employee={e} />}
+      {tab === 'overview' && <StaffOverviewTab employee={e} editable={editable} />}
       {tab === 'qualifications' && <QualificationsTab employee={e} editable={editable} />}
       {tab === 'experience' && <ExperienceTab employee={e} editable={editable} />}
       {tab === 'teaching' && <TeachingTab employee={e} editable={canEditAcademics && !own} />}

@@ -1,6 +1,6 @@
 import { Ban, CalendarClock, ExternalLink, KeyRound, LogIn, Plus, RotateCcw, School } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router';
 import { Alert, Badge, Button, Card, CompactNumber, ConfirmDialog, DataTable, FilterBar, FilterSlot, IconButton, PageHeader, Pagination, SearchInput, Select, Spinner, type Column } from '@/components/ui';
 import { EMPTY_SCHOOL_FORM, OnboardSchoolModal, type SchoolForm } from '@/features/platform/components/OnboardSchoolModal';
 import { ResetAdminModal } from '@/features/platform/components/ResetAdminModal';
@@ -9,7 +9,7 @@ import { CONSOLE_KEY, useConsoleSchools } from '@/features/platform/hooks/useCon
 import { SCHOOLS_KEY, useTiers } from '@/features/platform/hooks/usePlatform';
 import { platformService } from '@/features/platform/services/platformService';
 import type { ConsoleSchool, Phase } from '@/features/platform/types/console.types';
-import type { SchoolApplication, SchoolSummary } from '@/features/platform/types/platform.types';
+import type { SchoolSummary } from '@/features/platform/types/platform.types';
 import { schoolUrl } from '@/features/platform/utils/platform.utils';
 import { errorMessage } from '@/lib/errors';
 import { formatDate } from '@/lib/format';
@@ -32,7 +32,6 @@ const planTarget = (s: ConsoleSchool): PlanTarget => ({ id: s.id, name: s.name, 
 
 /** Platform "Tenant Management": every school in one paged table, split by trial / paid / grace / locked. */
 export function SchoolsPage() {
-  const location = useLocation();
   const navigate = useNavigate();
   const [phase, setPhase] = useState<'' | Phase>('');
   const [source, setSource] = useState('');
@@ -47,13 +46,6 @@ export function SchoolsPage() {
   const [opening, setOpening] = useState<string | null>(null);
   const [openError, setOpenError] = useState<string | null>(null);
 
-  // "Onboard" on an approved application lands here with the application in router state.
-  useEffect(() => {
-    const application = (location.state as { application?: SchoolApplication } | null)?.application;
-    if (!application) return;
-    setForm({ ...EMPTY_SCHOOL_FORM, name: application.schoolName, tierCode: application.requestedTierCode ?? '', adminFirstName: application.contactFirstName, adminLastName: application.contactLastName, adminEmail: application.contactEmail, primaryColor: application.preferredBrandColor ?? '', applicationId: application.id });
-    navigate(location.pathname, { replace: true, state: null });
-  }, [location.pathname, location.state, navigate]);
 
   const setStatus = useAction(({ id, status }: { id: string; status: SchoolSummary['status'] }) => platformService.setSchoolStatus(id, status).then(() => status), {
     success: (status) => (status === 'active' ? 'School reactivated' : 'School suspended'),

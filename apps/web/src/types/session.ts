@@ -27,4 +27,6 @@ export type Me =
       permissions: string[];
       /** Set while the platform owner works inside the school ("Open as admin"). */
       support?: { name: string } | null;
+      /** A leadership seat (principal, director…): the title and the dashboard parts hidden for this person. */
+      seat?: { titleKey: string; titleLabel: string; hiddenSections: string[] } | null;
     };

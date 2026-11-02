@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react';
 import { Button, Field, Input, Modal, Select } from '@/components/ui';
-import { APPLICATIONS_KEY, SCHOOLS_KEY } from '@/features/platform/hooks/usePlatform';
+import { SCHOOLS_KEY } from '@/features/platform/hooks/usePlatform';
 import { platformService } from '@/features/platform/services/platformService';
 import type { Tier } from '@/features/platform/types/platform.types';
 import { useAction } from '@/lib/hooks/useAction';
@@ -37,7 +37,7 @@ export function OnboardSchoolModal({ form, setForm, tiers, onClose }: { form: Sc
         admin: { firstName: f.adminFirstName, lastName: f.adminLastName, email: f.adminEmail, password: f.adminPassword },
         applicationId: f.applicationId,
       }),
-    { success: (r) => `${r.school.name} created with a 1-month free trial`, invalidate: [SCHOOLS_KEY, APPLICATIONS_KEY, ['platform', 'console']], onDone: onClose },
+    { success: (r) => `${r.school.name} created with a 1-month free trial`, invalidate: [SCHOOLS_KEY, ['platform', 'console']], onDone: onClose },
   );
   const set = (key: keyof typeof EMPTY_SCHOOL_FORM) => (e: { target: { value: string } }) => form && setForm({ ...form, [key]: e.target.value });
   function onSubmit(e: FormEvent) {

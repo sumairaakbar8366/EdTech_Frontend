@@ -48,6 +48,12 @@ import type { Tone } from '@/components/ui';
 /** Icon and accent tone for every page-4 menu entry (and the platform console). */
 const MAP: Record<string, [LucideIcon, Tone]> = {
   Dashboard: [LayoutDashboard, 'primary'],
+  Complaints: [ShieldAlert, 'rose'],
+  Registrations: [BadgeCheck, 'teal'],
+  'Website posts': [Globe, 'magenta'],
+  Events: [CalendarClock, 'amber'],
+  Forms: [FileText, 'teal'],
+  'Scholarship Candidates': [Award, 'emerald'],
   Students: [GraduationCap, 'emerald'],
   Staff: [Briefcase, 'sky'],
   Admissions: [ClipboardList, 'teal'],

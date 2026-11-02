@@ -17,6 +17,7 @@ export function SidebarNav({ nav, compact, onNavigate }: { nav: readonly ShellNa
             onClick={onNavigate}
             title={compact ? item.label : undefined}
             aria-label={item.label}
+            data-tour={`nav-${item.end ? 'dashboard' : item.path.split('/').filter(Boolean).slice(-1)[0] ?? 'dashboard'}`}
             className={({ isActive }) =>
               `group relative flex items-center rounded-lg py-1 text-sm font-semibold transition-all ${compact ? 'justify-center px-0' : 'gap-3 px-3'} ${
                 isActive

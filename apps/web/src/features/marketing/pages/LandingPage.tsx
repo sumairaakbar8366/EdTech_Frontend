@@ -1,18 +1,20 @@
+import { useSiteScale } from '@/features/marketing/hooks/useSiteScale';
 import { MotionConfig } from 'motion/react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { CONTACT_EMAIL, platformOrigin } from '@/config/site';
 import { Mail, MapPin, Phone } from 'lucide-react';
-import { Modal } from '@/components/ui';
 import { CtaSection } from '@/features/marketing/components/CtaSection';
 import { FeatureSlideshow } from '@/features/marketing/components/FeatureSlideshow';
 import { FindSchoolModal } from '@/features/marketing/components/FindSchoolModal';
 import { HeroSection } from '@/features/marketing/components/HeroSection';
 import { HowItWorksSection } from '@/features/marketing/components/HowItWorksSection';
+import { RoleGuidesSection } from '@/features/marketing/components/RoleGuidesSection';
 import { LandingHeader } from '@/features/marketing/components/LandingHeader';
 import { MetricsSection } from '@/features/marketing/components/MetricsSection';
 import { ModulesSection } from '@/features/marketing/components/ModulesSection';
 import { PlansSection } from '@/features/marketing/components/PlansSection';
-import { QuickSignup } from '@/features/marketing/components/QuickSignup';
+import { LatestPosts } from '@/features/marketing/components/LatestPosts';
 import { RolesSection } from '@/features/marketing/components/RolesSection';
 import { SectionNav } from '@/features/marketing/components/SectionNav';
 import { SpecialFeaturesSection } from '@/features/marketing/components/SpecialFeaturesSection';
@@ -29,10 +31,12 @@ const demoHref = (email: string) => `mailto:${email}?subject=${encodeURIComponen
  * All motion respects the visitor's reduced-motion setting.
  */
 export function LandingPage() {
+  useSiteScale();
   const [findOpen, setFindOpen] = useState(false);
   const openFind = () => setFindOpen(true);
-  const [trialOpen, setTrialOpen] = useState(false);
-  const openTrial = () => setTrialOpen(true);
+  // A free trial starts with registering the school: its identity and details are checked first.
+  const navigate = useNavigate();
+  const openTrial = () => navigate('/register');
   // Contact details and social accounts come from the owner's console (Public site).
   const site = usePublicSiteSettings().data;
   const DEMO_HREF = demoHref(site?.contactEmail ?? CONTACT_EMAIL);
@@ -44,11 +48,13 @@ export function LandingPage() {
         <main>
           <HeroSection demoHref={DEMO_HREF} onStartTrial={openTrial} />
           <HowItWorksSection />
+          <RoleGuidesSection />
           <FeatureSlideshow />
           <RolesSection />
           <ModulesSection />
           <SpecialFeaturesSection />
           <MetricsSection />
+          <LatestPosts />
           <PlansSection demoHref={DEMO_HREF} onStartTrial={openTrial} />
           <CtaSection demoHref={DEMO_HREF} onFindSchool={openFind} onStartTrial={openTrial} />
         </main>
@@ -71,9 +77,6 @@ export function LandingPage() {
           </div>
         </footer>
         <FindSchoolModal open={findOpen} onClose={() => setFindOpen(false)} />
-        <Modal open={trialOpen} title="Start your free trial" onClose={() => setTrialOpen(false)}>
-          <QuickSignup />
-        </Modal>
       </div>
     </MotionConfig>
   );

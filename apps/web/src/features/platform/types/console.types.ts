@@ -99,7 +99,7 @@ export interface ConsoleLogin {
   createdAt: string;
 }
 
-export type OwnerNotificationKind = 'school_signup' | 'school_application' | 'payment_received' | 'password_reset_request' | 'user_id_request' | 'password_reset_done';
+export type OwnerNotificationKind = 'school_signup' | 'school_usage' | 'school_application' | 'payment_received' | 'password_reset_request' | 'user_id_request' | 'password_reset_done';
 
 export interface OwnerNotification {
   id: string;

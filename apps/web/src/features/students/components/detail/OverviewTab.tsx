@@ -5,6 +5,7 @@ import { PreviousSchoolsCard } from '@/features/students/components/detail/Previ
 import type { StudentDetail } from '@/features/students/types/student.types';
 import { age } from '@/features/students/utils/student.utils';
 import { formatDate } from '@/lib/format';
+import { CustomAnswersCard } from '@/features/forms/components/CustomAnswersCard';
 
 /** Personal and medical details, emergency contacts and previous schools. */
 export function OverviewTab({ student: s, editable }: { student: StudentDetail; editable: boolean }) {
@@ -33,6 +34,7 @@ export function OverviewTab({ student: s, editable }: { student: StudentDetail; 
       </Card>
       <EmergencyContactsCard student={s} editable={editable} />
       <PreviousSchoolsCard student={s} editable={editable} />
+      <div className="lg:col-span-2"><CustomAnswersCard subject="student" id={s.id} editable={editable} /></div>
     </div>
   );
 }

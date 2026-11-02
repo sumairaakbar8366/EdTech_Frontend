@@ -7,8 +7,9 @@ import type { PaymentMethod } from '@/features/fees/types/fee.types';
 import { money } from '@/features/fees/utils/fee.utils';
 import { useAcademicReport, useAttendanceReport, useFinanceReport } from '@/features/reports/hooks/useReports';
 import { compactNumber } from '@/lib/format';
+import { PerformanceTab } from '@/features/insights/PerformanceTab';
 
-type Tab = 'finance' | 'attendance' | 'academics';
+type Tab = 'performance' | 'finance' | 'attendance' | 'academics';
 
 const monthLabel = (ym: string) => new Date(`${ym}-01T00:00:00Z`).toLocaleDateString(undefined, { month: 'short', timeZone: 'UTC' });
 
@@ -151,8 +152,9 @@ function AcademicsTab() {
 
 /** Reports (page 14): admins see finance, attendance and academics; accounts only finance. */
 export function ReportsPage({ financeOnly = false }: { financeOnly?: boolean }) {
-  const [tab, setTab] = useState<Tab>('finance');
+  const [tab, setTab] = useState<Tab>(financeOnly ? 'finance' : 'performance');
   const tabs = [
+    ...(financeOnly ? [] : [{ id: 'performance' as const, label: 'School growth', icon: TrendingUp }]),
     { id: 'finance' as const, label: 'Financial', icon: Wallet },
     ...(financeOnly ? [] : [{ id: 'attendance' as const, label: 'Attendance', icon: CalendarCheck }, { id: 'academics' as const, label: 'Academic', icon: Award }]),
   ];
@@ -160,6 +162,7 @@ export function ReportsPage({ financeOnly = false }: { financeOnly?: boolean }) 
     <div>
       <PageHeader title={financeOnly ? 'Financial reports' : 'Reports'} sub="Live figures from your school's records" icon={ChartColumn} tone="primary" />
       {tabs.length > 1 && <Tabs tabs={tabs} value={tab} onChange={setTab} />}
+      {tab === 'performance' && <PerformanceTab />}
       {tab === 'finance' && <FinanceTab />}
       {tab === 'attendance' && <AttendanceTab />}
       {tab === 'academics' && <AcademicsTab />}

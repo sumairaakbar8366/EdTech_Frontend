@@ -529,3 +529,13 @@ table { font-variant-numeric: tabular-nums; }
 
 /* Live classes TV: the thin bar that fills while a slide is shown. */
 @keyframes slide-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+
+/* Public pages: on large screens everything scales up a little with the screen (rem-based), so a wide monitor does not show tiny text. */
+@media screen and (min-width: 1280px) {
+  html.site-scale { font-size: clamp(16px, calc(16px + (100vw - 1280px) * 0.0094), 22px); }
+}
+/* Nothing on the landing page may widen the page on a phone. */
+.landing { overflow-x: clip; }
+/* iPhone browsers widen the layout (and shrink the page) if anything pokes out: keep it clipped. */
+html.site-scale, html.site-scale body { overflow-x: hidden; max-width: 100%; }

@@ -1,3 +1,7 @@
+import { ComplaintsPage } from '@/features/complaints/ComplaintsPage';
+import { EventsPage } from '@/features/events/EventsPage';
+import { FormsPage } from '@/features/forms/pages/FormsPage';
+import { SchoolScholarshipsPage } from '@/features/sponsorship/SchoolScholarshipsPage';
 import { BillingPage } from '@/features/billing/pages/BillingPage';
 import { WebsiteEditorPage } from '@/features/website/pages/WebsiteEditorPage';
 import { AdmissionFormBuilderPage } from '@/features/website/pages/AdmissionFormBuilderPage';
@@ -67,6 +71,10 @@ export const adminRoutes: AreaRoutes = (can) => [
   { path: 'notifications', capability: 'communication.any', element: <NotificationsPage /> },
   { path: 'communication', capability: 'communication.manage', element: <CommunicationPage /> },
   { path: 'messages', capability: 'communication.converse', element: <MessagesPage title="Direct messages" sub="Write privately to a student's parents" /> },
+  { path: 'complaints', capability: 'complaints.own', element: <ComplaintsPage handler={can('complaints.handle')} /> },
+  { path: 'events', capability: 'communication.manage', element: <EventsPage /> },
+  { path: 'forms', capability: 'staff.edit', element: <FormsPage /> },
+  { path: 'scholarship-candidates', capability: 'students.edit', element: <SchoolScholarshipsPage /> },
   { path: 'reports', capability: 'reports.all', element: <ReportsPage /> },
   { path: 'documents', element: <SchoolDocumentsPage /> },
 ];

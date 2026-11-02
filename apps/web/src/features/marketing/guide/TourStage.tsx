@@ -1,6 +1,6 @@
 import { CheckCircle2, Lock, MousePointer2 } from 'lucide-react';
 import { PRODUCT_NAME } from '@/config/brand';
-import { areaBox, isPhone, shotUrl, TOUR_BEATS, VIDEO_CHAPTERS, VOICE_MS, type Box, type ShotId, type TourBeat } from '@/features/marketing/guide/tour.beats';
+import { areaBox, DEFAULT_CLIPS, isPhone, shotUrl, VOICE_MS, type Box, type Clip, type ShotId, type TourBeat } from '@/features/marketing/guide/tour.beats';
 
 /**
  * One frame of the walkthrough on a fixed 1280×720 stage (the player scales it). Real screenshots sit
@@ -79,9 +79,40 @@ export function beatTiming(b: TourBeat, exitZoom: boolean) {
   return { clickAt, zoomOutAt, duration: zoomOutAt + (exitZoom ? 600 : 200) };
 }
 
+/** Addresses of the screens captured for the short videos (by the screenshot's prefix). */
+const SHOT_PAGES: [RegExp, string][] = [
+  [/^r-(start|email|phone|verified|about|school|review|done)/, 'register'],
+  [/^r-login/, 'login'],
+  [/^r-(change|next)/, 'greenfield-public-school/admin'],
+  [/^o-sch/, 'console/scholarships'],
+  [/^o-/, 'console/applications'],
+  [/^a-(users|leader)/, 'demo/admin/users-and-access'],
+  [/^a-forms/, 'demo/admin/forms'],
+  [/^a-complaint/, 'demo/admin/complaints'],
+  [/^a-(sch)/, 'demo/admin/scholarship-candidates'],
+  [/^a-scholarships/, 'demo/admin/scholarship-candidates'],
+  [/^a-/, 'demo/admin'],
+  [/^p-/, 'demo/principal'],
+  [/^t-today/, 'demo/teacher/todays-classes'],
+  [/^t-marks/, 'demo/teacher/exams-marks'],
+  [/^t-complaint/, 'demo/teacher/complaints'],
+  [/^t-/, 'demo/teacher'],
+  [/^ac-invoices/, 'demo/accounts/student-invoices'],
+  [/^ac-payments/, 'demo/accounts/payments'],
+  [/^ac-scholarships/, 'demo/accounts/scholarships'],
+  [/^ac-/, 'demo/accounts'],
+  [/^s-timetable/, 'demo/student/timetable'],
+  [/^s-assignments/, 'demo/student/assignments'],
+  [/^s-results/, 'demo/student/results'],
+  [/^s-complaints/, 'demo/student/complaints'],
+  [/^s-/, 'demo/student'],
+];
+
 /** The address shown in the browser bar for a screenshot. */
 function pathOf(shot: ShotId): string {
-  if (shot === 'signup') return 'access?mode=signup';
+  if (shot === 'signup') return 'register';
+  const known = SHOT_PAGES.find(([re]) => re.test(shot));
+  if (known) return known[1];
   const [school, rest] = shot.startsWith('b-') ? ['bright-future-school', shot.slice(2)] : shot.startsWith('d-') ? ['demo', shot.slice(2)] : ['demo', shot];
   const page: [RegExp, string][] = [
     [/^(site|job-apply|job-applied)/, ''],
@@ -126,6 +157,8 @@ function Device({ shot }: { shot: ShotId }) {
 }
 
 export interface StageState {
+  /** The clips being played (the full walkthrough by default). */
+  clips?: Clip[];
   chapterIndex: number;
   beatIndex: number;
   /** ms into the beat (negative during the chapter's title card). */
@@ -137,9 +170,9 @@ export interface StageState {
 }
 
 /** The whole stage: device and camera, cursor, click, confirmation, caption and title card. */
-export function TourStage({ chapterIndex, beatIndex, t, prev, exitZoom, captions = true }: StageState & { captions?: boolean }) {
-  const chapter = VIDEO_CHAPTERS[chapterIndex]!;
-  const beat = TOUR_BEATS[chapter.id]![beatIndex]!;
+export function TourStage({ clips = DEFAULT_CLIPS, chapterIndex, beatIndex, t, prev, exitZoom, captions = true }: StageState & { captions?: boolean }) {
+  const chapter = clips[chapterIndex]!;
+  const beat = chapter.beats[beatIndex]!;
   const timing = beatTiming(beat, exitZoom);
   const bt = Math.max(0, t);
   const f = frameOf(beat.shot);
@@ -223,7 +256,7 @@ export function TourStage({ chapterIndex, beatIndex, t, prev, exitZoom, captions
         <div className="absolute inset-0 z-30 flex items-center justify-center" style={{ opacity: title, background: 'linear-gradient(135deg,#eef3fb 0%,#f8fafc 50%,#fdf3ea 100%)' }}>
           <div className="flex max-w-[900px] flex-col items-center text-center" style={{ transform: `scale(${0.96 + 0.04 * easeOut((t + TITLE_MS) / 600)})` }}>
             <span className="flex h-20 w-20 items-center justify-center rounded-2xl bg-orange-500 text-white shadow-[0_18px_40px_-14px_rgb(249_115_22/0.7)]"><chapter.icon size={40} /></span>
-            <span className="mt-7 rounded-full bg-white px-4 py-1.5 text-[14px] font-bold uppercase tracking-[0.22em] text-orange-600 ring-1 ring-orange-200">Step {chapterIndex + 1} of {VIDEO_CHAPTERS.length}</span>
+            <span className="mt-7 rounded-full bg-white px-4 py-1.5 text-[14px] font-bold uppercase tracking-[0.22em] text-orange-600 ring-1 ring-orange-200">{chapter.kicker ?? `Step ${chapterIndex + 1} of ${clips.length}`}</span>
             <h2 className="mt-4 text-[48px] font-bold leading-tight text-slate-900">{chapter.title}</h2>
             <p className="mt-4 text-[20px] leading-relaxed text-slate-600">{chapter.summary}</p>
             <span className="mt-8 text-[13px] font-semibold uppercase tracking-[0.2em] text-slate-400">{PRODUCT_NAME} · How it works</span>

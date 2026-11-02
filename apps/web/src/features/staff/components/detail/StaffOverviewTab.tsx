@@ -3,8 +3,9 @@ import { Card, InfoItem } from '@/components/ui';
 import { EMPLOYMENT_LABEL } from '@/features/staff/constants';
 import type { EmployeeDetail } from '@/features/staff/types/staff.types';
 import { formatDate } from '@/lib/format';
+import { CustomAnswersCard } from '@/features/forms/components/CustomAnswersCard';
 
-export function StaffOverviewTab({ employee: e }: { employee: EmployeeDetail }) {
+export function StaffOverviewTab({ employee: e, editable = false }: { employee: EmployeeDetail; editable?: boolean }) {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <Card title="Employment" icon={Briefcase} tone="sky">
@@ -31,6 +32,7 @@ export function StaffOverviewTab({ employee: e }: { employee: EmployeeDetail }) 
           <InfoItem label="Emergency phone">{e.profile?.emergencyContactPhone}</InfoItem>
         </dl>
       </Card>
+      <div className="lg:col-span-2"><CustomAnswersCard subject="employee" id={e.id} editable={editable} /></div>
     </div>
   );
 }

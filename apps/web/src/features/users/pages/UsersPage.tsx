@@ -9,9 +9,11 @@ import { CredentialsModal } from '@/features/users/components/CredentialsModal';
 import { EditRolesModal } from '@/features/users/components/EditRolesModal';
 import { EmailEditModal } from '@/features/users/components/EmailEditModal';
 import { GrantAccessModal } from '@/features/users/components/GrantAccessModal';
+import { LeadershipCard } from '@/features/users/components/LeadershipCard';
 import { SharedAccessCard } from '@/features/users/components/SharedAccessCard';
 import { PhotoRequestsCard } from '@/features/photos/PhotoRequestsCard';
-import { loginStatus, PERSON_LABEL, usersService, useUsers, useUsersAction, useUsersSummary, type Credentials, type PersonType, type SchoolLogin, type UserStatusFilter } from '@/features/users/users';
+import { AccessRequestsPanel } from '@/features/access/AccessRequestsPanel';
+import { handoversOf, loginStatus, PERSON_LABEL, usersService, useUsers, useUsersAction, useUsersSummary, type Credentials, type LoginHandover, type PersonType, type SchoolLogin, type UserStatusFilter } from '@/features/users/users';
 import { compactNumber } from '@/lib/format';
 
 const ROLE_FILTER: { key: SchoolRoleKey; label: string }[] = [
@@ -55,7 +57,7 @@ export function UsersPage() {
   const summary = useUsersSummary().data;
 
   const [granting, setGranting] = useState(false);
-  const [credentials, setCredentials] = useState<{ c: Credentials; title: string } | null>(null);
+  const [credentials, setCredentials] = useState<{ c: Credentials | LoginHandover; title: string } | null>(null);
   const [editing, setEditing] = useState<SchoolLogin | null>(null);
   const [emailing, setEmailing] = useState<SchoolLogin | null>(null);
   const [resetting, setResetting] = useState<SchoolLogin | null>(null);
@@ -112,7 +114,9 @@ export function UsersPage() {
         <StatCard label="Disabled" value={summary?.disabled ?? '–'} icon={ShieldOff} tone="rose" />
       </div>
 
+      <div data-tour="access-requests" className="mb-6"><AccessRequestsPanel /></div>
       <PhotoRequestsCard />
+      <LeadershipCard onCreated={(r) => { const [h] = handoversOf([r.credentials]); if (h) setCredentials({ c: { ...h, user: { ...h.user, roles: [{ name: r.titleLabel }] } }, title: 'Access given' }); }} />
       <SharedAccessCard onCreated={(c) => setCredentials({ c, title: 'Access shared' })} />
 
       <Card padded={false}>

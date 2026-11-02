@@ -1,3 +1,4 @@
+import { ComplaintsPage } from '@/features/complaints/ComplaintsPage';
 import type { AreaRoutes } from '@/app/router/types';
 import { LeavePage } from '@/features/leave/pages/LeavePage';
 import { MyAttendancePage } from '@/features/attendance/pages/MyAttendancePage';
@@ -14,4 +15,5 @@ export const staffRoutes: AreaRoutes = () => [
   { path: 'payslips', capability: 'payroll.own', element: <MyPayslipsPage /> },
   { path: 'assigned-tasks', capability: 'staff.own', element: <MyTasksPage /> },
   { path: 'notifications', capability: 'communication.any', element: <NotificationsPage /> },
+  { path: 'complaints', capability: 'complaints.own', element: <ComplaintsPage handler={false} /> },
 ];

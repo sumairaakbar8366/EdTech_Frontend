@@ -27,6 +27,7 @@ import type { Tone } from '@/components/ui';
 export const SECTIONS = [
   { id: 'top', label: 'Home' },
   { id: 'tour', label: 'How it works' },
+  { id: 'videos', label: 'Videos' },
   { id: 'features', label: 'Features' },
   { id: 'roles', label: 'Dashboards' },
   { id: 'modules', label: 'Modules' },
@@ -36,7 +37,8 @@ export const SECTIONS = [
   { id: 'contact', label: 'Get started' },
 ] as const;
 
-export const NAV_LINKS = SECTIONS.filter((s) => ['tour', 'features', 'roles', 'modules', 'special', 'plans'].includes(s.id));
+/** The header shows the main five; the dots on the right (wide screens) list every section. */
+export const NAV_LINKS = SECTIONS.filter((s) => ['tour', 'videos', 'features', 'modules', 'plans'].includes(s.id));
 
 export interface FeatureSlide {
   title: string;

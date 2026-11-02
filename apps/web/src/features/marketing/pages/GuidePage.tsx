@@ -1,3 +1,4 @@
+import { useSiteScale } from '@/features/marketing/hooks/useSiteScale';
 import { ArrowLeft, Download, HelpCircle, Lightbulb, Mail, MapPin, Phone, PlayCircle, Printer, UserCog } from 'lucide-react';
 import { useEffect } from 'react';
 import { Link } from 'react-router';
@@ -5,7 +6,8 @@ import { useForcedLightTheme } from '@/app/providers/ThemeProvider';
 import { BrandLockup } from '@/components/brand/BrandLogo';
 import { PRODUCT_NAME } from '@/config/brand';
 import { CONTACT_EMAIL } from '@/config/site';
-import { CHAPTERS, FAQ } from '@/features/marketing/guide/guide.content';
+import { FAQ } from '@/features/marketing/guide/guide.content';
+import { ROLE_GUIDES } from '@/features/marketing/guide/guide.roles';
 import { usePublicSiteSettings } from '@/features/website/siteService';
 
 export const GUIDE_PDF = '/guide/Skool-EdTech-User-Guide.pdf';
@@ -22,6 +24,7 @@ const ROLES: [role: string, does: string, login: string][] = [
 
 /** The written user guide: every step of setting up and running a school, printable as a PDF. */
 export function GuidePage() {
+  useSiteScale();
   useForcedLightTheme();
   const site = usePublicSiteSettings().data;
   const email = site?.contactEmail ?? CONTACT_EMAIL;
@@ -46,28 +49,29 @@ export function GuidePage() {
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-600">User guide</p>
         <h1 className="mt-2 font-display text-4xl font-semibold text-slate-900 sm:text-5xl">How to use {PRODUCT_NAME}</h1>
         <p className="mt-4 max-w-3xl text-lg leading-relaxed text-slate-600">
-          Everything you need to set up your school and run it day to day: from signing up with Google to admissions, fees, exams and the parent portal. Follow the steps in order the first time; afterwards, jump to the part you need.
+          Find your role and follow its steps: how to register, how the administrator sets up a new school, and what the principal, teachers, accountants, students and parents do every day. Each part has a short video on our website.
         </p>
 
         <section className="mt-10 rounded-2xl border border-slate-200 bg-slate-50 p-6 print:break-inside-avoid print:bg-white">
           <h2 className="text-lg font-bold text-slate-900">Contents</h2>
           <ol className="mt-4 grid gap-x-8 gap-y-2 sm:grid-cols-2">
-            {CHAPTERS.map((c, i) => (
+            {ROLE_GUIDES.map((c, i) => (
               <li key={c.id}><a href={`#${c.id}`} className="flex gap-3 text-slate-700 hover:text-primary-700"><span className="w-6 shrink-0 text-right font-mono text-slate-400">{i + 1}.</span>{c.title}</a></li>
             ))}
-            <li><a href="#roles" className="flex gap-3 text-slate-700 hover:text-primary-700"><span className="w-6 shrink-0 text-right font-mono text-slate-400">{CHAPTERS.length + 1}.</span>Who does what: roles and access</a></li>
-            <li><a href="#faq" className="flex gap-3 text-slate-700 hover:text-primary-700"><span className="w-6 shrink-0 text-right font-mono text-slate-400">{CHAPTERS.length + 2}.</span>Problems and answers</a></li>
+            <li><a href="#roles" className="flex gap-3 text-slate-700 hover:text-primary-700"><span className="w-6 shrink-0 text-right font-mono text-slate-400">{ROLE_GUIDES.length + 1}.</span>Who does what: roles and access</a></li>
+            <li><a href="#faq" className="flex gap-3 text-slate-700 hover:text-primary-700"><span className="w-6 shrink-0 text-right font-mono text-slate-400">{ROLE_GUIDES.length + 2}.</span>Problems and answers</a></li>
           </ol>
         </section>
 
-        {CHAPTERS.map((c, i) => (
+        {ROLE_GUIDES.map((c, i) => (
           <section key={c.id} id={c.id} className="mt-14 scroll-mt-24 print:mt-8 print:break-before-page">
             <div className="flex items-start gap-4">
               <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-50 text-primary-700 print:border print:border-slate-300"><c.icon size={24} /></span>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-orange-600">Step {i + 1} of {CHAPTERS.length}</p>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-orange-600">Part {i + 1} of {ROLE_GUIDES.length}</p>
                 <h2 className="mt-1 font-display text-2xl font-semibold text-slate-900 sm:text-3xl">{c.title}</h2>
                 <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-slate-500"><UserCog size={14} /> {c.who}</p>
+                {c.video && <Link to="/#videos" className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 hover:underline print:hidden"><PlayCircle size={15} /> Watch the video for this part</Link>}
               </div>
             </div>
             <p className="mt-4 text-lg leading-relaxed text-slate-600">{c.summary}</p>

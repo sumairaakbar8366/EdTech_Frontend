@@ -1,74 +1,26 @@
 import { api } from '@/services/api/http';
 
-export interface SignupDetails {
-  schoolName: string;
-  slug: string;
-  city: string;
-  firstName: string;
-  lastName: string;
-  designation: string;
-  email: string;
-  phone: string;
-  password: string;
-}
-
-export interface SlugCheck {
-  slug: string;
-  available: boolean;
-  reason: string | null;
-  suggestion: string | null;
-}
-
-export interface SignupResult {
-  school: { id: string; name: string; slug: string };
-  loginId: string;
-  trialEndsAt: string;
-  signInUrl: string;
-  /** Opens the school's site already signed in (valid 2 minutes, once). */
-  continueUrl: string;
-  /** Quick sign-up: where the generated password was emailed. */
-  passwordSentTo?: string | null;
-}
-
 /** What the sign-up and sign-in screens may offer. */
 export interface AuthConfig {
   /** OAuth client ID for "Continue with Google"; null when not set up. */
   googleClientId: string | null;
-  /** "off" while testing: any email is accepted without a code. */
-  emailVerification: 'required' | 'off';
 }
 
 export type SocialProvider = 'google';
 
 /** Where a sign-in on the main /login continues: one account, or the schools to choose from. */
-export type SignInOutcome = { continueUrl: string } | { choose: { school: string; name: string }[] };
-/** Google sign-in on the main site with no account yet: offer the free trial. */
+export type SignInOutcome = { continueUrl: string } | { choose: { school: string; name: string }[] } | { twoFactor: { verificationId: string; email: string } };
+/** Google sign-in on the main site with no account yet: point to the verified registration. */
 export type SocialSignInOutcome = SignInOutcome | { noAccount: { email: string } };
-
-/** The "Start free trial" sign-up: a school name plus Google, or an email and name. */
-export interface QuickSignup {
-  schoolName: string;
-  provider?: SocialProvider;
-  credential?: string;
-  nonce?: string;
-  email?: string;
-  name?: string;
-  verificationId?: string;
-  code?: string;
-}
 
 /** Public (signed-out) marketing API. */
 export const marketingService = {
-  checkSlug: (slug: string) => api<SlugCheck>(`/public/signup/slug?slug=${encodeURIComponent(slug)}`),
-  /** A 6-digit code to the admin's email (proves the address before the school is created). */
-  signupCode: (email: string) => api<{ verificationId: string | null; skipped?: boolean }>('/public/signup/code', { method: 'POST', body: { email } }),
   authConfig: () => api<AuthConfig>('/public/signup/config'),
-  quickSignup: (body: QuickSignup) => api<SignupResult>('/public/signup/quick', { method: 'POST', body }),
   /** "Continue with Google": a one-time link into the person's school, or schools to choose from. */
   socialTicket: (body: { provider: SocialProvider; credential: string; nonce: string; school?: string }) => api<SocialSignInOutcome>('/public/social/ticket', { method: 'POST', body }),
   /** The single /login for the owner and every school (`school` picks one of several matches). */
+  verifyOwner: (body: { verificationId: string; code: string }) => api<{ continueUrl: string }>('/public/login/verify', { method: 'POST', body }),
   login: (body: { identifier: string; password: string; school?: string; remember?: boolean }) => api<SignInOutcome>('/public/login', { method: 'POST', body }),
-  signup: (body: Omit<SignupDetails, 'city'> & { city?: string; verificationId: string; code: string }) => api<SignupResult>('/public/signup', { method: 'POST', body }),
 };
 
 /** The payment gateway's checkout (the built-in test gateway's page lives on this site). */
