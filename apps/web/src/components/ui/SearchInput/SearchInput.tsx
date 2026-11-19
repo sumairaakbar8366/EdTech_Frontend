@@ -10,7 +10,7 @@ export function SearchInput({ value, onChange, placeholder, label }: { value: st
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         aria-label={label}
-        className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-base outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-500/15 dark:border-white/10 dark:bg-[#0e1626] dark:text-white"
+        className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-base outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-500/15 dark:border-white/10 dark:bg-(--surface-raised) dark:text-white"
       />
     </div>
   );

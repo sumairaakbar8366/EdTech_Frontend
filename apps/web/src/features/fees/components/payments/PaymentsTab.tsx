@@ -42,7 +42,7 @@ export function PaymentsTab({ canEdit }: { canEdit: boolean }) {
       {list.data?.items.length === 0 && <EmptyState icon={CreditCard} title={q ? 'No payment matches this search' : 'No payments in this range'} tone="emerald" />}
       {!!list.data?.items.length && (
         <div className="overflow-x-auto">
-          <table className="w-full text-base">
+          <table data-stack className="w-full text-base">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50/60 text-left text-sm uppercase tracking-wider text-slate-500 dark:border-white/5 dark:bg-white/[0.02] dark:text-slate-400">
                 <th className="px-5 py-3 font-semibold">Receipt</th>

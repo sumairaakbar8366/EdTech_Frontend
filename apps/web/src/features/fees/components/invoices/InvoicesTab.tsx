@@ -44,7 +44,7 @@ export function InvoicesTab({ canEdit, initialStatus = '' }: { canEdit: boolean;
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search invoice no., period, student…"
             aria-label="Search invoices"
-            className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-base outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-500/15 dark:border-white/10 dark:bg-[#0e1626] dark:text-white"
+            className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-base outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-500/15 dark:border-white/10 dark:bg-(--surface-raised) dark:text-white"
           />
         </div>
         <div className="w-44">
@@ -64,7 +64,7 @@ export function InvoicesTab({ canEdit, initialStatus = '' }: { canEdit: boolean;
       )}
       {!!list.data?.items.length && (
         <div className="overflow-x-auto">
-          <table className="w-full text-base">
+          <table data-stack className="w-full text-base">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50/60 text-left text-sm uppercase tracking-wider text-slate-500 dark:border-white/5 dark:bg-white/[0.02] dark:text-slate-400">
                 <th className="px-5 py-3 font-semibold">Invoice</th>

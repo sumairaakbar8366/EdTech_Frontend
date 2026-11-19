@@ -11,7 +11,7 @@ export function RolesSection() {
   const [active, setActive] = useState(ROLE_VIEWS[0]!.key);
   const role = ROLE_VIEWS.find((r) => r.key === active)!;
   return (
-    <section id="roles" className="relative overflow-hidden border-y border-slate-100 bg-white py-16 text-slate-800 sm:py-20 dark:border-white/5 dark:bg-[#0b1426] dark:text-white">
+    <section id="roles" className="relative overflow-hidden border-y border-slate-100 bg-white py-16 text-slate-800 sm:py-20 dark:border-white/5 dark:bg-(--page-bg) dark:text-white">
       <div className="relative mx-auto max-w-7xl px-4 sm:px-8">
         <SectionHeading kicker="Dashboards" title="A clear view for every role" text="Each person gets a dashboard built around their day, with access limited to what they need." />
         <Reveal delay={0.1} className="mt-9 grid gap-5 lg:grid-cols-[15rem_1fr]">

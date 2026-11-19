@@ -30,4 +30,4 @@ export function useFieldProps() {
 
 /** Shared look of text inputs, selects and text areas. */
 export const inputClass =
-  'w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-base text-slate-900 shadow-[inset_0_1px_2px_rgb(15_23_42/0.06)] outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-4 focus:ring-primary-500/15 dark:border-white/10 dark:bg-[#0e1626] dark:text-white';
+  'w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-base text-slate-900 shadow-[inset_0_1px_2px_rgb(15_23_42/0.06)] outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-4 focus:ring-primary-500/15 dark:border-white/10 dark:bg-(--surface-raised) dark:text-white';

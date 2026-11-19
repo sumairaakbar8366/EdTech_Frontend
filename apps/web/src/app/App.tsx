@@ -8,6 +8,7 @@ import { ScholarshipOfferPage } from '@/features/sponsorship/ScholarshipOfferPag
 import { CheckoutPage } from '@/features/marketing/pages/CheckoutPage';
 import { LandingPage } from '@/features/marketing/pages/LandingPage';
 import { GuidePage } from '@/features/marketing/pages/GuidePage';
+import { LegalPage } from '@/features/marketing/pages/LegalPage';
 import { WatchPage } from '@/features/marketing/pages/WatchPage';
 import { TourPage } from '@/features/marketing/pages/TourPage';
 import { setApiBase } from '@/services/api/http';
@@ -33,6 +34,8 @@ export function App() {
         <Route path="/tour" element={<TourPage />} />
         <Route path="/watch/:id" element={<WatchPage />} />
         <Route path="/guide" element={<GuidePage />} />
+        <Route path="/privacy" element={<LegalPage kind="privacy" />} />
+        <Route path="/terms" element={<LegalPage kind="terms" />} />
         {/* Applying to join: the owner's team verifies the application by hand, then approves it. */}
         <Route path="/register" element={<RegisterSchoolPage />} />
         <Route path="/access" element={<Navigate to="/login" replace />} />

@@ -39,7 +39,7 @@ const securityHeaders = {
 export default defineConfig({
   plugins: [react(), tailwindcss(),
     // `preview.headers` skips the HTML pages, which are the ones that need the policy.
-    { name: 'security-headers', configurePreviewServer: (server) => { server.middlewares.use((_req, res, next) => { for (const [k, v] of Object.entries(securityHeaders)) res.setHeader(k, v); next(); }); } }, seoPlugin({ origin: 'https://ed-tech.anetcybersolution.com', api: 'http://localhost:3000' })],
+    { name: 'security-headers', configurePreviewServer: (server) => { server.middlewares.use((_req, res, next) => { for (const [k, v] of Object.entries(securityHeaders)) res.setHeader(k, v); next(); }); } }, seoPlugin({ origin: 'https://skooledtech.com', api: 'http://localhost:3000' })],
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
   // Lazily imported (export/import buttons): pre-bundle them so the dev server never serves a stale copy.
   optimizeDeps: { include: ['write-excel-file/browser', 'read-excel-file/browser'] },
@@ -51,7 +51,7 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
-    allowedHosts: ['.localhost', '.ed-tech.anetcybersolution.com'],
+    allowedHosts: ['.localhost', 'skooledtech.com', 'www.skooledtech.com'],
     proxy: {
       '/api': { target: 'http://localhost:3000', changeOrigin: false },
     },
@@ -61,7 +61,7 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     headers: securityHeaders,
-    allowedHosts: ['.localhost', '.ed-tech.anetcybersolution.com'],
+    allowedHosts: ['.localhost', 'skooledtech.com', 'www.skooledtech.com'],
     proxy: {
       '/api': { target: 'http://localhost:3000', changeOrigin: false },
       // Search engines look for the sitemap at the site root; the API builds it from the schools.

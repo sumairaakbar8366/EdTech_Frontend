@@ -17,6 +17,7 @@ import { RequestAccessPage } from '@/features/access/RequestAccessPage';
 import { useTenant } from '@/features/tenancy/useTenant';
 import { ApiError } from '@/services/api/http';
 import { marketingOrigin } from '@/config/site';
+import { applyBrandTheme } from '@/lib/brandTheme';
 import type { Tenant } from '@/types/session';
 
 /** The owner console has no sign-in page of its own: it uses the main /login. */
@@ -31,6 +32,14 @@ function ToMainLogin() {
  */
 export function TenantApp({ basename }: { basename: string }) {
   const tenant = useTenant();
+  // The school's own colours restyle the whole app (sign-in, sidebar, dashboards, buttons) in both themes.
+  const branding = tenant.data?.kind === 'school' ? tenant.data.school.branding : null;
+  const primary = branding?.primaryColor ?? null;
+  const accent = branding?.secondaryColor ?? null;
+  useEffect(() => {
+    applyBrandTheme(primary, accent);
+    return () => applyBrandTheme(null);
+  }, [primary, accent]);
   if (tenant.isLoading) return <><Backdrop /><FullPageMessage title="Loading…" /></>;
   if (tenant.error || !tenant.data) {
     const status = tenant.error instanceof ApiError ? tenant.error.status : 0;

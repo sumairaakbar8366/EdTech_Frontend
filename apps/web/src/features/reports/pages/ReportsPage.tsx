@@ -46,7 +46,7 @@ function FinanceTab() {
         </Card>
         <Card title="By payment method" icon={Wallet} tone="primary" padded={false}>
           {d.byMethod.length === 0 ? <EmptyState icon={Wallet} title="No payments yet" tone="primary" /> : (
-            <table className="w-full text-base">
+            <table data-stack className="w-full text-base">
               <tbody className="divide-y divide-slate-200/70 dark:divide-white/5">
                 {d.byMethod.map((m) => (
                   <tr key={m.method}>
@@ -63,7 +63,7 @@ function FinanceTab() {
       <Card title="Dues by class (current year)" icon={Wallet} tone="amber" padded={false}>
         {d.byClass.length === 0 ? <EmptyState icon={Wallet} title="No invoices this year" tone="amber" /> : (
           <div className="overflow-x-auto">
-            <table className="w-full text-base">
+            <table data-stack className="w-full text-base">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50/60 text-left text-sm uppercase tracking-wider text-slate-500 dark:border-white/5 dark:bg-white/[0.02]">
                   <th className="px-5 py-3 font-semibold">Class</th>

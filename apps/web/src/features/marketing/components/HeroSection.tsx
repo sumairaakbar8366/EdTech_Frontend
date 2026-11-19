@@ -91,7 +91,7 @@ export function HeroSection({ demoHref, onStartTrial }: { demoHref: string; onSt
   return (
     <section id="top" ref={ref} className="relative flex min-h-[min(760px,calc(100dvh-4.25rem))] items-center overflow-hidden">
       <img src="/images/marketing/ai-school-erp.png" alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full scale-[1.04] object-cover object-[center_38%] opacity-[0.28] blur-[2px]" />
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-linear-to-r from-[#f6f7f5]/90 via-[#f1f3f2]/58 to-[#e8edf0]/36 dark:from-[#0b1426]/92 dark:via-[#14213a]/72 dark:to-[#253341]/48" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-linear-to-r from-[#f6f7f5]/90 via-[#f1f3f2]/58 to-[#e8edf0]/36 dark:from-(--page-bg)/92 dark:via-[#14213a]/72 dark:to-[#253341]/48" />
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_78%_50%,rgb(113_135_154/0.10),transparent_52%)]" />
 
       <motion.div style={reduce ? undefined : { y: contentY, opacity: contentOpacity }} className="relative mx-auto grid w-full max-w-7xl items-center gap-8 px-5 py-12 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-10 lg:py-14">

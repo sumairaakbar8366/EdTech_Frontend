@@ -44,7 +44,7 @@ export function PipelineBoard({ postId, canEdit, onEditPost }: { postId: string;
                 </div>
                 <div className="space-y-2">
                   {items.map((a) => (
-                    <button key={a.id} onClick={() => setOpenId(a.id)} className="w-full rounded-lg border border-slate-200 bg-white p-3 text-left shadow-depth-1 transition hover:border-primary-300 dark:border-white/10 dark:bg-[#111a2c]">
+                    <button key={a.id} onClick={() => setOpenId(a.id)} className="w-full rounded-lg border border-slate-200 bg-white p-3 text-left shadow-depth-1 transition hover:border-primary-300 dark:border-white/10 dark:bg-(--surface-bg)">
                       <div className="font-semibold text-slate-800 dark:text-slate-100">{a.firstName} {a.lastName}</div>
                       <div className="truncate text-sm text-slate-500 dark:text-slate-400">{a.education ?? a.email}</div>
                       {a.interviews[0]?.score && <div className="mt-1 flex items-center gap-1 text-sm text-amber-600"><Star size={12} /> {a.interviews[0].score}/10</div>}

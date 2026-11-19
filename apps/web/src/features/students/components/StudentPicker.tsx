@@ -42,10 +42,10 @@ export function StudentPicker({ value, onChange }: { value: PickedStudent | null
         onChange={(e) => setText(e.target.value)}
         placeholder="Type a name or admission no.…"
         aria-label="Find student"
-        className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-base outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-500/15 dark:border-white/10 dark:bg-[#0e1626] dark:text-white"
+        className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-base outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-500/15 dark:border-white/10 dark:bg-(--surface-raised) dark:text-white"
       />
       {!!results.data?.items.length && (
-        <ul className="absolute z-10 mt-1 max-h-64 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-depth-3 dark:border-white/10 dark:bg-[#111a2c]">
+        <ul className="absolute z-10 mt-1 max-h-64 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-depth-3 dark:border-white/10 dark:bg-(--surface-bg)">
           {results.data.items.map((s) => (
             <li key={s.id}>
               <button type="button" onClick={() => onChange({ id: s.id, firstName: s.firstName, lastName: s.lastName, admissionNo: s.admissionNo })} className="flex w-full items-center justify-between px-3.5 py-2 text-left hover:bg-primary-500/10">

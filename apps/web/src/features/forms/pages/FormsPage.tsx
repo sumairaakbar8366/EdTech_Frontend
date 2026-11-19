@@ -55,7 +55,7 @@ export function FormsPage() {
   return (
     <div>
       <PageHeader title="Registration forms" sub="Decide what your school asks about each kind of person" icon={BookUser} tone="teal" actions={<Button icon={Save} loading={busy} disabled={!dirty} onClick={() => void save()}>Save form</Button>} />
-      <div role="tablist" className="surface mb-5 inline-flex flex-wrap gap-1 rounded-xl p-1" data-tour="forms-tabs">
+      <div role="tablist" className="surface mb-5 inline-flex max-w-full flex-nowrap gap-1 overflow-x-auto rounded-xl p-1 sm:flex-wrap [&>button]:shrink-0 [&>button]:whitespace-nowrap" data-tour="forms-tabs">
         {KINDS.map((k) => (
           <button key={k.kind} role="tab" aria-selected={k.kind === kind} onClick={() => setKind(k.kind)} className={`focus-ring inline-flex items-center gap-2 rounded-lg px-4 py-2 text-base font-bold uppercase tracking-wide transition-colors ${k.kind === kind ? 'bg-brand text-white' : 'text-slate-600 hover:bg-slate-500/10 dark:text-slate-300'}`}>
             <k.icon size={16} /> {k.label}{(drafts[k.kind] && JSON.stringify(drafts[k.kind]) !== JSON.stringify(forms.data?.find((f) => f.kind === k.kind)?.form)) ? ' •' : ''}

@@ -1,0 +1,64 @@
+{
+  "name": "skool-edtech-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "test:ui": "bash run-ui-tests.sh"
+  },
+  "dependencies": {
+    "@expo-google-fonts/inter": "^0.4.2",
+    "@noble/curves": "^1.9.7",
+    "@noble/hashes": "^1.8.0",
+    "expo": "~58.0.25",
+    "expo-asset": "~58.0.21",
+    "expo-constants": "~58.0.16",
+    "expo-crypto": "~58.0.8",
+    "expo-file-system": "~58.0.13",
+    "expo-font": "~58.0.12",
+    "expo-linear-gradient": "~58.0.4",
+    "expo-local-authentication": "~58.0.3",
+    "expo-location": "~58.0.22",
+    "expo-network": "~58.0.5",
+    "expo-secure-store": "~58.0.3",
+    "expo-splash-screen": "~58.0.14",
+    "expo-status-bar": "~58.0.5",
+    "lucide-react-native": "^1.73.0",
+    "react": "^19.3.0",
+    "react-native": "^0.88.1",
+    "react-native-safe-area-context": "~5.11.1",
+    "react-native-svg": "15.16.0",
+    "react-native-webview": "14.0.1"
+  },
+  "devDependencies": {
+    "@react-native/jest-preset": "^0.88.1",
+    "@testing-library/react-native": "^14.1.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^26.6.6",
+    "@types/react": "~19.3.0",
+    "babel-jest": "^30.5.2",
+    "babel-preset-expo": "^58.0.25",
+    "jest": "^30.5.2",
+    "jest-expo": "^58.0.14",
+    "react-test-renderer": "^19.3.0",
+    "typescript": "~6.0.3"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/__tests__/**/*.test.ts"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "babel-jest"
+    },
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1",
+      "^lucide-react-native$": "<rootDir>/__tests__/lucideStub.js"
+    }
+  }
+}

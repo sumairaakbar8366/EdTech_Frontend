@@ -23,7 +23,7 @@ export interface SiteVideo {
 
 /** Vimeo numbers by video id. The site embeds Vimeo; the MP4 files are not kept in the project. */
 export const VIMEO: Record<string, string> = {
-  master: '1242320685',
+  master: '1242722843',
   'guide-register': '1242323533',
   'guide-admin': '1242323204',
   'guide-admin2': '1242323607',
@@ -35,7 +35,7 @@ export const VIMEO: Record<string, string> = {
 };
 
 /** Lengths in seconds, as recorded. */
-const SECONDS: Record<string, number> = { master: 292, 'guide-register': 97, 'guide-admin': 182, 'guide-admin2': 197, 'guide-principal': 94, 'guide-teacher': 142, 'guide-accounts': 90, 'guide-student': 83, 'guide-parent': 70 };
+const SECONDS: Record<string, number> = { master: 290, 'guide-register': 97, 'guide-admin': 182, 'guide-admin2': 197, 'guide-principal': 94, 'guide-teacher': 142, 'guide-accounts': 90, 'guide-student': 83, 'guide-parent': 70 };
 
 const make = (v: Omit<SiteVideo, 'file' | 'poster' | 'seconds' | 'vimeoId'>): SiteVideo => ({ ...v, seconds: SECONDS[v.id] ?? 120, file: `/videos/${v.id}.mp4`, poster: `/videos/${v.id}.jpg`, vimeoId: VIMEO[v.id] || undefined });
 

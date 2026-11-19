@@ -29,7 +29,7 @@ export function CtaSection({ demoHref, onFindSchool, onStartTrial }: { demoHref:
   return (
     <section
       id="contact"
-      className="relative overflow-hidden border-y border-slate-200 bg-white dark:border-white/5 dark:bg-[#0b1426]"
+      className="relative overflow-hidden border-y border-slate-200 bg-white dark:border-white/5 dark:bg-(--page-bg)"
       onPointerMove={(e) => {
         const r = e.currentTarget.getBoundingClientRect();
         mx.set(((e.clientX - r.left) / r.width) * 100);

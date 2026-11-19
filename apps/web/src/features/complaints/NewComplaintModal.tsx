@@ -22,7 +22,7 @@ function PersonSearch({ kind, value, onPick, placeholder }: { kind: AgainstKind;
     <div className="relative">
       <Input value={text} autoComplete="off" onChange={(e) => setText(e.target.value)} placeholder={placeholder} />
       {(hits.data?.length ?? 0) > 0 && (
-        <ul className="absolute z-30 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-slate-200 bg-white shadow-lg dark:border-white/10 dark:bg-[#0e1626]">
+        <ul className="absolute z-30 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-slate-200 bg-white shadow-lg dark:border-white/10 dark:bg-(--surface-raised)">
           {hits.data!.map((h, i) => <li key={i}><button type="button" className="block w-full px-3 py-2 text-left text-sm hover:bg-primary-500/10" onClick={() => onPick(h)}><span className="font-semibold">{h.name}</span><span className="block text-xs text-slate-500">{h.detail}</span></button></li>)}
         </ul>
       )}

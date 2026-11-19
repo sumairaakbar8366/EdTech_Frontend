@@ -42,7 +42,7 @@ export function ServiceRecordCard({ employeeId }: { employeeId: string }) {
       </ul>
       {d.years.length > 0 && (
         <div className="overflow-x-auto border-t border-(--surface-border)">
-          <table className="w-full text-sm">
+          <table data-stack className="w-full text-sm">
             <thead className="bg-slate-50/60 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:bg-white/[0.02]">
               <tr><th className="px-5 py-2.5">Year</th><th className="px-3 py-2.5 text-right">Sign-ins</th><th className="px-3 py-2.5 text-right">Changes</th><th className="px-3 py-2.5 text-right">Risky</th><th className="px-3 py-2.5">Main areas</th><th className="px-5 py-2.5">Last active</th></tr>
             </thead>

@@ -58,7 +58,7 @@ export function LandingPage() {
           <PlansSection demoHref={DEMO_HREF} onStartTrial={openTrial} />
           <CtaSection demoHref={DEMO_HREF} onFindSchool={openFind} onStartTrial={openTrial} />
         </main>
-        <footer className="border-t border-slate-200 bg-white dark:border-white/5 dark:bg-[#0b1426]">
+        <footer className="border-t border-slate-200 bg-white dark:border-white/5 dark:bg-(--page-bg)">
           {site && Object.values(site).some(Boolean) && (
             <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 border-b border-slate-200 px-4 py-5 text-sm text-slate-600 sm:px-8 dark:border-white/5 dark:text-slate-300">
               <div className="flex flex-wrap gap-x-6 gap-y-2">

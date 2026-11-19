@@ -11,7 +11,7 @@ export function HowItWorksSection() {
     <section id="tour" className="relative scroll-mt-16 bg-slate-50 py-16 sm:py-20 dark:bg-white/[0.02]">
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
         <SectionHeading kicker="How it works" title="From paper work to a school that runs itself" text="Five minutes: the problem every school knows, and everything Skool EdTech does about it, from admissions and fees to scholarships and security. Then watch the short guide for your own role below." />
-        <Reveal className="mx-auto mt-10 max-w-5xl"><VideoPlayer video={MASTER_VIDEO} /></Reveal>
+        <Reveal className="mx-auto mt-10 max-w-3xl"><VideoPlayer video={MASTER_VIDEO} /></Reveal>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
           <span className="inline-flex items-center gap-1.5 text-sm text-slate-500"><Clock size={15} /> {mmss(MASTER_VIDEO.seconds)} · with voice-over</span>
         </div>

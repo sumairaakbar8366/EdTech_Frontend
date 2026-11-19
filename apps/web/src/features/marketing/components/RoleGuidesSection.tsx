@@ -19,7 +19,7 @@ function Slide({ video, active, onPick }: { video: SiteVideo; active: boolean; o
       type="button"
       onClick={onPick}
       aria-pressed={active}
-      className={`group relative flex w-[17rem] shrink-0 snap-start flex-col overflow-hidden rounded-2xl bg-white text-left transition duration-300 dark:bg-[#171e29] ${active ? 'ring-2 ring-orange-500 shadow-[0_18px_40px_-18px_rgb(249_115_22/0.55)]' : 'ring-1 ring-slate-200 hover:-translate-y-1 dark:ring-white/10'}`}
+      className={`group relative flex h-full w-[13.5rem] shrink-0 snap-start flex-col overflow-hidden rounded-2xl bg-white text-left transition duration-300 dark:bg-(--surface-bg) ${active ? 'ring-2 ring-orange-500 shadow-[0_18px_40px_-18px_rgb(249_115_22/0.55)]' : 'ring-1 ring-slate-200 hover:-translate-y-1 dark:ring-white/10'}`}
     >
       <span className="relative block aspect-video overflow-hidden bg-slate-900">
         <img src={video.poster} alt="" loading="lazy" draggable={false} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]" />
@@ -28,7 +28,7 @@ function Slide({ video, active, onPick }: { video: SiteVideo; active: boolean; o
       </span>
       <span className="flex items-start gap-2.5 p-3">
         <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-500/10 text-orange-600"><Icon size={17} /></span>
-        <span className="min-w-0"><span className="block text-[11px] font-bold uppercase tracking-wider text-orange-600">{video.role}</span><span className="block text-sm font-bold leading-snug text-slate-900 dark:text-white">{video.title}</span></span>
+        <span className="min-w-0"><span className="block text-[11px] font-bold uppercase tracking-wider text-orange-600">{video.role}</span><span className="line-clamp-3 block min-h-[3.9rem] text-sm font-bold leading-snug text-slate-900 dark:text-white">{video.title}</span></span>
       </span>
     </button>
   );
@@ -56,11 +56,11 @@ export function RoleGuidesSection() {
   const slide = (dir: number) => row.current?.scrollBy({ left: dir * 300, behavior: 'smooth' });
 
   return (
-    <section id="videos" className="relative scroll-mt-16 border-y border-slate-200 bg-white py-16 sm:py-20 dark:border-white/5 dark:bg-[#0f141c]">
+    <section id="videos" className="relative scroll-mt-16 border-y border-slate-200 bg-white py-16 sm:py-20 dark:border-white/5 dark:bg-(--page-bg)">
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
         <SectionHeading kicker="Guides by role" title="Watch the guide for your role" text="Start with how to register. Then pick who you are: the administrator’s guide shows how to set up a new, empty school, step by step. Every video has a voice-over." />
 
-        <Reveal className="mt-10 grid items-start gap-6 lg:grid-cols-[1.6fr_1fr]">
+        <Reveal className="mt-10 grid items-start gap-6 lg:grid-cols-[1.15fr_1fr]">
           <div ref={player}><VideoPlayer key={`${video.id}:${picked}`} video={video} autoPlay={picked} /></div>
           <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200 dark:bg-white/[0.04] dark:ring-white/10">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-500/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-orange-600">{video.role}</span>
@@ -82,8 +82,8 @@ export function RoleGuidesSection() {
             <button type="button" onClick={() => slide(1)} aria-label="Next guides" className="flex h-9 w-9 items-center justify-center rounded-full bg-white shadow ring-1 ring-slate-200 hover:bg-slate-50 dark:bg-white/5 dark:ring-white/10"><ChevronRight size={18} /></button>
           </div>
         </div>
-        <ul ref={row} className="mt-4 flex snap-x gap-4 overflow-x-auto pb-4 [scrollbar-width:thin]">
-          {GUIDE_VIDEOS.map((v) => <li key={v.id}><Slide video={v} active={v.id === video.id} onPick={() => pick(v.id, true)} /></li>)}
+        <ul ref={row} className="mt-4 flex snap-x items-stretch gap-4 overflow-x-auto px-1 pb-4 pt-2 [scrollbar-width:thin]">
+          {GUIDE_VIDEOS.map((v) => <li key={v.id} className="flex"><Slide video={v} active={v.id === video.id} onPick={() => pick(v.id, true)} /></li>)}
         </ul>
       </div>
     </section>

@@ -6,6 +6,26 @@ import { useDebouncedValue } from '@/lib/hooks/useDebouncedValue';
 
 const ACTION_TONE: Record<string, Tone> = { create: 'emerald', update: 'sky', delete: 'rose' };
 
+const UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
+/** Known technical requests, in plain words. Anything unlisted falls back to "<action> <module>". */
+const SUMMARIES: [RegExp, string][] = [
+  [/^\/staff-attendance\/check-in$/, 'Checked in'],
+  [/^\/staff-attendance\/check-out$/, 'Checked out'],
+  [/^\/staff-attendance\/biometric\/app\/challenge$/, 'Biometric verification started'],
+  [/^\/staff-attendance\/biometric\/app\/register$/, 'Registered a biometric device'],
+  [/^\/staff-attendance\/biometric\/devices\/:id\/approve$/, 'Approved a biometric device'],
+  [/^\/staff-attendance\/biometric\/devices\/:id$/, 'Approved a biometric device'],
+  [/^\/staff-attendance\/:id$/, 'Reviewed a staff attendance record'],
+  [/^\/tours\//, 'Updated the welcome tour'],
+];
+
+/** One plain-language line for an audit row, e.g. "Checked in" instead of "POST /staff-attendance/check-in". */
+function summarize(e: { action: string; entity: string; path: string }): string {
+  const clean = e.path.split('?')[0].replace(UUID, ':id');
+  const hit = SUMMARIES.find(([re]) => re.test(clean));
+  return hit ? hit[1] : `${e.action} · ${e.entity.replace(/-/g, ' ')}`;
+}
+
 /** Who changed what and when: every write made through the school API (page 14 audit_logs). */
 export function AuditLogCard() {
   const [page, setPage] = useState(1);
@@ -30,14 +50,14 @@ export function AuditLogCard() {
       {d?.items.length === 0 && <EmptyState icon={ScrollText} title="No changes recorded yet" tone="slate" />}
       {!!d?.items.length && (
         <div className="overflow-x-auto">
-          <table className="w-full text-base">
+          <table data-stack className="w-full text-base">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50/60 text-left text-sm uppercase tracking-wider text-slate-500 dark:border-white/5 dark:bg-white/[0.02]">
                 <th className="px-5 py-3 font-semibold">When</th>
                 <th className="px-5 py-3 font-semibold">Who</th>
                 <th className="px-5 py-3 font-semibold">Action</th>
                 <th className="px-5 py-3 font-semibold">Module</th>
-                <th className="px-5 py-3 font-semibold">Request</th>
+                <th className="px-5 py-3 font-semibold">Details</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200/70 dark:divide-white/5">
@@ -47,7 +67,7 @@ export function AuditLogCard() {
                   <td className="px-5 py-2.5 font-semibold text-slate-800 dark:text-slate-100">{e.actorName ?? '—'}</td>
                   <td className="px-5 py-2.5"><Badge tone={ACTION_TONE[e.action] ?? 'primary'}>{e.action}</Badge></td>
                   <td className="px-5 py-2.5 capitalize text-slate-700 dark:text-slate-200">{e.entity}</td>
-                  <td className="max-w-[22rem] truncate px-5 py-2.5 font-mono text-xs text-slate-500" title={`${e.method} ${e.path}${e.ip ? ` · ${e.ip}` : ''}`}>{e.method} {e.path}</td>
+                  <td className="max-w-[22rem] truncate px-5 py-2.5 text-sm text-slate-600 dark:text-slate-300" title={`${e.method} ${e.path}${e.ip ? ` · ${e.ip}` : ''}`}>{summarize(e)}</td>
                 </tr>
               ))}
             </tbody>

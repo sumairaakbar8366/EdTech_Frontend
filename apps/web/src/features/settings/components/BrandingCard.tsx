@@ -8,6 +8,7 @@ import { settingsService } from '@/features/settings/services/settingsService';
 import { DAY_NAMES } from '@/lib/format';
 import { onSubmit } from '@/lib/forms';
 import { apiAsset } from '@/services/api/http';
+import { applyBrandTheme } from '@/lib/brandTheme';
 
 // The standard theme's colours, used for the preview and as the starting point for custom colours.
 const DEFAULT_PRIMARY = '#2f3e52';
@@ -26,6 +27,13 @@ export function BrandingCard() {
   useEffect(() => {
     if (s) setForm({ custom: !!s.primaryColor, primaryColor: s.primaryColor ?? DEFAULT_PRIMARY, secondaryColor: s.secondaryColor ?? DEFAULT_SECONDARY, timezone: s.timezone, currency: s.currency, weeklyOffDays: s.weeklyOffDays });
   }, [s]);
+  // The whole app shows the colours as they are chosen (both light and dark); leaving puts the saved ones back.
+  const savedPrimary = s?.primaryColor ?? null;
+  const savedAccent = s?.secondaryColor ?? null;
+  useEffect(() => {
+    if (form.custom) applyBrandTheme(form.primaryColor, form.secondaryColor); else applyBrandTheme(null);
+    return () => applyBrandTheme(savedPrimary, savedAccent);
+  }, [form.custom, form.primaryColor, form.secondaryColor, savedPrimary, savedAccent]);
   const save = useSettingsAction(() => {
     const { custom, primaryColor, secondaryColor, ...rest } = form;
     // Colours are sent only when they change, so saving the region never needs the theme feature.
@@ -58,7 +66,7 @@ export function BrandingCard() {
             <legend className="mb-2 text-sm font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">Colours <span className="font-normal normal-case tracking-normal text-slate-500">(optional)</span></legend>
             <div role="radiogroup" aria-label="Colours" className="grid gap-2 sm:grid-cols-2">
               {[
-                { custom: false, title: 'Standard theme', text: 'The official navy and orange. Nothing to set up.' },
+                { custom: false, title: 'Standard theme', text: 'The official smoky blue and orange. Nothing to set up.' },
                 { custom: true, title: 'Our school colours', text: canTheme || form.custom ? 'Use your own primary and accent colour.' : 'Available on plans with “Your theme colour”.' },
               ].map((o) => {
                 const on = form.custom === o.custom;
@@ -73,8 +81,8 @@ export function BrandingCard() {
             </div>
             {form.custom && (
               <div className="mt-3 grid gap-4 sm:grid-cols-2">
-                <Field label="Primary colour"><Input type="color" value={form.primaryColor} onChange={(e) => setForm({ ...form, primaryColor: e.target.value })} className="h-11 cursor-pointer px-1.5 py-1" /></Field>
-                <Field label="Accent colour"><Input type="color" value={form.secondaryColor} onChange={(e) => setForm({ ...form, secondaryColor: e.target.value })} className="h-11 cursor-pointer px-1.5 py-1" /></Field>
+                <Field label="Primary colour" hint="Sidebar, banners and the tint of pages and cards. A dark colour becomes the dark theme itself."> <Input type="color" value={form.primaryColor} onChange={(e) => setForm({ ...form, primaryColor: e.target.value })} className="h-11 cursor-pointer px-1.5 py-1" /></Field>
+                <Field label="Accent colour" hint="Buttons and highlights."><Input type="color" value={form.secondaryColor} onChange={(e) => setForm({ ...form, secondaryColor: e.target.value })} className="h-11 cursor-pointer px-1.5 py-1" /></Field>
               </div>
             )}
           </fieldset>

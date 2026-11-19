@@ -89,6 +89,28 @@
   --app-sidebar-bg: #23262b;
   --app-sidebar-bg-deep: #16181c;
   --app-sidebar-text: #111827;
+  /* Cards, banners and panels (a school's own colours replace these: see lib/brandTheme.ts). */
+  --surface-raised: #ffffff;
+  --surface-grad-top: #ffffff;
+  --surface-grad-bottom: #ffffff;
+  --card-top: #ffffff;
+  --card-bottom: #f7f9fc;
+  --card-border: #c3d6ef;
+  --card-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 1px 2px rgb(15 23 42 / 0.06), 0 4px 8px -2px rgb(15 23 42 / 0.08), 0 12px 24px -10px rgb(15 23 42 / 0.16);
+  --surface-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+  --accent-rim: #f5b98a;
+  --hero-bg: #2f3e52;
+  --panel-border: #e6ebf1;
+  --panel-from: #ffffff;
+  --panel-to: #f8fafc;
+  --panel-ink: #1e293b;
+  --welcome-from: #ffffff;
+  --welcome-mid: #f8fafc;
+  --welcome-to: #edf4fb;
+  --welcome-blob: #e3effa;
+  --smoke: transparent;
+  --btn-sheen: none;
+  --btn-shadow: none;
 }
 :root[data-theme='dark'] {
   color-scheme: dark;
@@ -97,14 +119,39 @@
   --page-bg: #0f141c;
   --surface-bg: #171e29;
   --surface-border: #2a3441;
-  --app-sidebar-bg: #1a1c20;
-  --app-sidebar-bg-deep: #0e0f12;
+  --app-sidebar-bg: #212c39;
+  --app-sidebar-bg-deep: #10161d;
   --app-sidebar-text: #e2e8f0;
+  /* Smoky greyish blue, raised: every card catches light on its top edge and drops a deep shadow. */
+  --surface-raised: #222f3d;
+  --surface-grad-top: #243242;
+  --surface-grad-bottom: #1a232e;
+  --card-top: #243242;
+  --card-bottom: #1a232e;
+  --card-border: #33465a;
+  --card-shadow: inset 0 1px 0 rgb(255 255 255 / 0.09), inset 0 -1px 0 rgb(0 0 0 / 0.35), 0 2px 4px rgb(0 0 0 / 0.35), 0 14px 28px -10px rgb(0 0 0 / 0.7);
+  --surface-shadow: inset 0 1px 0 rgb(255 255 255 / 0.07), inset 0 -1px 0 rgb(0 0 0 / 0.3), 0 2px 4px rgb(0 0 0 / 0.3), 0 10px 20px -10px rgb(0 0 0 / 0.6);
+  --accent-rim: #b4581e;
+  --hero-bg: #263648;
+  --panel-border: #33465a;
+  --panel-from: #243242;
+  --panel-to: #1a232e;
+  --panel-ink: #e2e8f0;
+  --welcome-from: #223040;
+  --welcome-mid: #1c2733;
+  --welcome-to: #263a4f;
+  --welcome-blob: #2c445c;
+  --smoke: rgb(98 132 172 / 0.16);
+  --btn-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.2) 0%, rgb(255 255 255 / 0) 48%, rgb(0 0 0 / 0.16) 100%);
+  --btn-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28), inset 0 -1px 0 rgb(0 0 0 / 0.25), 0 2px 4px rgb(0 0 0 / 0.4), 0 8px 16px -6px rgb(0 0 0 / 0.55);
 }
 
 body {
   @apply font-sans antialiased;
-  background: var(--page-bg);
+  background-color: var(--page-bg);
+  /* A faint smoky glow behind the page (dark theme and tinted themes), so it is not a flat slab. */
+  background-image: radial-gradient(1000px 520px at 12% -10%, var(--smoke), transparent 70%), radial-gradient(800px 420px at 100% 0%, var(--smoke), transparent 70%);
+  background-attachment: fixed;
   color: var(--app-sidebar-text);
 }
 
@@ -115,16 +162,11 @@ h1, h2, h3 {
 /* Card surface: plain white with a hairline border; colour is kept for meaning, not decoration. */
 @utility surface {
   border: 1px solid var(--surface-border);
-  background-color: #ffffff;
-  background-image: none;
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
-}
-[data-theme='dark'] .surface {
-  border-color: var(--surface-border);
   background-color: var(--surface-bg);
-  background-image: none;
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.22);
+  background-image: linear-gradient(180deg, var(--surface-grad-top), var(--surface-grad-bottom));
+  box-shadow: var(--surface-shadow);
 }
+:root:not([data-theme='dark']) .surface { background-color: #ffffff; }
 
 /* Module "tones" no longer recolour cards: one calm look everywhere. */
 .tone-card { transition: box-shadow 180ms ease; }
@@ -136,38 +178,20 @@ h1, h2, h3 {
   background-color: var(--surface-bg);
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
 }
-.dashboard-link-tile:hover { transform: translateY(-2px); border-color: #f3a46a; box-shadow: 0 6px 16px -6px rgb(15 23 42 / 0.12); }
-[data-theme='dark'] .dashboard-link-tile:hover { border-color: #b4581e; }
+.dashboard-link-tile:hover { transform: translateY(-2px); border-color: var(--accent-rim); box-shadow: 0 6px 16px -6px rgb(15 23 42 / 0.12); }
 
 /* Raised card (every Card / StatCard): soft blue rim, top light, layered drop shadow. On dashboards (.dash) it lifts with an orange rim on hover. */
 .card-3d {
   border-radius: 1rem;
-  border-color: #c3d6ef;
-  background-image: linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.9),
-    0 1px 2px rgb(15 23 42 / 0.06),
-    0 4px 8px -2px rgb(15 23 42 / 0.08),
-    0 12px 24px -10px rgb(15 23 42 / 0.16);
-  transition: transform 180ms ease, box-shadow 180ms ease;
+  border-color: var(--card-border);
+  background-image: linear-gradient(180deg, var(--card-top) 0%, var(--card-bottom) 100%);
+  box-shadow: var(--card-shadow);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
 }
 .dash .card-3d:hover {
   transform: translateY(-2px);
-  border-color: #f5b98a;
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.9),
-    0 2px 4px rgb(15 23 42 / 0.06),
-    0 8px 16px -4px rgb(15 23 42 / 0.1),
-    0 20px 32px -12px rgb(15 23 42 / 0.22);
-}
-[data-theme='dark'] .card-3d {
-  border-color: #2e4766;
-  background-image: linear-gradient(180deg, #1b2330 0%, #161d27 100%);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 4px 10px -2px rgb(0 0 0 / 0.4), 0 14px 28px -12px rgb(0 0 0 / 0.55);
-}
-[data-theme='dark'] .dash .card-3d:hover {
-  border-color: #8a4a1f;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 8px 16px -4px rgb(0 0 0 / 0.45), 0 22px 36px -14px rgb(0 0 0 / 0.6);
+  border-color: var(--accent-rim);
+  box-shadow: var(--card-shadow), 0 18px 30px -14px rgb(0 0 0 / 0.28);
 }
 
 /* Dark smoky-grey sidebar with light text, in both themes. */
@@ -176,6 +200,9 @@ h1, h2, h3 {
   box-shadow: inset -1px 0 0 rgb(255 255 255 / 0.06);
   color: #e2e8f0;
 }
+
+/* The sidebar is dark in both themes: the initials in its user card must be light. */
+.app-sidebar span[role='img'] { color: #e5e9f2 !important; }
 
 /* The floating rail flows out of the screen's left edge: concave curves join it to the edge above and below. */
 @media (min-width: 1024px) {
@@ -224,19 +251,18 @@ h1, h2, h3 {
 /* Dashboard welcome banner: greyish blue with white text and a thin orange rule. */
 .dashboard-hero {
   color: #ffffff;
-  background: #2f3e52;
-  border-bottom: 3px solid #f97316;
+  background: var(--hero-bg);
+  border-bottom: 3px solid var(--brand-action, #f97316);
 }
-:root[data-theme='dark'] .dashboard-hero { background: #1b2533; }
 
 .school-dashboard-panel {
-  border: 1px solid #e6ebf1;
-  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-  color: #1e293b;
+  border: 1px solid var(--panel-border);
+  background: linear-gradient(145deg, var(--panel-from) 0%, var(--panel-to) 100%);
+  color: var(--panel-ink);
 }
 .school-dashboard-welcome {
   isolation: isolate;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 58%, #edf4fb 100%);
+  background: linear-gradient(135deg, var(--welcome-from) 0%, var(--welcome-mid) 58%, var(--welcome-to) 100%);
 }
 .school-dashboard-welcome::before {
   content: '';
@@ -247,7 +273,7 @@ h1, h2, h3 {
   width: 74%;
   aspect-ratio: 1;
   border-radius: 9999px;
-  background: #e3effa;
+  background: var(--welcome-blob);
 }
 .school-dashboard-photo {
   position: absolute;
@@ -259,21 +285,12 @@ h1, h2, h3 {
   object-position: center bottom;
   mask-image: linear-gradient(90deg, transparent 0%, #000 36%);
 }
-:root[data-theme='dark'] .school-dashboard-panel {
-  border-color: #2a3441;
-  background: linear-gradient(145deg, #171e29 0%, #1d2633 100%);
-  color: #e2e8f0;
-}
-:root[data-theme='dark'] .school-dashboard-welcome {
-  background: linear-gradient(135deg, #171e29 0%, #1b2533 58%, #202e40 100%);
-}
-:root[data-theme='dark'] .school-dashboard-welcome::before { background: #263d55; }
-
 /* Brand: pale operational surfaces with industrial orange controls. */
 /* Action colour: the school's own theme colour (plans with "theme"), otherwise the standard orange. */
 @utility bg-brand {
   background-color: var(--brand-action, #ff6b00);
-  background-image: none;
+  background-image: var(--btn-sheen);
+  box-shadow: var(--btn-shadow);
   color: #111827;
 }
 @utility text-brand {
@@ -539,3 +556,22 @@ table { font-variant-numeric: tabular-nums; }
 .landing { overflow-x: clip; }
 /* iPhone browsers widen the layout (and shrink the page) if anything pokes out: keep it clipped. */
 html.site-scale, html.site-scale body { overflow-x: hidden; max-width: 100%; }
+
+/* Phones: wide data tables (marked data-stack) become one card per row. See lib/stackTables.ts. */
+@media (max-width: 639px) {
+  table[data-stack] { display: block; width: 100% !important; min-width: 0 !important; table-layout: auto; }
+  table[data-stack] thead { display: none; }
+  table[data-stack] tbody { display: block; }
+  table[data-stack] tbody > tr { display: block; padding: 0.7rem 1rem; border-bottom: 1px solid var(--surface-border); }
+  table[data-stack] tbody > tr[data-span] { padding: 0.5rem 1rem; }
+  table[data-stack] tbody > tr > td { display: flex; justify-content: space-between; align-items: baseline; gap: 0.75rem; padding: 0.18rem 0 !important; text-align: right !important; border: 0 !important; min-width: 0; overflow-wrap: anywhere; }
+  table[data-stack] tbody > tr > td::before { content: attr(data-label); flex-shrink: 0; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: rgb(100 116 139); text-align: left; }
+  table[data-stack] tbody > tr > td[data-label=""]::before { display: none; }
+  table[data-stack] tbody > tr > td[data-label=""] { justify-content: flex-end; }
+  /* the first cell is the card's title */
+  table[data-stack] tbody > tr > td:first-child { display: block; text-align: left !important; font-weight: 600; padding-bottom: 0.3rem !important; }
+  table[data-stack] tbody > tr > td:first-child::before { display: none; }
+  table[data-stack] tbody > tr > td:empty { display: none; }
+  table[data-stack] tbody > tr[data-span] > td { display: block; text-align: center !important; }
+  table[data-stack] tbody > tr[data-span] > td::before { display: none; }
+}

@@ -1,4 +1,6 @@
 import { Coffee, Pencil, Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { useNarrow } from '@/lib/hooks/useNarrow';
 import { IconButton, LiveDot } from '@/components/ui';
 import type { TimetableSlot } from '@/features/timetable/types/timetable.types';
 import { subjectAccent } from '@/features/timetable/utils/timetable.utils';
@@ -20,7 +22,12 @@ export function WeekGrid({ slots, show, onDelete, onEdit, onAdd, highlightDay }:
   onAdd?: (at: { dayOfWeek: number; startTime: string; endTime: string }) => void;
   highlightDay?: number;
 }) {
-  const days = [1, 2, 3, 4, 5, ...[6, 7].filter((d) => slots.some((s) => s.dayOfWeek === d))];
+  const allDays = [1, 2, 3, 4, 5, ...[6, 7].filter((d) => slots.some((s) => s.dayOfWeek === d))];
+  // On a phone the week does not fit: one day at a time (today first), chosen with the day buttons.
+  const narrow = useNarrow();
+  const [pick, setPick] = useState<number | null>(null);
+  const shownDay = pick && allDays.includes(pick) ? pick : highlightDay && allDays.includes(highlightDay) ? highlightDay : allDays[0]!;
+  const days = narrow ? [shownDay] : allDays;
   const periods = [...new Map(slots.map((s) => [`${s.startMinute}-${s.endMinute}`, { start: s.startMinute, end: s.endMinute }])).values()].sort((a, b) => a.start - b.start || a.end - b.end);
   const nowMinute = new Date().getHours() * 60 + new Date().getMinutes();
   if (periods.length === 0) return <p className="py-10 text-center text-slate-500">No periods scheduled yet.</p>;
@@ -34,7 +41,16 @@ export function WeekGrid({ slots, show, onDelete, onEdit, onAdd, highlightDay }:
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-190 table-fixed border-separate border-spacing-0 text-sm">
+      {narrow && (
+        <div role="tablist" aria-label="Day" className="mb-3 flex gap-1.5 overflow-x-auto px-1 pb-1">
+          {allDays.map((d) => (
+            <button key={d} role="tab" aria-selected={d === shownDay} type="button" onClick={() => setPick(d)}
+              className={`shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-semibold ${d === shownDay ? 'border-orange-500 bg-orange-500 text-white' : 'border-(--surface-border) bg-white text-slate-600 dark:bg-white/5 dark:text-slate-300'}`}>
+              {DAY_NAMES[d]!.slice(0, 3)}{d === highlightDay ? ' · today' : ''}
+            </button>))}
+        </div>
+      )}
+      <table className={`w-full ${narrow ? '' : 'min-w-190'} table-fixed border-separate border-spacing-0 text-sm`}>
         <thead>
           <tr>
             <th className="w-24 border-b border-(--surface-border) px-3 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Time</th>

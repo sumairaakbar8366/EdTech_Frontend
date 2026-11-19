@@ -149,7 +149,7 @@ function Device({ shot }: { shot: ShotId }) {
     <div className="absolute overflow-hidden rounded-xl bg-white shadow-[0_40px_90px_-40px_rgb(15_23_42/0.45),0_0_0_1px_rgb(15_23_42/0.07)]" style={{ left: DESKTOP.x, top: DESKTOP.y - 28, width: DESKTOP.w }}>
       <div className="flex h-7 items-center gap-2 border-b border-slate-200 bg-slate-50 px-3">
         <span className="flex gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-rose-400" /><i className="h-2.5 w-2.5 rounded-full bg-amber-400" /><i className="h-2.5 w-2.5 rounded-full bg-emerald-400" /></span>
-        <span className="mx-auto flex items-center gap-1.5 rounded-md bg-white px-3 py-0.5 text-[11px] text-slate-500 ring-1 ring-slate-200"><Lock size={9} /> ed-tech.anetcybersolution.com/{pathOf(shot)}</span>
+        <span className="mx-auto flex items-center gap-1.5 rounded-md bg-white px-3 py-0.5 text-[11px] text-slate-500 ring-1 ring-slate-200"><Lock size={9} /> skooledtech.com/{pathOf(shot)}</span>
       </div>
       <img src={shotUrl(shot)} alt="" className="block" style={{ width: DESKTOP.w, height: DESKTOP.h }} draggable={false} />
     </div>

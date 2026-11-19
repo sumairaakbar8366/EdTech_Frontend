@@ -2,6 +2,9 @@
 // The access token lives only in memory; the refresh token is an httpOnly cookie the
 // browser sends to <API base>/auth. A 401 triggers one silent refresh and a retry.
 
+import { discardQueued, getOfflineState, hasOfflineSession, listQueued, rememberUser, retryQueued, isNetworkFailure, markOffline, offlineGet, offlineWrite, onSignedOut, rememberAnswer, syncNow } from '../../lib/offline/layer';
+import type { QueuedWrite, SendResult } from '../../lib/offline/queue';
+
 export class ApiError extends Error {
   constructor(
     readonly status: number,
@@ -90,8 +93,10 @@ export function refreshSession(): Promise<boolean> {
       }
       setAccessToken((await parse<TokenResponse>(res)).accessToken);
       return true;
-    } catch {
+    } catch (e) {
       setAccessToken(null);
+      // No connection (not a refusal): keep the person signed in from the saved copy, so the app opens offline.
+      if (isNetworkFailure(e) && (await hasOfflineSession(apiBase))) { markOffline(true); return true; }
       return false;
     } finally {
       refreshInFlight = null;
@@ -104,16 +109,67 @@ export async function api<T>(
   path: string,
   options: { method?: string; body?: unknown } = {},
 ): Promise<T> {
+  const method = (options.method ?? 'GET').toUpperCase();
   const init: RequestInit = {
-    method: options.method ?? 'GET',
+    method,
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
   };
-  let res = await send(path, init);
-  if (res.status === 401 && accessToken && !path.startsWith('/auth/')) {
-    if (await refreshSession()) res = await send(path, init);
+  try {
+    let res = await send(path, init);
+    if (res.status === 401 && accessToken && !path.startsWith('/auth/')) {
+      if (await refreshSession()) res = await send(path, init);
+    }
+    const out = await parse<T>(res);
+    markOffline(false);
+    // Every school answer is kept for the next time there is no internet.
+    if (method === 'GET') void rememberAnswer(apiBase, path, out);
+    return out;
+  } catch (e) {
+    if (!isNetworkFailure(e)) throw e;
+    // The connection failed (not the server): show the saved copy, or keep the change to send later.
+    if (method === 'GET') return offlineGet<T>(apiBase, path);
+    return offlineWrite<T>(apiBase, method, path, options.body);
   }
-  return parse<T>(res);
 }
+
+/** Sends one change that was kept while offline (no fallbacks: a failure here must stay a failure). */
+async function sendQueued(w: QueuedWrite): Promise<SendResult> {
+  try {
+    const init: RequestInit = { method: w.method, body: w.body === undefined ? undefined : JSON.stringify(w.body) };
+    let res = await send(w.path, init);
+    if (res.status === 401 && accessToken && (await refreshSession())) res = await send(w.path, init);
+    if (res.ok) return { ok: true };
+    const body = await res.json().catch(() => undefined);
+    const message = errorMessage(body) ?? res.statusText ?? 'Refused';
+    return res.status >= 500 || res.status === 408 || res.status === 429 ? { ok: false, kind: 'server', message } : { ok: false, kind: 'refused', message };
+  } catch (e) {
+    return { ok: false, kind: 'network', message: e instanceof Error ? e.message : 'No connection' };
+  }
+}
+
+/** The connection is back: sign the session in for real, then send what was kept. 'expired' means the person must sign in again. */
+export async function reconnect(): Promise<'ok' | 'expired' | 'offline'> {
+  try {
+    const res = await send('/auth/refresh', { method: 'POST' });
+    if (res.status === 401 || res.status === 403) { setAccessToken(null); return 'expired'; }
+    if (!res.ok) return 'offline';
+    setAccessToken((await parse<TokenResponse>(res)).accessToken);
+    markOffline(false);
+    await syncNow(apiBase, sendQueued);
+    return 'ok';
+  } catch {
+    return 'offline';
+  }
+}
+
+/** Sends whatever is waiting (called after a change and when the app comes back online). */
+export const syncQueue = () => syncNow(apiBase, sendQueued);
+export { getOfflineState };
+export const queuedChanges = () => listQueued(apiBase);
+export const discardChange = (id: string) => discardQueued(apiBase, id);
+export const retryRefused = async () => { await retryQueued(apiBase); await syncNow(apiBase, sendQueued); };
+/** After sign-in: whose saved copies these are (someone else's are dropped). */
+export const rememberSignedInUser = (userId: string) => rememberUser(apiBase, userId);
 
 /** Authenticated multipart upload (lets the browser set the multipart boundary). */
 export async function upload<T>(path: string, form: FormData): Promise<T> {
@@ -174,6 +230,7 @@ export async function logout(): Promise<void> {
       await api<void>('/auth/logout', { method: 'POST' });
     } finally {
       setAccessToken(null);
+      await onSignedOut();
     }
   });
 }

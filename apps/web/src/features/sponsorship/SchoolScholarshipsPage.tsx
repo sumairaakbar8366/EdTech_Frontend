@@ -1,8 +1,10 @@
-import { Award, Check, GraduationCap, Medal, Send, Sparkles } from 'lucide-react';
+import { Award, Check, GraduationCap, HandHeart, Medal, Send, Sparkles } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { OfferBody } from '@/features/sponsorship/ScholarshipOfferPage';
 import { Alert, Badge, Button, Card, EmptyState, Field, Input, PageHeader, SearchInput, Spinner, TextArea } from '@/components/ui';
-import { pkr, schoolScholarshipService as svc, type SchoolProgram, type ShortlistRow } from '@/features/sponsorship/sponsorship';
+import { pkr, schoolOffersService, schoolScholarshipService as svc, type SchoolProgram, type ShortlistRow } from '@/features/sponsorship/sponsorship';
 import { errorMessage } from '@/lib/errors';
 import { useAction } from '@/lib/hooks/useAction';
 
@@ -92,6 +94,33 @@ function Shortlist({ program }: { program: SchoolProgram }) {
   );
 }
 
+/** Offers from Skool EdTech waiting for this school: open one to read it and answer, right here. */
+function Offers() {
+  const { me } = useAuth();
+  const qc = useQueryClient();
+  const list = useQuery({ queryKey: [...KEY, 'offers'], queryFn: schoolOffersService.list });
+  const [open, setOpen] = useState<string | null>(null);
+  const contact = me?.scope === 'school' ? { name: `${me.user.firstName} ${me.user.lastName}`, email: me.user.email ?? '' } : undefined;
+  const waiting = (list.data ?? []).filter((o) => o.status === 'sent' || o.status === 'viewed');
+  if (!list.data?.length) return null;
+  return (
+    <Card title={`Scholarship offers${waiting.length ? ` · ${waiting.length} waiting` : ''}`} icon={HandHeart} tone="amber" className="mb-5">
+      <ul className="divide-y divide-slate-200/70 dark:divide-white/5">
+        {list.data.map((o) => (
+          <li key={o.id} className="py-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="min-w-0 flex-1"><div className="font-bold text-slate-900 dark:text-white">{o.program.title}</div><div className="text-sm text-slate-500">{o.program.sponsor ? `Sponsored by ${o.program.sponsor}` : 'From Skool EdTech'}{o.program.awardAmount ? ` · ${pkr(o.program.awardAmount, o.program.currency)} per student` : ''}</div></div>
+              <Badge tone={o.status === 'submitted' ? 'emerald' : o.status === 'sent' || o.status === 'viewed' ? 'amber' : 'slate'}>{o.status === 'sent' || o.status === 'viewed' ? 'waiting for you' : o.status}</Badge>
+              {(o.status === 'sent' || o.status === 'viewed') && <Button variant={open === o.id ? 'secondary' : 'primary'} onClick={() => setOpen(open === o.id ? null : o.id)}>{open === o.id ? 'Close' : 'Read and answer'}</Button>}
+            </div>
+            {open === o.id && <div className="mt-3"><OfferBody source={{ key: `school-${o.id}`, load: () => schoolOffersService.get(o.id), submit: (b) => schoolOffersService.submit(o.id, b), decline: () => schoolOffersService.decline(o.id), contact, onAnswered: () => void qc.invalidateQueries({ queryKey: KEY }) }} /></div>}
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
+
 /**
  * Scholarship candidates (principal and admin). For each scholarship the school is approved for, the
  * system lists the students who qualify from the school's own live data; the school reviews, confirms
@@ -104,9 +133,10 @@ export function SchoolScholarshipsPage() {
   return (
     <div>
       <PageHeader title="Scholarship candidates" sub="Students who qualify for the scholarships your school was approved for" icon={Award} tone="emerald" />
+      <Offers />
       {programs.isLoading && <Spinner />}
       {programs.data?.length === 0 && <Card><EmptyState icon={Award} title="No scholarship is open to your school yet" tone="emerald">When Skool EdTech offers your school a scholarship and approves your request, the students who qualify are listed here for you to review.</EmptyState></Card>}
-      {programs.data && programs.data.length > 1 && <div role="tablist" className="surface mb-4 inline-flex flex-wrap gap-1 rounded-xl p-1">{programs.data.map((p) => <button key={p.requestId} role="tab" aria-selected={current?.requestId === p.requestId} onClick={() => setOpen(p.requestId)} className={`focus-ring rounded-lg px-4 py-2 text-base font-bold uppercase tracking-wide ${current?.requestId === p.requestId ? 'bg-brand text-white' : 'text-slate-600 hover:bg-slate-500/10 dark:text-slate-300'}`}>{p.title}</button>)}</div>}
+      {programs.data && programs.data.length > 1 && <div role="tablist" className="surface mb-4 inline-flex max-w-full flex-nowrap gap-1 overflow-x-auto rounded-xl p-1 sm:flex-wrap [&>button]:shrink-0 [&>button]:whitespace-nowrap">{programs.data.map((p) => <button key={p.requestId} role="tab" aria-selected={current?.requestId === p.requestId} onClick={() => setOpen(p.requestId)} className={`focus-ring rounded-lg px-4 py-2 text-base font-bold uppercase tracking-wide ${current?.requestId === p.requestId ? 'bg-brand text-white' : 'text-slate-600 hover:bg-slate-500/10 dark:text-slate-300'}`}>{p.title}</button>)}</div>}
       {current && <Shortlist key={current.requestId} program={current} />}
     </div>
   );

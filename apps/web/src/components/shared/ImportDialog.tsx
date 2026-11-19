@@ -207,7 +207,7 @@ export function ImportDialog<P, C = undefined>({ spec, open, onClose }: { spec: 
           {step === 'done' && <Alert tone={failed.length ? 'info' : 'success'}>{imported} record{imported === 1 ? '' : 's'} imported.{failed.length ? ' Download the problem rows, correct them and import that file.' : ''}</Alert>}
           <div className="max-h-[45vh] overflow-auto rounded-lg border border-slate-200 dark:border-white/10">
             <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500 dark:bg-[#1b2430]">
+              <thead className="sticky top-0 bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500 dark:bg-(--surface-raised)">
                 <tr><th className="px-3 py-2">Row</th>{keyCols.map((c) => <th key={c.key} className="px-3 py-2">{c.header}</th>)}<th className="px-3 py-2">Status</th></tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-white/10">

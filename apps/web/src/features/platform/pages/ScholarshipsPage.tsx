@@ -1,11 +1,12 @@
-import { Award, Building2, CalendarClock, Check, ClipboardList, FileText, GraduationCap, HandCoins, HandHeart, Landmark, LayoutDashboard, Mail, Pencil, Plus, Save, Send, Users, X } from 'lucide-react';
+import { Award, GripVertical, Trophy, Building2, CalendarClock, Check, ClipboardList, FileText, GraduationCap, HandCoins, HandHeart, Landmark, LayoutDashboard, Mail, Pencil, Plus, Save, Send, Users, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router';
 import { Alert, Badge, Button, Card, CompactNumber, DataTable, EmptyState, Field, IconButton, Input, Modal, PageHeader, Select, Spinner, StatCard, TextArea, type Column, type Tone } from '@/components/ui';
 import { FormDesigner } from '@/features/forms/components/FormDesigner';
+import { moveItem, useDragReorder } from '@/lib/dragReorder';
 import type { CustomForm } from '@/features/forms/forms';
-import { pkr, sponsorshipService as svc, type CandidateRow, type Grant, type Offer, type Opportunity, type Program, type ProgramInput, type ProgramStatus, type SchoolRow, type ScholarshipRequest, type Sponsor, type SponsorInput } from '@/features/sponsorship/sponsorship';
+import { pkr, sponsorshipService as svc, type CandidateRow, type Grant, type Offer, type Opportunity, type Prize, type Program, type ProgramInput, type ProgramStatus, type SchoolRow, type ScholarshipRequest, type Sponsor, type SponsorInput } from '@/features/sponsorship/sponsorship';
 import { formatDate } from '@/lib/format';
 import { useAction } from '@/lib/hooks/useAction';
 import { errorMessage } from '@/lib/errors';
@@ -36,8 +37,8 @@ function Overview() {
       </div>
       <Card title="Programs" icon={Award} tone="emerald" padded={false}>
         {programs.data?.length === 0 ? <EmptyState icon={Award} title="No programs yet" tone="emerald">Create a program under Programs & sponsors.</EmptyState> : (
-          <div className="overflow-x-auto"><table className="w-full text-base"><thead><tr className="border-b border-slate-200 text-left text-sm uppercase tracking-wider text-slate-500 dark:border-white/5"><th className="px-5 py-3">Program</th><th className="px-5 py-3">Status</th><th className="px-5 py-3 text-right">Children</th><th className="px-5 py-3 text-right">Slots left</th><th className="px-5 py-3 text-right">Committed</th><th className="px-5 py-3 text-right">Paid</th></tr></thead>
-            <tbody className="divide-y divide-slate-200/70 dark:divide-white/5">{programs.data?.map((p) => <tr key={p.id}><td className="px-5 py-2.5"><div className="font-semibold">{p.title}</div><div className="text-xs text-slate-500">{p.sponsor?.name ?? 'No sponsor'}</div></td><td className="px-5 py-2.5"><Badge tone={STATUS_TONE[p.status]}>{p.status}</Badge></td><td className="px-5 py-2.5 text-right tabular-nums">{p.students}</td><td className="px-5 py-2.5 text-right tabular-nums">{p.slots ? p.slotsLeft : '—'}</td><td className="px-5 py-2.5 text-right tabular-nums"><CompactNumber value={p.committed} /></td><td className="px-5 py-2.5 text-right tabular-nums"><CompactNumber value={p.disbursed} /></td></tr>)}</tbody></table></div>
+          <div className="overflow-x-auto"><table data-stack className="w-full text-base"><thead><tr className="border-b border-slate-200 text-left text-sm uppercase tracking-wider text-slate-500 dark:border-white/5"><th className="px-5 py-3">Program</th><th className="px-5 py-3">Status</th><th className="px-5 py-3 text-right">Children</th><th className="px-5 py-3 text-right">Slots left</th><th className="px-5 py-3 text-right">Committed</th><th className="px-5 py-3 text-right">Paid</th></tr></thead>
+            <tbody className="divide-y divide-slate-200/70 dark:divide-white/5">{programs.data?.map((p) => <tr key={p.id}><td className="px-5 py-2.5"><div className="font-semibold">{p.title}</div><div className="text-xs text-slate-500">{p.sponsor?.name ?? 'Funded by us'}</div></td><td className="px-5 py-2.5"><Badge tone={STATUS_TONE[p.status]}>{p.status}</Badge>{p.kind === 'prize' && <Badge tone="amber"><Trophy size={12} /> prizes</Badge>}</td><td className="px-5 py-2.5 text-right tabular-nums">{p.students}</td><td className="px-5 py-2.5 text-right tabular-nums">{p.slots ? p.slotsLeft : '—'}</td><td className="px-5 py-2.5 text-right tabular-nums"><CompactNumber value={p.committed} /></td><td className="px-5 py-2.5 text-right tabular-nums"><CompactNumber value={p.disbursed} /></td></tr>)}</tbody></table></div>
         )}
       </Card>
     </div>
@@ -51,16 +52,17 @@ function OfferModal({ title, schoolId, opportunityId, onClose }: { title: string
   const [message, setMessage] = useState('');
   const [error, setError] = useState<string | null>(null);
   useEffect(() => { if (!programId && open[0]) setProgramId(open[0].id); }, [open, programId]);
-  const send = useAction(() => (opportunityId ? svc.offerFromOpportunity(opportunityId, { programId, message: message.trim() || undefined }) : svc.sendOffer({ schoolId: schoolId!, programId, message: message.trim() || undefined })), { success: (r) => `Offer sent to ${r.school}: ${r.emailedTo} email(s)`, invalidate: [...ALL], onDone: onClose, toastErrors: false });
+  const send = useAction(() => (opportunityId ? svc.offerFromOpportunity(opportunityId, { programId, message: message.trim() || undefined }) : svc.sendOffer({ schoolId: schoolId!, programId, message: message.trim() || undefined })), { success: (r) => `Offer sent to ${r.school}: ${r.notified} administrator(s) will see it on their dashboard`, invalidate: [...ALL], onDone: onClose, toastErrors: false });
   return (
     <Modal open title={title} onClose={onClose} footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button icon={Send} loading={send.isPending} disabled={!programId} onClick={() => { setError(null); send.mutate(undefined, { onError: (e) => setError(errorMessage(e)) }); }}>Send offer</Button></>}>
       <div className="space-y-4">
         {error && <Alert>{error}</Alert>}
         {open.length === 0 ? <Alert tone="info">No program is recruiting or live. Create one under Programs &amp; sponsors, set to “recruiting”.</Alert> : (
-          <Field label="Scholarship program"><Select value={programId} onChange={(e) => setProgramId(e.target.value)}>{open.map((p) => <option key={p.id} value={p.id}>{p.title}{p.sponsor ? ` · ${p.sponsor.name}` : ''}</option>)}</Select></Field>
+          <Field label="Scholarship program"><Select value={programId} onChange={(e) => setProgramId(e.target.value)}>{open.map((p) => <option key={p.id} value={p.id}>{p.title}{p.sponsor ? ` · ${p.sponsor.name}` : ' · funded by us'}</option>)}</Select></Field>
         )}
+        {open.find((p) => p.id === programId) && (() => { const p = open.find((x) => x.id === programId)!; return <div className="rounded-lg bg-slate-500/5 p-3 text-sm text-slate-600 dark:text-slate-300"><strong className="text-slate-900 dark:text-white">{p.sponsor?.name ? `Sponsored by ${p.sponsor.name}` : 'Funded by us'}</strong>{p.kind === 'prize' ? ' · prizes for an activity' : p.awardAmount ? ` · ${pkr(p.awardAmount, p.currency)} per student` : ''}{p.deadline ? ` · deadline ${formatDate(p.deadline)}` : ''}</div>; })()}
         <Field label="Personal message (optional)" hint="Shown in the email and on the school’s private page."><TextArea rows={4} maxLength={1500} value={message} onChange={(e) => setMessage(e.target.value)} /></Field>
-        <p className="text-sm text-slate-500">The school’s administrator gets an email with a private link to the request form (the one under “Request form”). The link works for 30 days.</p>
+        <p className="text-sm text-slate-500">The school’s administrator sees the offer on their dashboard (Scholarships) and in their notifications, and answers it there with the request form you designed (under “Request form”). No email or link is needed. The offer stays open for 30 days.</p>
       </div>
     </Modal>
   );
@@ -73,7 +75,7 @@ function Opportunities() {
   const dismiss = useAction((id: string) => svc.dismiss(id), { success: 'Dismissed', invalidate: [...ALL] });
   const kinds = useQuery({ queryKey: K('kinds'), queryFn: svc.eventKinds, staleTime: Infinity });
   return (
-    <Card title="Events and admissions at schools" icon={CalendarClock} tone="amber" padded={false} actions={<Select aria-label="Show" className="w-44" value={status} onChange={(e) => setStatus(e.target.value)}><option value="">New &amp; offered</option><option value="new">New only</option><option value="offered">Offered</option><option value="dismissed">Dismissed</option></Select>}>
+    <Card title="Events and admissions at schools" icon={CalendarClock} tone="amber" padded={false} actions={<Select aria-label="Show" className="w-56" value={status} onChange={(e) => setStatus(e.target.value)}><option value="">New &amp; offered</option><option value="new">New only</option><option value="offered">Offered</option><option value="dismissed">Dismissed</option></Select>}>
       {list.isLoading && <div className="p-5"><Spinner /></div>}
       {list.data?.length === 0 && <EmptyState icon={CalendarClock} title="Nothing new" tone="amber">When a school opens admissions or shares an event (a science fair, sports day…), it appears here so you can offer a scholarship with one click.</EmptyState>}
       <ul className="divide-y divide-slate-200/70 dark:divide-white/5">
@@ -91,21 +93,60 @@ function Opportunities() {
   );
 }
 
+/** The prizes of an activity (a sports day…): a position, what it is for, and the amount. Drag a row by its grip to change the order. */
+function PrizeEditor({ prizes, onChange }: { prizes: Prize[]; onChange: (p: Prize[]) => void }) {
+  const drag = useDragReorder((from, to) => onChange(moveItem(prizes, from, to)));
+  const set = (i: number, patch: Partial<Prize>) => onChange(prizes.map((p, j) => (j === i ? { ...p, ...patch } : p)));
+  const ORD = ['1st', '2nd', '3rd', '4th', '5th'];
+  const total = prizes.reduce((t, p) => t + (Number(p.amount) || 0), 0);
+  return (
+    <div className="space-y-3 rounded-xl border border-slate-200 p-4 sm:col-span-2 dark:border-white/10">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-500"><Trophy size={16} /> Prizes we give</p>
+        <div className="flex gap-2">
+          <Button type="button" variant="secondary" onClick={() => onChange([{ position: '1st', title: 'Best performer', amount: 10000 }, { position: '2nd', title: 'Runner-up', amount: 5000 }, { position: '3rd', title: 'Third place', amount: 2500 }])}>1st · 2nd · 3rd</Button>
+          <Button type="button" icon={Plus} onClick={() => onChange([...prizes, { position: ORD[prizes.length] ?? `${prizes.length + 1}th`, title: '', amount: 0 }])}>Add prize</Button>
+        </div>
+      </div>
+      <p className="text-xs text-slate-500">The school receives this list with its offer and names its winners. You set the prizes, and nothing is shared until you approve the request.</p>
+      {prizes.length === 0 && <p className="rounded-lg bg-slate-500/5 px-3 py-4 text-center text-sm text-slate-500">No prizes yet. Add one, or start with 1st · 2nd · 3rd.</p>}
+      <ol className="space-y-2">
+        {prizes.map((p, i) => (
+          <li key={i} {...drag.row(i)} className={`grid grid-cols-[auto_5rem_1fr_8rem_auto] items-center gap-2 rounded-lg p-1 transition ${drag.over === i && drag.from !== null && drag.from !== i ? (drag.from < i ? 'border-b-2 border-orange-500' : 'border-t-2 border-orange-500') : ''} ${drag.from === i ? 'opacity-50' : ''}`}>
+            <span {...drag.grip(i)} title="Drag to move" aria-label="Drag to change the order" className="flex cursor-grab touch-none items-center text-slate-400 hover:text-slate-700 active:cursor-grabbing"><GripVertical size={18} /></span>
+            <Input aria-label="Position" required maxLength={40} value={p.position} onChange={(e) => set(i, { position: e.target.value })} placeholder="1st" />
+            <Input aria-label="What the prize is for" required maxLength={120} value={p.title} onChange={(e) => set(i, { title: e.target.value })} placeholder="e.g. Best athlete" />
+            <Input aria-label="Amount (PKR)" required type="number" min={0} value={p.amount} onChange={(e) => set(i, { amount: Number(e.target.value) || 0 })} />
+            <IconButton icon={X} label="Remove prize" onClick={() => onChange(prizes.filter((_, j) => j !== i))} />
+          </li>
+        ))}
+      </ol>
+      {prizes.length > 0 && <p className="text-right text-sm text-slate-600 dark:text-slate-300">Total prize money <strong className="tabular-nums">{pkr(total)}</strong></p>}
+    </div>
+  );
+}
+
 function ProgramModal({ program, sponsors, onClose }: { program: Program | null; sponsors: Sponsor[]; onClose: () => void }) {
-  const [f, setF] = useState<ProgramInput>({ title: program?.title ?? '', sponsorId: program?.sponsorId ?? '', description: program?.description ?? '', criteria: program?.criteria ?? '', awardAmount: program?.awardAmount ?? null, budget: program?.budget ?? null, slots: program?.slots ?? 0, deadline: program?.deadline?.slice(0, 10) ?? '', status: program?.status ?? 'draft', targetLevels: program?.targetLevels ?? [], period: program?.period ?? 'yearly', currentPeriod: program?.currentPeriod ?? '', continuesToUndergrad: program?.continuesToUndergrad ?? false, minAverage: program?.minAverage ?? 70, minAttendance: program?.minAttendance ?? 85, needRequired: program?.needRequired ?? true });
+  const [f, setF] = useState<ProgramInput>({ kind: program?.kind ?? 'scholarship', prizes: program?.prizes ?? [], title: program?.title ?? '', sponsorId: program?.sponsorId ?? '', description: program?.description ?? '', criteria: program?.criteria ?? '', awardAmount: program?.awardAmount ?? null, budget: program?.budget ?? null, slots: program?.slots ?? 0, deadline: program?.deadline?.slice(0, 10) ?? '', status: program?.status ?? 'draft', targetLevels: program?.targetLevels ?? [], period: program?.period ?? 'yearly', currentPeriod: program?.currentPeriod ?? '', continuesToUndergrad: program?.continuesToUndergrad ?? false, minAverage: program?.minAverage ?? 70, minAttendance: program?.minAttendance ?? 85, needRequired: program?.needRequired ?? true });
   const save = useAction(() => svc.saveProgram(program?.id ?? null, { ...f, sponsorId: f.sponsorId || null, deadline: f.deadline || null, currentPeriod: f.currentPeriod?.trim() || null }), { success: 'Program saved', invalidate: [...ALL], onDone: onClose });
   const num = (v: string) => (v === '' ? null : Number(v));
   return (
-    <Modal open size="lg" title={program ? 'Edit program' : 'New scholarship program'} onClose={onClose} footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" form="program-form" loading={save.isPending}>Save</Button></>}>
+    <Modal open size="lg" title={program ? 'Edit program' : f.kind === 'prize' ? 'New prize program' : 'New scholarship program'} onClose={onClose} footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" form="program-form" loading={save.isPending}>Save</Button></>}>
       <form id="program-form" className="grid gap-4 sm:grid-cols-2" onSubmit={onSubmit(() => save.mutate(undefined))}>
+        <div className="flex flex-wrap gap-2 sm:col-span-2" role="radiogroup" aria-label="Kind of program">
+          {([['scholarship', 'Scholarship', 'Students chosen from the school’s own marks, attendance and fee records'], ['prize', 'Prizes for an activity', 'Sports day, science fair…: you set the prizes, the school names the winners']] as const).map(([k, l, h]) => (
+            <button key={k} type="button" role="radio" aria-checked={f.kind === k} onClick={() => setF({ ...f, kind: k })} className={`flex-1 rounded-xl p-3 text-left ring-1 transition ${f.kind === k ? 'bg-primary-500/10 ring-primary-400' : 'ring-slate-200 hover:bg-slate-50 dark:ring-white/10 dark:hover:bg-white/5'}`}><span className="block font-bold text-slate-800 dark:text-slate-100">{l}</span><span className="block text-xs text-slate-500">{h}</span></button>
+          ))}
+        </div>
         <div className="sm:col-span-2"><Field label="Title" required><Input required value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} /></Field></div>
-        <Field label="Sponsor"><Select value={f.sponsorId ?? ''} onChange={(e) => setF({ ...f, sponsorId: e.target.value })}><option value="">No sponsor yet</option>{sponsors.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</Select></Field>
+        <Field label="Sponsor"><Select value={f.sponsorId ?? ''} onChange={(e) => setF({ ...f, sponsorId: e.target.value })}><option value="">Our own funds (no sponsor)</option>{sponsors.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</Select></Field>
         <Field label="Status"><Select value={f.status} onChange={(e) => setF({ ...f, status: e.target.value as ProgramStatus })}>{(Object.keys(STATUS_HELP) as ProgramStatus[]).map((s) => <option key={s} value={s}>{s} · {STATUS_HELP[s]}</option>)}</Select></Field>
-        <Field label="Amount per student (PKR)"><Input type="number" min={0} value={f.awardAmount ?? ''} onChange={(e) => setF({ ...f, awardAmount: num(e.target.value) })} /></Field>
+        {f.kind === 'prize' ? <PrizeEditor prizes={f.prizes ?? []} onChange={(prizes) => setF({ ...f, prizes })} /> : null}
+        {f.kind !== 'prize' && <><Field label="Amount per student (PKR)"><Input type="number" min={0} value={f.awardAmount ?? ''} onChange={(e) => setF({ ...f, awardAmount: num(e.target.value) })} /></Field>
         <Field label="Total budget (PKR)"><Input type="number" min={0} value={f.budget ?? ''} onChange={(e) => setF({ ...f, budget: num(e.target.value) })} /></Field>
-        <Field label="Number of students it can fund"><Input type="number" min={0} value={f.slots ?? 0} onChange={(e) => setF({ ...f, slots: Number(e.target.value) || 0 })} /></Field>
+        <Field label="Number of students it can fund"><Input type="number" min={0} value={f.slots ?? 0} onChange={(e) => setF({ ...f, slots: Number(e.target.value) || 0 })} /></Field></>}
         <Field label="Apply by"><Input type="date" value={f.deadline ?? ''} onChange={(e) => setF({ ...f, deadline: e.target.value })} /></Field>
-        <div className="space-y-3 rounded-xl border border-slate-200 p-4 sm:col-span-2 dark:border-white/10">
+        {f.kind !== 'prize' && <div className="space-y-3 rounded-xl border border-slate-200 p-4 sm:col-span-2 dark:border-white/10">
           <p className="text-sm font-bold uppercase tracking-wider text-slate-500">Who it is for</p>
           <div>
             <div className="mb-2 flex flex-wrap gap-2">
@@ -124,7 +165,7 @@ function ProgramModal({ program, sponsors, onClose }: { program: Program | null;
             <Field label="Lowest attendance (%)"><Input type="number" min={0} max={100} value={f.minAttendance} onChange={(e) => setF({ ...f, minAttendance: Number(e.target.value) })} /></Field>
           </div>
           <label className="flex items-center gap-2 text-base font-semibold"><input type="checkbox" className="h-4 w-4" checked={!!f.needRequired} onChange={(e) => setF({ ...f, needRequired: e.target.checked })} /> Only students with a sign of financial need (from the school’s fee records)</label>
-        </div>
+        </div>}
         <div className="sm:col-span-2"><Field label="Description (shown to schools)"><TextArea value={f.description ?? ''} onChange={(e) => setF({ ...f, description: e.target.value })} /></Field></div>
         <div className="sm:col-span-2"><Field label="Who can receive it"><TextArea value={f.criteria ?? ''} onChange={(e) => setF({ ...f, criteria: e.target.value })} /></Field></div>
       </form>
@@ -159,11 +200,11 @@ function Programs() {
       <Card title="Scholarship programs" icon={Award} tone="emerald" padded={false} actions={<Button icon={Plus} onClick={() => setProg('new')}>New program</Button>}>
         {programs.data?.length === 0 && <EmptyState icon={Award} title="No programs yet" tone="emerald">A program is one scholarship: its sponsor, the amount per student, how many students and who can receive it.</EmptyState>}
         <ul className="divide-y divide-slate-200/70 dark:divide-white/5">{programs.data?.map((p) => (
-          <li key={p.id} className="flex flex-wrap items-center gap-3 px-5 py-4"><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><span className="font-bold text-slate-900 dark:text-white">{p.title}</span><Badge tone={STATUS_TONE[p.status]}>{p.status}</Badge></div><div className="text-sm text-slate-500">{p.sponsor?.name ?? 'No sponsor'} · {p.awardAmount ? `${pkr(p.awardAmount, p.currency)} each` : 'amount not set'} · {p.students}/{p.slots || '∞'} students · {p.targetLevels.length ? `class ${p.targetLevels.join(', ')}${p.continuesToUndergrad ? ' + undergrad' : ''}` : 'every class'} · {p.period === 'semester' ? 'each semester' : 'each year'}{p.currentPeriod ? ` (${p.currentPeriod})` : ''} · {p.offersSent} offers, {p.offersAnswered} answered</div></div><IconButton icon={Pencil} label="Edit program" onClick={() => setProg(p)} /></li>
+          <li key={p.id} className="flex flex-wrap items-center gap-3 px-5 py-4"><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><span className="font-bold text-slate-900 dark:text-white">{p.title}</span><Badge tone={STATUS_TONE[p.status]}>{p.status}</Badge></div><div className="text-sm text-slate-500">{p.sponsor?.name ?? 'Funded by us'} · {p.awardAmount ? `${pkr(p.awardAmount, p.currency)} each` : 'amount not set'} · {p.students}/{p.slots || '∞'} students · {p.targetLevels.length ? `class ${p.targetLevels.join(', ')}${p.continuesToUndergrad ? ' + undergrad' : ''}` : 'every class'} · {p.period === 'semester' ? 'each semester' : 'each year'}{p.currentPeriod ? ` (${p.currentPeriod})` : ''} · {p.offersSent} offers, {p.offersAnswered} answered</div></div><IconButton icon={Pencil} label="Edit program" onClick={() => setProg(p)} /></li>
         ))}</ul>
       </Card>
-      <Card title="Sponsors" icon={Users} tone="primary" padded={false} actions={<Button variant="secondary" icon={Plus} onClick={() => setSpon('new')}>Add</Button>}>
-        {sponsors.data?.length === 0 && <EmptyState icon={Users} title="No sponsors yet" tone="primary">Companies, foundations or individuals who fund scholarships.</EmptyState>}
+      <Card title="Other sponsors (optional)" icon={Users} tone="primary" padded={false} actions={<Button variant="secondary" icon={Plus} onClick={() => setSpon('new')}>Add</Button>}>
+        {sponsors.data?.length === 0 && <EmptyState icon={Users} title="No other sponsors" tone="primary">You fund the scholarships yourselves, so a program needs no sponsor. Add one only when a company or person funds a program with you.</EmptyState>}
         <ul className="divide-y divide-slate-200/70 dark:divide-white/5">{sponsors.data?.map((s) => <li key={s.id} className="flex items-center gap-3 px-5 py-3"><div className="min-w-0 flex-1"><div className="font-semibold text-slate-900 dark:text-white">{s.name} <Badge tone="slate">{s.kind}</Badge></div><div className="text-xs text-slate-500">{[s.contactName, s.email, s.phone].filter(Boolean).join(' · ') || 'No contact details'} · {s._count.programs} program(s)</div></div><IconButton icon={Pencil} label="Edit sponsor" onClick={() => setSpon(s)} /></li>)}</ul>
       </Card>
       {prog && <ProgramModal program={prog === 'new' ? null : prog} sponsors={sponsors.data ?? []} onClose={() => setProg(null)} />}
@@ -174,13 +215,15 @@ function Programs() {
 
 function ChildrenModal({ request, onClose }: { request: ScholarshipRequest; onClose: () => void }) {
   const amount = request.program.awardAmount ?? 0;
-  const [rows, setRows] = useState([{ studentName: '', className: '', amount: String(amount || '') }]);
+  const named = request.nominations ?? [];
+  const [rows, setRows] = useState(named.length ? named.map((n) => ({ studentName: n.studentName, className: n.className ?? '', amount: String(request.program.prizes?.find((p) => p.position === n.position)?.amount ?? amount ?? '') })) : [{ studentName: '', className: '', amount: String(amount || '') }]);
   const [error, setError] = useState<string | null>(null);
   const save = useAction(() => svc.addGrants(request.id, rows.filter((r) => r.studentName.trim()).map((r) => ({ studentName: r.studentName.trim(), className: r.className.trim() || undefined, amount: Number(r.amount) }))), { success: (r) => `${r.added} child(ren) recorded`, invalidate: [...ALL], onDone: onClose, toastErrors: false });
   return (
     <Modal open size="lg" title={`Children receiving it · ${request.school.name}`} onClose={onClose} footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button loading={save.isPending} disabled={!rows.some((r) => r.studentName.trim() && Number(r.amount) >= 0)} onClick={() => { setError(null); save.mutate(undefined, { onError: (e) => setError(errorMessage(e)) }); }}>Record</Button></>}>
       <div className="space-y-3">
         {error && <Alert>{error}</Alert>}
+        {named.length > 0 && <Alert tone="info">The school named {named.length} winner(s); their prize amounts are filled in from your prize list. Check them, then save.</Alert>}
         <p className="text-sm text-slate-500">The school asked for {request.studentsRequested} student(s). Enter the children chosen (name and class are kept as text; the school’s own records are not touched).</p>
         {rows.map((r, i) => (
           <div key={i} className="grid gap-2 sm:grid-cols-[1fr_8rem_9rem_auto]">
@@ -216,6 +259,7 @@ function Requests() {
         <ul className="divide-y divide-slate-200/70 dark:divide-white/5">{requests.data?.map((r) => (
           <li key={r.id} className="px-5 py-4"><div className="flex flex-wrap items-start gap-3"><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><span className="font-bold text-slate-900 dark:text-white">{r.school.name}</span><Badge tone={r.status === 'approved' ? 'emerald' : r.status === 'rejected' ? 'rose' : 'amber'}>{r.status}</Badge></div><div className="text-sm text-slate-500">{r.program.title} · asks for {r.studentsRequested} student(s) · {r.contactName} ({r.contactEmail}) · {formatDate(r.createdAt)}</div>
             <dl className="mt-2 grid gap-1 text-sm sm:grid-cols-2">{Object.entries(r.answers).map(([k, v]) => <div key={k}><dt className="inline font-semibold text-slate-500">{k}: </dt><dd className="inline text-slate-800 dark:text-slate-100">{Array.isArray(v) ? v.join(', ') : String(v)}</dd></div>)}</dl>
+            {r.nominations?.length > 0 && <div className="mt-2 rounded-lg bg-amber-500/10 p-3 text-sm"><div className="mb-1 flex items-center gap-1.5 font-bold text-amber-800 dark:text-amber-200"><Trophy size={14} /> Winners named by the school</div><ul className="space-y-0.5 text-slate-700 dark:text-slate-200">{r.nominations.map((n, i) => { const pz = r.program.prizes?.find((p) => p.position === n.position); return <li key={i}><strong>{n.position}</strong>{pz ? ` · ${pz.title}` : ''}: {n.studentName}{n.className ? ` (${n.className})` : ''}{pz ? <span className="text-slate-500"> · {pkr(pz.amount)}</span> : null}</li>; })}</ul></div>}
             {r.grants.length > 0 && <div className="mt-2 text-sm text-slate-600 dark:text-slate-300">Children: {r.grants.map((g) => `${g.studentName}${g.className ? ` (${g.className})` : ''}`).join(', ')}</div>}</div>
             <div className="flex flex-wrap gap-2">{r.status === 'submitted' && <><Button icon={Check} onClick={() => decide.mutate({ id: r.id, status: 'approved' })}>Approve</Button><Button variant="danger" icon={X} onClick={() => decide.mutate({ id: r.id, status: 'rejected' })}>Decline</Button></>}{r.status === 'approved' && <Button variant="secondary" icon={GraduationCap} onClick={() => setNaming(r)}>Record children</Button>}</div></div></li>
         ))}</ul>
@@ -339,7 +383,7 @@ function RequestForm() {
   return (
     <Card title="Request form sent to schools" icon={FileText} tone="teal" actions={<Button icon={Save} loading={save.isPending} onClick={() => { setError(null); save.mutate(undefined, { onError: (e) => setError(errorMessage(e)) }); }}>Save form</Button>}>
       {error && <div className="mb-4"><Alert>{error}</Alert></div>}
-      <FormDesigner value={form} onChange={setForm} introLabel="Introduction (shown above the form)" fixedNote="Every request always asks the school’s contact name, email and how many students would benefit. Add your own questions here: they are sent with every offer from now on." />
+      <FormDesigner value={form} onChange={setForm} fixedPreview={['Your name', 'Your email', 'How many students would benefit?']} introLabel="Introduction (shown above the form)" fixedNote="Every request always asks the school’s contact name, email and how many students would benefit. Add your own questions here: they are sent with every offer from now on." />
     </Card>
   );
 }
@@ -352,7 +396,7 @@ export function ScholarshipsPage() {
   return (
     <div>
       <PageHeader title="Scholarships & sponsorship" sub="Offer support to schools, and follow it to the child" icon={HandHeart} tone="emerald" />
-      <div role="tablist" className="surface mb-5 inline-flex flex-wrap gap-1 rounded-xl p-1" data-tour="scholar-tabs">{tabs.map((t) => <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => setParams({ tab: t.id }, { replace: true })} className={`focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 text-base font-bold uppercase tracking-wide ${tab === t.id ? 'bg-brand text-white' : 'text-slate-600 hover:bg-slate-500/10 dark:text-slate-300'}`}><t.icon size={16} /> {t.label}</button>)}</div>
+      <div role="tablist" className="surface mb-5 inline-flex max-w-full flex-nowrap gap-1 overflow-x-auto rounded-xl p-1 sm:flex-wrap [&>button]:shrink-0 [&>button]:whitespace-nowrap" data-tour="scholar-tabs">{tabs.map((t) => <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => setParams({ tab: t.id }, { replace: true })} className={`focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 text-base font-bold uppercase tracking-wide ${tab === t.id ? 'bg-brand text-white' : 'text-slate-600 hover:bg-slate-500/10 dark:text-slate-300'}`}><t.icon size={16} /> {t.label}</button>)}</div>
       {tab === 'overview' && <Overview />}
       {tab === 'opportunities' && <Opportunities />}
       {tab === 'programs' && <Programs />}

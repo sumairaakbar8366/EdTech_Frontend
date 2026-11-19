@@ -82,7 +82,7 @@ export function PerformanceTab() {
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             <Card title="Compared with the period before" icon={CalendarCheck} tone="sky" padded={false}>
-              <table className="w-full text-base"><tbody className="divide-y divide-slate-200/70 dark:divide-white/5">
+              <table data-stack className="w-full text-base"><tbody className="divide-y divide-slate-200/70 dark:divide-white/5">
                 {([['Students', d.current.students, d.previous.students, d.changes.students, false], ['Fees received', d.current.collected, d.previous.collected, d.changes.collected, true], ['Salaries paid', d.current.salaries, d.previous.salaries, d.changes.salaries, true], ['Admission applications', d.current.admissions, d.previous.admissions, d.changes.admissions, false]] as const).map(([k, a, b, c, isMoney]) => (
                   <tr key={k}><td className="px-5 py-2.5 font-semibold text-slate-700 dark:text-slate-200">{k}</td><td className="px-5 py-2.5 text-right tabular-nums"><CompactNumber value={a} /></td><td className="px-5 py-2.5 text-right tabular-nums text-slate-400">{isMoney ? <CompactNumber value={b} /> : b}</td><td className="px-5 py-2.5 text-right"><Delta v={c} /></td></tr>
                 ))}

@@ -52,7 +52,7 @@ export function ExportMenu<T>({ rows, columns, fileName, label = 'Export' }: { r
         {label} {!locked && <ChevronDown size={14} />}
       </Button>
       {open && (
-        <div role="menu" className="absolute right-0 top-full z-40 mt-1 w-52 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-depth-3 dark:border-white/10 dark:bg-[#171e29]">
+        <div role="menu" className="absolute right-0 top-full z-40 mt-1 w-52 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-depth-3 dark:border-white/10 dark:bg-(--surface-bg)">
           <button role="menuitem" onClick={() => void run('xlsx')} className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/5">
             <FileSpreadsheet size={16} className="text-emerald-600" /> Excel (.xlsx)
           </button>

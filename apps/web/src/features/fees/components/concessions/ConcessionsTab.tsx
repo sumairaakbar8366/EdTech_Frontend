@@ -54,7 +54,7 @@ export function ConcessionsTab({ canEdit, focus = 'all' }: { canEdit: boolean; f
         {!!awards.data?.length && awarded?.length === 0 && <p className="px-5 py-4 text-sm text-slate-500">No award matches this search.</p>}
         {!!awarded?.length && (
           <div className="overflow-x-auto">
-            <table className="w-full text-base">
+            <table data-stack className="w-full text-base">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50/60 text-left text-sm uppercase tracking-wider text-slate-500 dark:border-white/5 dark:bg-white/[0.02] dark:text-slate-400">
                   <th className="px-5 py-3 font-semibold">Student</th>

@@ -75,8 +75,8 @@ export function LiveClassesSlides({ className = '' }: { className?: string }) {
   return (
     <section className={`card-3d overflow-hidden border border-(--surface-border) bg-(--surface-bg) p-3 sm:p-4 ${className}`} aria-label="Live classes">
       {/* The screen */}
-      <div className="relative overflow-hidden rounded-xl border border-sky-100 bg-gradient-to-br from-white via-sky-50/60 to-emerald-50/50 text-slate-800 shadow-[inset_0_1px_0_rgb(255_255_255),0_1px_3px_rgb(15_23_42/0.06)] dark:border-white/10 dark:from-slate-800 dark:via-slate-800 dark:to-slate-900 dark:text-slate-100" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
-        <div className="flex flex-wrap items-center gap-3 border-b border-sky-100 px-5 py-3 dark:border-white/10">
+      <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white text-slate-800 shadow-[inset_0_1px_0_rgb(255_255_255),0_1px_3px_rgb(15_23_42/0.06)] dark:border-white/10 dark:from-slate-800 dark:via-slate-800 dark:to-slate-900 dark:text-slate-100" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+        <div className="flex flex-wrap items-center gap-3 border-b border-slate-200 px-5 py-3 dark:border-white/10">
           <MonitorPlay size={20} className="text-emerald-600 dark:text-emerald-400" />
           <span className="font-display text-lg font-bold uppercase tracking-wider">Live classes</span>
           {d?.nowMinute != null && <span className="font-mono text-sm text-slate-500 dark:text-slate-400">{hhmm(d.nowMinute)}</span>}
@@ -123,7 +123,7 @@ export function LiveClassesSlides({ className = '' }: { className?: string }) {
           )}
         </div>
 
-        <div className="flex items-center gap-3 border-t border-sky-100 px-5 py-2.5 dark:border-white/10">
+        <div className="flex items-center gap-3 border-t border-slate-200 px-5 py-2.5 dark:border-white/10">
           <div className="flex flex-1 flex-wrap gap-1.5">
             {slides.map((s, i) => (
               <button key={s.key} onClick={() => setIndex(i)} aria-label={`${s.title} ${s.page}`} className={`h-1.5 rounded-full transition-all ${i === index % slides.length ? 'w-6 bg-emerald-500' : 'w-1.5 bg-slate-300 hover:bg-slate-400 dark:bg-white/25'}`} />

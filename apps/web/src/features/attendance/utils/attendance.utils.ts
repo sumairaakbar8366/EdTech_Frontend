@@ -8,12 +8,16 @@ export const clockTime = (iso: string | null) => (iso ? new Date(iso).toLocaleTi
 /** "350 m" / "1.2 km". */
 export const distanceLabel = (meters: number) => (meters >= 1000 ? `${(meters / 1000).toFixed(1)} km` : `${meters} m`);
 
-/** Browser GPS as a promise; resolves null if denied or unavailable (the check-in is then "unknown"). */
+/**
+ * Browser GPS as a promise; resolves null if denied or unavailable (the check-in is then "unknown").
+ * Tries the precise GPS first; if that gives nothing (common indoors on Android, where precise mode uses the satellites only),
+ * tries again with the network / wifi position, which is enough to tell whether the person is at school.
+ */
 export function currentPosition(): Promise<GeolocationPosition | null> {
-  return new Promise((resolve) => {
-    if (!('geolocation' in navigator)) return resolve(null);
-    navigator.geolocation.getCurrentPosition(resolve, () => resolve(null), { enableHighAccuracy: true, timeout: 15_000, maximumAge: 0 });
-  });
+  const ask = (enableHighAccuracy: boolean, timeout: number, maximumAge: number) =>
+    new Promise<GeolocationPosition | null>((resolve) => navigator.geolocation.getCurrentPosition(resolve, () => resolve(null), { enableHighAccuracy, timeout, maximumAge }));
+  if (!('geolocation' in navigator)) return Promise.resolve(null);
+  return ask(true, 12_000, 0).then((p) => p ?? ask(false, 15_000, 30_000));
 }
 
 /** Device fingerprint sent with a check-in (helps admins spot shared phones). */

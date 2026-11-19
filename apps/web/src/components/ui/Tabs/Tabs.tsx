@@ -6,7 +6,7 @@ import { useId } from 'react';
 export function Tabs<T extends string>({ tabs, value, onChange }: { tabs: { id: T; label: string; icon: LucideIcon }[]; value: T; onChange: (id: T) => void }) {
   const pill = useId();
   return (
-    <div role="tablist" className="surface mb-6 inline-flex flex-wrap gap-1 rounded-xl p-1">
+    <div role="tablist" className="surface mb-6 inline-flex max-w-full flex-nowrap gap-1 overflow-x-auto rounded-xl p-1 sm:flex-wrap [&>button]:shrink-0 [&>button]:whitespace-nowrap">
       {tabs.map((t) => {
         const active = t.id === value;
         return (
@@ -15,7 +15,7 @@ export function Tabs<T extends string>({ tabs, value, onChange }: { tabs: { id: 
             role="tab"
             aria-selected={active}
             onClick={() => onChange(t.id)}
-            className={`focus-ring relative inline-flex items-center gap-2 rounded-lg px-4 py-2 text-base font-bold uppercase tracking-wide transition-colors ${
+            className={`focus-ring relative inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold sm:px-4 sm:text-base uppercase tracking-wide transition-colors ${
               active ? 'text-white' : 'text-slate-600 hover:bg-slate-500/10 dark:text-slate-300'
             }`}
           >

@@ -69,7 +69,7 @@ function CorrectionModal({ cardId, onClose }: { cardId: string; onClose: () => v
             {c.section.schoolClass.name} · Section {c.section.name} · {c.exam.academicYear.name} · admission no. {c.student.admissionNo}. Now: <strong>{Number(c.percentage)}%</strong>, grade {c.grade}, <strong>{c.passed ? 'Passed' : 'Failed'}</strong>{c.exam.status === 'published' && ' (published: the family is told about a change)'}.
           </p>
           <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-white/10">
-            <table className="w-full text-sm">
+            <table data-stack className="w-full text-sm">
               <thead><tr className="border-b border-slate-200 bg-slate-50/60 text-left text-xs uppercase tracking-wider text-slate-500 dark:border-white/5 dark:bg-white/5"><th className="px-4 py-2">Subject</th><th className="px-4 py-2 text-right">Max</th><th className="px-4 py-2 text-right">Pass</th><th className="px-4 py-2">Marks</th><th className="px-4 py-2">Absent</th></tr></thead>
               <tbody>
                 {lines.map((l, i) => (

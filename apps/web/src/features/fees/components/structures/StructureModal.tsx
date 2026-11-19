@@ -2,7 +2,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Alert, Button, Field, IconButton, Input, Modal, Select } from '@/components/ui';
 import { useClasses } from '@/features/academics/hooks/useAcademics';
-import { FREQUENCY_LABEL } from '@/features/fees/constants';
+import { FREQUENCY_CHARGE } from '@/features/fees/constants';
 import { useFeeCategories, useFeesAction } from '@/features/fees/hooks/useFees';
 import { feeService, type StructurePayload } from '@/features/fees/services/feeService';
 import type { FeeStructure, Frequency } from '@/features/fees/types/fee.types';
@@ -73,6 +73,7 @@ export function StructureModal({ structure, onClose }: { structure: FeeStructure
         </div>
         <div>
           <div className="mb-1 text-sm font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">Fee items</div>
+          <p className="mb-2 text-sm text-slate-500">For each charge, enter the amount of <strong>one payment</strong> and choose how often it is paid. A monthly charge is billed every month, an annual charge once a year. Parents see them as separate charges, never as one yearly total.</p>
           <div className="space-y-2">
             {items.map((row, i) => (
               <div key={i} className="grid grid-cols-[1fr_8rem_9rem_auto] items-center gap-2">
@@ -80,9 +81,9 @@ export function StructureModal({ structure, onClose }: { structure: FeeStructure
                   <option value="">Category</option>
                   {activeCategories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </Select>
-                <Input aria-label="Amount" required inputMode="decimal" pattern="\d{1,10}(\.\d{1,2})?" placeholder="0.00" value={row.amount} onChange={(e) => setItem(i, { amount: e.target.value })} />
+                <Input aria-label="Amount of one payment" required inputMode="decimal" pattern="\d{1,10}(\.\d{1,2})?" placeholder="0.00" value={row.amount} onChange={(e) => setItem(i, { amount: e.target.value })} />
                 <Select aria-label="Frequency" value={row.frequency} onChange={(e) => setItem(i, { frequency: e.target.value as Frequency })}>
-                  {(Object.keys(FREQUENCY_LABEL) as Frequency[]).map((f) => <option key={f} value={f}>{FREQUENCY_LABEL[f]}</option>)}
+                  {(Object.keys(FREQUENCY_CHARGE) as Frequency[]).map((f) => <option key={f} value={f}>{FREQUENCY_CHARGE[f].option}</option>)}
                 </Select>
                 <IconButton icon={Trash2} label="Remove item" tone="danger" disabled={items.length === 1} onClick={() => setItems((r) => r.filter((_, idx) => idx !== i))} />
               </div>
