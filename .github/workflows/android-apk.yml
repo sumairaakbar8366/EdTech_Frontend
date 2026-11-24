@@ -1,0 +1,38 @@
+# Builds the Android APK on GitHub's servers (the live server is too small to build it).
+# Run it: GitHub -> Actions -> "Build Android APK" -> Run workflow. The APK appears under "Artifacts".
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - run: npm ci
+      - name: Create the native Android project
+        run: npx expo prebuild --platform android --no-install
+      - name: Build the release APK
+        run: ./gradlew assembleRelease --no-daemon
+        working-directory: mobile/android
+      - name: Name the file
+        run: cp android/app/build/outputs/apk/release/app-release.apk SkoolEdTech.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SkoolEdTech-apk
+          path: mobile/SkoolEdTech.apk
+          retention-days: 30
