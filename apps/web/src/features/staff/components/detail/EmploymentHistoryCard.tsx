@@ -12,7 +12,7 @@ export function EmploymentHistoryCard({ employee: e }: { employee: EmployeeDetai
       <ol className="relative space-y-5 border-l-2 border-slate-200 pl-6 dark:border-white/10">
         {e.statusHistory.map((h) => (
           <li key={h.id} className="relative">
-            <span className={`absolute -left-[31px] top-1 h-4 w-4 rounded-full ring-4 ring-white dark:ring-[#111a2c] ${DOT[STATUS_TONE[h.toStatus]] ?? 'bg-slate-400'}`} />
+            <span className={`absolute -left-[31px] top-1 h-4 w-4 rounded-full ring-4 ring-white dark:ring-(--surface-bg) ${DOT[STATUS_TONE[h.toStatus]] ?? 'bg-slate-400'}`} />
             <div className="flex flex-wrap items-center gap-2">
               {h.fromStatus && <><StatusBadge status={h.fromStatus} tones={STATUS_TONE} labels={STATUS_LABEL} /><span className="text-slate-400">→</span></>}
               <StatusBadge status={h.toStatus} tones={STATUS_TONE} labels={STATUS_LABEL} />

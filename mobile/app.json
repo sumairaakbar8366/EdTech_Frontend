@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "Skool EdTech",
+    "slug": "skool-edtech",
+    "scheme": "skooledtech",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.skooledtech.app",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "Unlock Skool EdTech and confirm attendance with Face ID.",
+        "NSCameraUsageDescription": "Skool EdTech uses the camera when you take a photo to upload.",
+        "NSPhotoLibraryUsageDescription": "Skool EdTech lets you choose files and photos to upload."
+      }
+    },
+    "android": {
+      "package": "com.skooledtech.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#FFFFFF",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "permissions": [
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA"
+      ]
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-font",
+      "expo-asset",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Skool EdTech uses your location to confirm you are at school when you check in."
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#FFFFFF",
+          "imageWidth": 200
+        }
+      ]
+    ]
+  }
+}

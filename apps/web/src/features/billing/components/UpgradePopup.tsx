@@ -51,7 +51,7 @@ export function UpgradePopup() {
       {open && (
         <motion.aside
           initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 24 }} transition={{ duration: 0.25 }}
-          className="fixed bottom-5 right-5 z-[90] w-[min(24rem,calc(100vw-2.5rem))] overflow-hidden rounded-2xl border border-orange-200 bg-white shadow-depth-3 dark:border-orange-400/20 dark:bg-[#171e29]"
+          className="fixed bottom-5 right-5 z-[90] w-[min(24rem,calc(100vw-2.5rem))] overflow-hidden rounded-2xl border border-orange-200 bg-white shadow-depth-3 dark:border-orange-400/20 dark:bg-(--surface-bg)"
           role="dialog" aria-label="New feature"
         >
           <div className="flex items-center justify-between bg-[#2f3e52] px-4 py-2.5 text-white">

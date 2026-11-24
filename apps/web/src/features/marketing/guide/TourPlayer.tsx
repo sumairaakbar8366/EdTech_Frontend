@@ -54,7 +54,8 @@ export function TourPlayer({ record = false, at, initialChapter, showChapters = 
   const [playing, setPlaying] = useState(autoPlay);
   const [started, setStarted] = useState(record || !!initialChapter || autoPlay);
   const [scale, setScale] = useState(1);
-  const [muted, setMuted] = useState(false);
+  // Silent until the viewer turns the voice on (the speaker button), so it never plays aloud by surprise.
+  const [muted, setMuted] = useState(true);
   /** Bumped on every jump, so the voice restarts at the new position. */
   const [jumps, setJumps] = useState(0);
   const voice = useRef<HTMLAudioElement | null>(null);

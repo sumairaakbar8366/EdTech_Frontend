@@ -7,6 +7,8 @@ export const COMPACT_WIDTH = 72;
 const HOVER_OPEN_DELAY = 120;
 const HOVER_CLOSE_DELAY = 200;
 const DESKTOP_QUERY = '(min-width: 1024px)';
+/** The guided tour fires this (detail: true/false) so the menu opens, names showing, while it explains a menu entry. */
+export const TOUR_NAV_EVENT = 'skool:tour-nav';
 
 function stored<T>(key: string, parse: (v: string | null) => T, fallback: T): T {
   try {
@@ -42,6 +44,12 @@ export function useSidebarState(storageKey = 'schoolerp-sidebar', defaultWidth =
   );
   const [pinned, setPinned] = useState(() => stored(`${storageKey}-pinned`, (v) => v === 'true', false));
   const [hovered, setHovered] = useState(false);
+  const [touring, setTouring] = useState(false);
+  useEffect(() => {
+    const on = (e: Event) => { const show = !!(e as CustomEvent<boolean>).detail; setTouring(show); setOpen(show); };
+    window.addEventListener(TOUR_NAV_EVENT, on);
+    return () => window.removeEventListener(TOUR_NAV_EVENT, on);
+  }, []);
   const [resizing, setResizing] = useState(false);
   const resizingRef = useRef(false);
   const hoverTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -81,7 +89,7 @@ export function useSidebarState(storageKey = 'schoolerp-sidebar', defaultWidth =
   };
 
   // The mobile drawer always shows labels; on desktop the rail is compact unless pinned or hovered.
-  const expanded = !desktop || pinned || hovered;
+  const expanded = !desktop || pinned || hovered || touring;
 
   return {
     open,
@@ -90,7 +98,7 @@ export function useSidebarState(storageKey = 'schoolerp-sidebar', defaultWidth =
     pinned,
     togglePinned: () => setPinned((v) => !v),
     /** Unpinned and opened by hover: the panel floats over the page instead of pushing it. */
-    floating: desktop && !pinned && hovered,
+    floating: desktop && !pinned && (hovered || touring),
     resizing,
     width,
     /** Width the panel is drawn at. */

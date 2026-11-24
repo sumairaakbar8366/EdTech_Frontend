@@ -69,7 +69,7 @@ export function GrowthPieWidget({ className = '' }: { className?: string }) {
       {d?.locked && (
         <div className="relative">
           <div aria-hidden className="pointer-events-none select-none opacity-80"><Pie parts={sample} active={null} onActive={() => undefined} blur /></div>
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-xl bg-white/70 p-4 text-center dark:bg-[#0b1426]/75">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-xl bg-white/70 p-4 text-center dark:bg-(--page-bg)/75">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-500/15 px-3 py-1 text-xs font-bold uppercase tracking-wide text-orange-700 dark:text-orange-300"><Lock size={12} /> Paid plans</span>
             <p className="max-w-xs text-sm font-semibold text-slate-800 dark:text-slate-100">Want to monitor your school’s growth, fees and complaints every month?</p>
             <AreaLink to="/plans-and-billing" className="rounded-lg bg-brand px-4 py-2 text-sm font-bold uppercase tracking-wide text-white shadow-depth-1 hover:brightness-110">See plans</AreaLink>

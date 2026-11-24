@@ -43,7 +43,7 @@ function pageTitle(pathname: string, offset: number): string {
 }
 
 /** Sidebar layout shared by school role areas and the platform console. */
-export function AppShell({ title, nav, userName, userDetail, brandColor, areas = [], titleOffset = 0, headerActions, banner, override, sidebarVariant = 'floating', dashboardTitle, tourArea }: AppShellProps) {
+export function AppShell({ title, nav, userName, userDetail, areas = [], titleOffset = 0, headerActions, banner, override, sidebarVariant = 'floating', dashboardTitle, tourArea }: AppShellProps) {
   const sidebar = useSidebarState(sidebarVariant === 'floating' ? 'schoolerp-rail' : undefined, sidebarVariant === 'floating' ? 232 : undefined, sidebarVariant === 'floating' ? 58 : undefined);
   const { pathname } = useLocation();
   const scroller = useRef<HTMLDivElement>(null);
@@ -62,7 +62,7 @@ export function AppShell({ title, nav, userName, userDetail, brandColor, areas =
 
   return (
     <MotionConfig reducedMotion="user">
-    <div className="flex h-dvh overflow-hidden" style={{ '--sidebar-size': `${sidebar.size}px`, '--sidebar-reserved': `${sidebar.reserved}px`, ...(brandColor ? { '--brand-primary': brandColor, '--brand-action': brandColor } : {}) } as CSSProperties}>
+    <div className="flex h-dvh overflow-hidden" style={{ '--sidebar-size': `${sidebar.size}px`, '--sidebar-reserved': `${sidebar.reserved}px` } as CSSProperties}>
       <Backdrop variant="app" />
       {sidebar.open && <div className="fixed inset-0 z-30 bg-slate-950/50 lg:hidden" onClick={() => sidebar.setOpen(false)} />}
       <Sidebar nav={nav} userName={userName} userDetail={userDetail} state={sidebar} variant={sidebarVariant} />

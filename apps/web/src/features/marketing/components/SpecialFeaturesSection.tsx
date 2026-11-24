@@ -16,7 +16,7 @@ interface Special {
 }
 
 const Frame = ({ children, label }: { children: ReactNode; label: string }) => (
-  <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-white/10 dark:bg-[#171e29]">
+  <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-white/10 dark:bg-(--surface-bg)">
     <div className="flex items-center gap-1.5 border-b border-slate-200 bg-slate-50 px-3 py-2 dark:border-white/10 dark:bg-white/5">
       <span className="h-2.5 w-2.5 rounded-full bg-rose-400" /><span className="h-2.5 w-2.5 rounded-full bg-amber-400" /><span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
       <span className="ml-3 truncate rounded bg-white px-2 py-0.5 font-mono text-[11px] text-slate-500 dark:bg-white/10 dark:text-slate-300">{label}</span>
@@ -87,7 +87,7 @@ const SPECIALS: Special[] = [
     text: 'The moment a school joins, it gets a public website made from its own data: classes, campuses, teachers, open jobs. The admin adds texts and photos; parents apply online.',
     points: ['Online admission form → straight into Admissions', 'Careers page with online job applications', 'Photo gallery: campus, students, functions', 'Free subdomain; own domain as a yearly add-on'],
     visual: () => (
-      <Frame label="ed-tech.anetcybersolution.com/greenfield">
+      <Frame label="skooledtech.com/greenfield">
         <div className="rounded-lg bg-[#2f3e52] p-4 text-white"><div className="text-xs uppercase tracking-widest text-orange-300">Welcome to</div><div className="text-xl font-extrabold">Greenfield School</div><div className="mt-2 inline-block rounded bg-orange-500 px-2.5 py-1 text-xs font-bold">Apply for admission</div></div>
         <div className="mt-3 grid grid-cols-3 gap-2">{[0, 1, 2].map((i) => <motion.div key={i} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 + i * 0.15 }} className="aspect-[4/3] rounded-md bg-linear-to-br from-slate-200 to-slate-300 dark:from-white/10 dark:to-white/5" />)}</div>
       </Frame>
@@ -196,7 +196,7 @@ export function SpecialFeaturesSection() {
   }, [reduce, paused]);
   const s = SPECIALS[i]!;
   return (
-    <section id="special" className="relative border-y border-slate-200 bg-white py-16 sm:py-20 dark:border-white/5 dark:bg-[#0f141c]">
+    <section id="special" className="relative border-y border-slate-200 bg-white py-16 sm:py-20 dark:border-white/5 dark:bg-(--page-bg)">
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
         <SectionHeading kicker="What makes us different" title="Built for how Pakistani schools really work" text="Beyond the usual modules: the things that save the office hours every week and make parents trust you." />
         <div className="mt-10 grid gap-8 lg:grid-cols-[0.9fr_1.1fr]" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>

@@ -8,7 +8,7 @@ import { formatDate } from '@/lib/format';
 /** A month of the signed-in employee's check-ins, with a month picker. */
 export function AttendanceHistoryCard({ records, month, onMonth }: { records: StaffRecord[] | undefined; month: string; onMonth: (m: string) => void }) {
   return (
-    <Card title="History" icon={CalendarCheck} tone="slate" actions={<input aria-label="Month" type="month" value={month} onChange={(e) => onMonth(e.target.value)} className="rounded-lg border border-slate-300 px-2 py-1 text-sm dark:border-white/10 dark:bg-[#0e1626]" />}>
+    <Card title="History" icon={CalendarCheck} tone="slate" actions={<input aria-label="Month" type="month" value={month} onChange={(e) => onMonth(e.target.value)} className="rounded-lg border border-slate-300 px-2 py-1 text-sm dark:border-white/10 dark:bg-(--surface-raised)" />}>
       {records?.length === 0 && <p className="text-base text-slate-400">No attendance this month.</p>}
       <ul className="divide-y divide-slate-200/70 dark:divide-white/5">
         {records?.map((r) => (

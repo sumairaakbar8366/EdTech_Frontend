@@ -4,7 +4,7 @@ import { Badge, Button, Card, CompactNumber, EmptyState, IconButton, Select, Spi
 import { useAcademicYears } from '@/features/academics/hooks/useAcademics';
 import { AssignStructureModal } from '@/features/fees/components/structures/AssignStructureModal';
 import { StructureModal } from '@/features/fees/components/structures/StructureModal';
-import { FREQUENCY_LABEL } from '@/features/fees/constants';
+import { FREQUENCY_CHARGE } from '@/features/fees/constants';
 import { useFeeStructures } from '@/features/fees/hooks/useFees';
 import type { FeeStructure } from '@/features/fees/types/fee.types';
 
@@ -33,7 +33,7 @@ export function StructuresTab({ canEdit }: { canEdit: boolean }) {
       )}
       <div className="stagger grid gap-4 lg:grid-cols-2">
         {structures.data?.map((s) => {
-          const monthly = s.items.filter((i) => i.frequency === 'monthly').reduce((t, i) => t + Number(i.amount), 0);
+          const sums = (['one_time', 'monthly', 'termly', 'annual'] as const).map((f) => ({ f, total: s.items.filter((i) => i.frequency === f).reduce((t, i) => t + Number(i.amount), 0) })).filter((x) => x.total > 0);
           return (
             <Card
               key={s.id}
@@ -58,12 +58,12 @@ export function StructuresTab({ canEdit }: { canEdit: boolean }) {
               <ul className="divide-y divide-slate-200/70 dark:divide-white/5">
                 {s.items.map((i) => (
                   <li key={i.id} className="flex items-center justify-between py-1.5">
-                    <span className="text-slate-700 dark:text-slate-200">{i.category.name} <span className="text-sm text-slate-500">· {FREQUENCY_LABEL[i.frequency]}</span></span>
+                    <span className="text-slate-700 dark:text-slate-200">{i.category.name} <span className="text-sm text-slate-500">· {FREQUENCY_CHARGE[i.frequency].when}</span></span>
                     <span className="font-semibold tabular-nums"><CompactNumber value={i.amount} /></span>
                   </li>
                 ))}
               </ul>
-              {monthly > 0 && <div className="mt-2 text-right text-sm text-slate-500">Monthly total <strong className="tabular-nums text-slate-800 dark:text-slate-100"><CompactNumber value={monthly} /></strong></div>}
+              {sums.length > 0 && <div className="mt-3 grid grid-cols-2 gap-2 border-t border-slate-200/70 pt-3 text-sm dark:border-white/5">{sums.map(({ f, total }) => <div key={f} className="rounded-md bg-slate-500/5 px-2.5 py-1.5"><div className="text-xs font-bold uppercase tracking-wider text-slate-500">{FREQUENCY_CHARGE[f].title}</div><div className="font-semibold tabular-nums text-slate-800 dark:text-slate-100"><CompactNumber value={total} /> <span className="text-xs font-normal text-slate-500">{FREQUENCY_CHARGE[f].when}</span></div></div>)}</div>}
             </Card>
           );
         })}

@@ -94,7 +94,7 @@ function SchoolLeadershipCard() {
       {list.data && rows.length === 0 && <p className="px-5 py-4 text-sm text-slate-500">Nothing matches.</p>}
       {rows.length > 0 && (
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table data-stack className="w-full text-sm">
             <thead className="border-b border-(--surface-border) bg-slate-50/60 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:bg-white/[0.02]">
               <tr><th className="px-5 py-3">School</th><th className="px-5 py-3">Role</th><th className="px-5 py-3">Person</th><th className="px-5 py-3">User ID</th><th className="px-5 py-3">Last sign-in</th><th className="px-5 py-3 text-right">Actions</th></tr>
             </thead>

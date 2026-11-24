@@ -78,7 +78,7 @@ export function LiveClassesPage() {
           {d && rows.length === 0 && <EmptyState icon={MonitorPlay} title="No classes here" />}
           {shown.length > 0 && (
             <div className="overflow-x-auto">
-              <table className={`w-full ${full ? 'text-sm' : 'text-xs'}`}>
+              <table data-stack className={`w-full ${full ? 'text-sm' : 'text-xs'}`}>
                 <thead className="border-b border-(--surface-border) bg-slate-50/70 text-left font-semibold uppercase tracking-wider text-slate-500 dark:bg-white/[0.02]">
                   <tr><th className="px-3 py-2">#</th><th className="px-3 py-2">Status</th><th className="px-3 py-2">Time</th><th className="px-3 py-2">Class</th><th className="px-3 py-2">Subject</th><th className="px-3 py-2">Teacher</th><th className="px-3 py-2">Room</th><th className="px-3 py-2">Started / ended</th></tr>
                 </thead>

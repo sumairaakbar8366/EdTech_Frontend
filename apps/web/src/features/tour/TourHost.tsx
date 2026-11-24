@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/services/api/http';
+import { TOUR_NAV_EVENT } from '@/layouts/AppShell/useSidebarState';
 import { TOURS, type Tour, type TourStep } from '@/features/tour/tours';
 
 type Progress = Record<string, 'done' | 'skipped'>;
@@ -66,6 +67,13 @@ function Overlay({ tour, index, setIndex, onClose, base }: { tour: Tour; index: 
     if (pathname !== to && pathname !== `${to}/`) navigate(to);
   }, [step, base, pathname, navigate]);
 
+  // Explaining a menu entry: the sidebar opens with its names, and closes again when the step moves on or the guide ends.
+  const onMenu = !!step.target?.startsWith('nav:');
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent(TOUR_NAV_EVENT, { detail: onMenu }));
+    return () => { window.dispatchEvent(new CustomEvent(TOUR_NAV_EVENT, { detail: false })); };
+  }, [onMenu]);
+
   // Follow the element: it may appear late (the page is loading), move (scroll, resize) or never exist.
   const measure = useCallback(() => {
     const el = findTarget(step.target);
@@ -109,17 +117,17 @@ function Overlay({ tour, index, setIndex, onClose, base }: { tour: Tour; index: 
       ) : (
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-slate-950/70" />
       )}
-      <div ref={card} className={`absolute max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-2xl border border-white/10 bg-white p-4 shadow-2xl sm:p-5 dark:bg-[#0e1626] ${reduce ? '' : 'transition-all duration-300'}`} style={{ top: Math.max(12, Math.min(pos.top, window.innerHeight - size.h - 12)), ...(narrow ? { left: 12, right: 12 } : { left: Math.max(12, Math.min(pos.left, window.innerWidth - size.w - 12)), width: 'min(22.5rem, calc(100vw - 1.5rem))' }) }}>
-        {pos.side !== 'center' && !narrow && <span aria-hidden className="absolute h-3.5 w-3.5 rotate-45 bg-white dark:bg-[#0e1626]" style={pos.side === 'right' ? { left: -7, top: pos.arrow - 7 } : pos.side === 'left' ? { right: -7, top: pos.arrow - 7 } : pos.side === 'bottom' ? { top: -7, left: pos.arrow - 7 } : { bottom: -7, left: pos.arrow - 7 }} />}
+      <div ref={card} className={`absolute max-h-[calc(100dvh-1.5rem)] overflow-y-auto overflow-x-hidden rounded-2xl border border-white/10 bg-white p-4 shadow-2xl sm:p-5 dark:bg-(--surface-raised) ${reduce ? '' : 'transition-all duration-300'}`} style={{ top: Math.max(12, Math.min(pos.top, window.innerHeight - size.h - 12)), ...(narrow ? { left: 12, right: 12 } : { left: Math.max(12, Math.min(pos.left, window.innerWidth - size.w - 12)), width: 'min(25rem, calc(100vw - 1.5rem))' }) }}>
+        {pos.side !== 'center' && !narrow && <span aria-hidden className="absolute h-3.5 w-3.5 rotate-45 bg-white dark:bg-(--surface-raised)" style={pos.side === 'right' ? { left: -7, top: pos.arrow - 7 } : pos.side === 'left' ? { right: -7, top: pos.arrow - 7 } : pos.side === 'bottom' ? { top: -7, left: pos.arrow - 7 } : { bottom: -7, left: pos.arrow - 7 }} />}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2">{last ? <PartyPopper size={20} className="text-orange-500" /> : <CircleHelp size={20} className="text-primary-600" />}<h2 className="text-lg font-bold text-slate-900 dark:text-white">{step.title}</h2></div>
           <button onClick={() => onClose('skipped')} aria-label="Close the guide" className="rounded-lg p-1 text-slate-400 hover:bg-slate-500/10 hover:text-slate-700 dark:hover:text-white"><X size={16} /></button>
         </div>
         <p className="mt-2 text-base leading-relaxed text-slate-600 dark:text-slate-300">{step.body}</p>
         {step.target && !rect && <p className="mt-2 text-xs text-slate-400">(Open the menu with the ☰ button to see this part.)</p>}
-        <div className="mt-4 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-1" aria-label={`Step ${index + 1} of ${tour.steps.length}`}>{tour.steps.map((_, i) => <span key={i} className={`h-1.5 rounded-full transition-all ${i === index ? 'w-5 bg-primary-600' : 'w-1.5 bg-slate-300 dark:bg-white/20'}`} />)}</div>
-          <div className="flex items-center gap-2">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-3">
+          <div className="flex shrink-0 items-center gap-1" aria-label={`Step ${index + 1} of ${tour.steps.length}`}>{tour.steps.map((_, i) => <span key={i} className={`h-1.5 rounded-full transition-all ${i === index ? 'w-5 bg-primary-600' : 'w-1.5 bg-slate-300 dark:bg-white/20'}`} />)}</div>
+          <div className="ml-auto flex items-center gap-2">
             {!last && <button onClick={() => onClose('skipped')} className="px-2 py-1.5 text-sm font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white">Skip</button>}
             {index > 0 && <button onClick={() => setIndex(index - 1)} className="focus-ring inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-sm font-bold uppercase text-slate-600 ring-1 ring-slate-300 hover:bg-slate-50 dark:text-slate-200 dark:ring-white/15 dark:hover:bg-white/5"><ArrowLeft size={14} /> Back</button>}
             <button ref={next} onClick={() => (last ? onClose('done') : setIndex(index + 1))} className="focus-ring inline-flex items-center gap-1.5 rounded-lg bg-brand px-3.5 py-1.5 text-sm font-bold uppercase text-white shadow-depth-1 hover:brightness-110">{last ? 'Got it' : 'Next'} {!last && <ArrowRight size={14} />}</button>
@@ -183,7 +191,7 @@ export function TourHost({ area }: { area: string }) {
       {menu && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setMenu(false)} />
-          <div role="menu" className="absolute right-0 z-50 mt-2 w-64 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-xl dark:border-white/10 dark:bg-[#0e1626]">
+          <div role="menu" className="absolute right-0 z-50 mt-2 w-64 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-xl dark:border-white/10 dark:bg-(--surface-raised)">
             {pageTour && <button role="menuitem" onClick={() => start(pageTour.key)} className="block w-full px-4 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-primary-500/10 dark:text-slate-200">Guide for this page</button>}
             {welcome && <button role="menuitem" onClick={() => start(welcome.key)} className="block w-full px-4 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-primary-500/10 dark:text-slate-200">{welcome.title}: first steps</button>}
             <button role="menuitem" onClick={replayAll} className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-primary-500/10 dark:text-slate-200"><RotateCcw size={14} /> Show every guide again</button>

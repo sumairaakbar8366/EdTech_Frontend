@@ -4,7 +4,9 @@ import { money } from '@/features/fees/utils/fee.utils';
 import type { FeeFrequency, PublicFeeStructure, PublicFees, PublicSite } from '@/features/website/website';
 
 const FREQUENCIES: FeeFrequency[] = ['one_time', 'monthly', 'termly', 'annual'];
-export const FREQUENCY_TITLE: Record<FeeFrequency, string> = { one_time: 'At admission', monthly: 'Monthly', termly: 'Per term', annual: 'Yearly' };
+export const FREQUENCY_TITLE: Record<FeeFrequency, string> = { one_time: 'Admission charges', monthly: 'Monthly charges', termly: 'Term charges', annual: 'Annual charges' };
+/** When each kind of charge is paid, so a column is never read as a yearly total. */
+export const FREQUENCY_WHEN: Record<FeeFrequency, string> = { one_time: 'paid once, at admission', monthly: 'paid every month', termly: 'paid every term', annual: 'paid once a year' };
 
 /** Sum of each kind of fee across a class's structures. */
 function totals(structures: PublicFeeStructure[]): Partial<Record<FeeFrequency, number>> {
@@ -24,7 +26,7 @@ export function FeeBreakdown({ structures, currency }: { structures: PublicFeeSt
           <ul className="divide-y divide-(--site-line)">
             {s.items.map((i, n) => (
               <li key={n} className="flex items-baseline justify-between gap-4 py-2">
-                <span className="text-slate-700">{i.name} <span className="text-sm text-slate-400">· {FREQUENCY_TITLE[i.frequency].toLowerCase()}</span></span>
+                <span className="text-slate-700">{i.name} <span className="text-sm text-slate-400">· {FREQUENCY_WHEN[i.frequency]}</span></span>
                 <span className="font-semibold tabular-nums text-slate-900">{money(i.amount, currency)}</span>
               </li>
             ))}
@@ -36,6 +38,7 @@ export function FeeBreakdown({ structures, currency }: { structures: PublicFeeSt
           <div key={f} className="rounded-md bg-(--site-accent-soft) px-3 py-2">
             <div className="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">{FREQUENCY_TITLE[f]}</div>
             <div className="font-semibold tabular-nums text-slate-900">{money(t[f]!, currency)}</div>
+            <div className="text-xs text-slate-500">{FREQUENCY_WHEN[f]}</div>
           </div>
         ))}
       </div>
@@ -77,11 +80,11 @@ export function SiteFees({ site }: { site: PublicSite }) {
         </div>
       )}
       <div className="overflow-x-auto rounded-md border border-(--site-line) bg-white">
-        <table className="w-full min-w-[32rem] text-left">
+        <table data-stack className="w-full min-w-[32rem] text-left">
           <thead className="bg-(--site-wash) text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
             <tr>
               <th className="px-5 py-3">Class</th>
-              {columns.map((f) => <th key={f} className="px-5 py-3 text-right">{FREQUENCY_TITLE[f]}</th>)}
+              {columns.map((f) => <th key={f} className="px-5 py-3 text-right">{FREQUENCY_TITLE[f]}<span className="block text-[11px] font-medium normal-case tracking-normal text-slate-400">{FREQUENCY_WHEN[f]}</span></th>)}
               <th className="w-10" />
             </tr>
           </thead>
@@ -106,7 +109,7 @@ export function SiteFees({ site }: { site: PublicSite }) {
         </table>
       </div>
       {fees.note && <p className="mt-4 flex gap-2 text-slate-600"><Info size={18} className="mt-0.5 shrink-0 text-(--site-accent)" /> <span className="whitespace-pre-line">{fees.note}</span></p>}
-      <p className="mt-2 text-sm text-slate-500">Tap a class to see each fee. Amounts are set by the school and may change; the office confirms them at admission.</p>
+      <p className="mt-2 text-sm text-slate-500">Tap a class to see each charge. Each column is a separate payment: monthly charges are paid every month, term charges every term, annual charges once a year and admission charges once. They are not one yearly total. Amounts are set by the school and may change; the office confirms them at admission.</p>
     </div>
   );
 }

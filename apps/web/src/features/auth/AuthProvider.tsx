@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createContext, useCallback, useContext, useMemo, type ReactNode } from 'react';
-import { api, changePassword as apiChangePassword, exchangeTicket, login as apiLogin, logout as apiLogout, refreshSession } from '@/services/api/http';
+import { api, changePassword as apiChangePassword, exchangeTicket, getOfflineState, login as apiLogin, logout as apiLogout, refreshSession, rememberSignedInUser } from '@/services/api/http';
+import { prefetchForOffline } from '../../lib/offline/prefetch';
 import { type Me } from '@/types/session';
 
 interface AuthState {
@@ -20,6 +21,19 @@ interface AuthState {
 const AuthContext = createContext<AuthState | null>(null);
 export const ME_KEY = ['auth', 'me'] as const;
 
+/** After signing in (or reopening): keep this person's saved copies, and save the day's first screens for offline use. */
+async function afterSignIn(me: Me): Promise<void> {
+  if (me.scope !== 'school') return;
+  await rememberSignedInUser(me.user.id);
+  if (getOfflineState().offline) return;
+  try {
+    const last = Number(localStorage.getItem('skool:prefetch-at') ?? 0);
+    if (Date.now() - last < 20 * 60_000) return;
+    localStorage.setItem('skool:prefetch-at', String(Date.now()));
+  } catch { /* storage blocked: save anyway */ }
+  void prefetchForOffline((p) => api(p), me).catch(() => undefined);
+}
+
 /** Restores the session from the refresh cookie on load, then exposes the current user. */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
@@ -28,7 +42,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryKey: ME_KEY,
     queryFn: async (): Promise<Me | null> => {
       if (!(await refreshSession())) return null;
-      return api<Me>('/auth/me');
+      const me = await api<Me>('/auth/me');
+      void afterSignIn(me);
+      return me;
     },
     staleTime: Infinity,
     retry: false,
@@ -38,6 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (identifier: string, password: string, remember = false) => {
       await apiLogin(identifier, password, remember);
       const me = await api<Me>('/auth/me');
+      void afterSignIn(me);
       queryClient.setQueryData(ME_KEY, me);
       return me;
     },
@@ -63,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (ticket: string) => {
       await exchangeTicket(ticket);
       const me = await api<Me>('/auth/me');
+      void afterSignIn(me);
       queryClient.setQueryData(ME_KEY, me);
       return me;
     },

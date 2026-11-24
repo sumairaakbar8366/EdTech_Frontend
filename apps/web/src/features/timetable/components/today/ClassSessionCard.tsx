@@ -41,7 +41,7 @@ export function ClassSessionCard({ slot: s, state, isNow, blocked, starting, end
             onChange={(e) => setTopic(e.target.value)}
             placeholder="Topic (optional)"
             maxLength={200}
-            className="w-52 rounded-lg border border-slate-300 bg-white px-3 py-2 text-base outline-none focus:border-primary-400 dark:border-white/10 dark:bg-[#0e1626] dark:text-white"
+            className="w-52 rounded-lg border border-slate-300 bg-white px-3 py-2 text-base outline-none focus:border-primary-400 dark:border-white/10 dark:bg-(--surface-raised) dark:text-white"
           />
           <Button icon={CirclePlay} disabled={blocked} title={blocked ? 'End your live class first' : undefined} loading={starting} onClick={() => onStart(topic || null)}>Start class</Button>
         </div>

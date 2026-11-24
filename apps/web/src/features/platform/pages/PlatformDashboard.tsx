@@ -184,7 +184,7 @@ export function PlatformDashboard(_props: { adminName: string }) {
           {applications.isLoading && <div className="p-6"><Spinner /></div>}
           {applications.isSuccess && pending.length === 0 && <div className="p-6"><EmptyState icon={ClipboardList} title="Nothing waiting" /></div>}
           {pending.length > 0 && (
-            <table className="w-full text-sm">
+            <table data-stack className="w-full text-sm">
               <thead className="text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr><th className="px-6 py-2.5">School</th><th className="px-3 py-2.5">Contact</th><th className="px-6 py-2.5 text-right">Received</th></tr>
               </thead>
@@ -204,7 +204,7 @@ export function PlatformDashboard(_props: { adminName: string }) {
           {finance.isLoading && <div className="p-6"><Spinner /></div>}
           {f && f.endingSoon.length === 0 && <div className="p-6"><EmptyState icon={CalendarClock} title="Nothing ends in the next two weeks" /></div>}
           {f && f.endingSoon.length > 0 && (
-            <table className="w-full text-sm">
+            <table data-stack className="w-full text-sm">
               <thead className="text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr><th className="px-6 py-2.5">School</th><th className="px-3 py-2.5">Plan</th><th className="px-6 py-2.5 text-right">Ends</th></tr>
               </thead>

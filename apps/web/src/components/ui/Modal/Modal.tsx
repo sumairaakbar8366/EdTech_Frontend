@@ -53,7 +53,7 @@ export function Modal({
         aria-modal="true"
         aria-labelledby={id}
         tabIndex={-1}
-        className={`relative flex max-h-[calc(100dvh-1.5rem)] w-full flex-col outline-none sm:max-h-[calc(100dvh-3rem)] ${{ md: 'max-w-lg', lg: 'max-w-2xl', xl: 'max-w-4xl' }[size]} animate-[fade-in_0.15s_ease-out] rounded-xl border border-slate-200 bg-white shadow-depth-3 dark:border-white/10 dark:bg-[#111a2c]`}
+        className={`relative flex max-h-[calc(100dvh-1.5rem)] w-full flex-col outline-none sm:max-h-[calc(100dvh-3rem)] ${{ md: 'max-w-lg', lg: 'max-w-2xl', xl: 'max-w-4xl' }[size]} animate-[fade-in_0.15s_ease-out] rounded-xl border border-slate-200 bg-white shadow-depth-3 dark:border-white/10 dark:bg-(--surface-bg)`}
       >
         <div className="flex shrink-0 items-center justify-between border-b border-slate-200 px-5 py-3.5 dark:border-white/10">
           <h2 id={id} className="text-lg font-bold uppercase tracking-wide text-slate-900 dark:text-white">{title}</h2>

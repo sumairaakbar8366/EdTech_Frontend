@@ -25,7 +25,7 @@ export function ParentDashboard() {
       {!me.user.photoKey && (
         <div className="surface card-3d flex flex-wrap items-center gap-3 px-5 py-3">
           <Camera size={18} className="text-primary-600" />
-          <p className="flex-1 text-sm text-slate-600 dark:text-slate-300">Upload a picture of the father or guardian for your dashboard. It is optional.</p>
+          <p className="min-w-[12rem] flex-1 basis-48 text-sm text-slate-600 dark:text-slate-300">Upload a picture of the father or guardian for your dashboard. It is optional.</p>
           <Button variant="secondary" onClick={() => setPhoto(true)}>Add picture</Button>
         </div>
       )}

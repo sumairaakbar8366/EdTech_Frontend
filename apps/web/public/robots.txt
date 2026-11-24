@@ -19,4 +19,4 @@ Disallow: /api/
 Allow: /api/public/
 Allow: /api/s/*/public/
 
-Sitemap: https://ed-tech.anetcybersolution.com/sitemap.xml
+Sitemap: https://skooledtech.com/sitemap.xml

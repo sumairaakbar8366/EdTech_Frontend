@@ -13,6 +13,7 @@ export interface StaffRecord {
   accuracyMeters: number | null;
   geofenceStatus: GeoStatus;
   deviceId: string | null;
+  biometricVerified?: boolean;
   reviewStatus: ReviewStatus | null;
   reviewNote: string | null;
   employee?: { id: string; firstName: string; lastName: string; employeeNo: string; designation: string; campus: { name: string; code: string } };
@@ -66,4 +67,39 @@ export interface StudentAttendanceSummary {
   counts: Record<Mark, number>;
   percentage: number | null;
   recent: { date: string; subject: string; status: Mark; remarks: string | null }[];
+}
+
+/** A teacher's own phone, enrolled with its fingerprint / face lock. */
+export interface BiometricStatus {
+  required: boolean;
+  devices: { id: string; label: string | null; status: 'pending' | 'active'; createdAt: string; lastUsedAt: string | null }[];
+  /** A cooling period after too many misses: when it ends. */
+  coolingUntil: string | null;
+  failures: number;
+  issues: { id: string; kind: string; message: string | null; status: 'open' | 'resolved'; resolution: string | null; resolutionNote: string | null; createdAt: string; resolvedAt: string | null }[];
+}
+export type IssueKind = 'fingerprint_failed' | 'cooling' | 'system_error' | 'help';
+export interface AttendanceIssue {
+  id: string;
+  kind: IssueKind;
+  message: string | null;
+  attempts: number;
+  status: 'open' | 'resolved';
+  resolution: string | null;
+  resolutionNote: string | null;
+  resolvedAt: string | null;
+  reportedAt: string | null;
+  reportNote: string | null;
+  createdAt: string;
+  employee: { id: string; employeeNo: string; firstName: string; lastName: string; designation: string };
+  recentTries: { purpose: string; outcome: string; reason: string | null; createdAt: string }[];
+}
+export interface PhoneRow {
+  id: string;
+  label: string | null;
+  status: 'pending' | 'active';
+  createdAt: string;
+  approvedAt: string | null;
+  lastUsedAt: string | null;
+  employee: { id: string; employeeNo: string; firstName: string; lastName: string; designation: string };
 }

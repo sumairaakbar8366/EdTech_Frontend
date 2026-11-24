@@ -38,7 +38,7 @@ export function FindSchoolModal({ open, onClose }: { open: boolean; onClose: () 
             onChange={(e) => { setSchool(e.target.value); setError(null); }}
             placeholder="your-school"
             aria-label="School address"
-            className="min-w-0 flex-1 bg-white px-3.5 py-2 text-lg outline-none dark:bg-[#0e1626] dark:text-white"
+            className="min-w-0 flex-1 bg-white px-3.5 py-2 text-lg outline-none dark:bg-(--surface-raised) dark:text-white"
           />
         </div>
         {error && <p className="text-base text-rose-600">{error}</p>}

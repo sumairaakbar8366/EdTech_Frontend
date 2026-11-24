@@ -30,7 +30,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <div aria-live="polite" className="pointer-events-none fixed bottom-4 right-4 z-[110] flex w-[min(24rem,calc(100vw-2rem))] flex-col gap-2">
         {items.map((t) => (
-          <div key={t.id} className="pointer-events-auto flex items-start gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-depth-3 animate-[fade-in_0.15s_ease-out] dark:border-white/10 dark:bg-[#111a2c]">
+          <div key={t.id} className="pointer-events-auto flex items-start gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-depth-3 animate-[fade-in_0.15s_ease-out] dark:border-white/10 dark:bg-(--surface-bg)">
             {t.tone === 'success' ? (
               <CircleCheck size={18} className="mt-0.5 shrink-0 text-emerald-500" />
             ) : t.tone === 'info' ? (

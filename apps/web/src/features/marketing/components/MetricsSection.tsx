@@ -28,7 +28,7 @@ const METRICS = [
 
 export function MetricsSection() {
   return (
-    <section id="numbers" className="relative overflow-hidden border-y border-slate-100 bg-slate-50/60 py-16 dark:border-white/5 dark:bg-[#0b1426] sm:py-20">
+    <section id="numbers" className="relative overflow-hidden border-y border-slate-100 bg-slate-50/60 py-16 dark:border-white/5 dark:bg-(--page-bg) sm:py-20">
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_60%_at_20%_30%,rgb(235_116_40/0.035),transparent),radial-gradient(50%_60%_at_80%_70%,rgb(52_93_141/0.035),transparent)]" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-8">
         <SectionHeading kicker="At a glance" title="Everything a school runs on" />

@@ -169,7 +169,7 @@ export function RegistrationsPage() {
   return (
     <div>
       <PageHeader title="School applications" sub="A school is created only after your team verifies it and you approve" icon={BadgeCheck} tone="teal" />
-      <div role="tablist" className="surface mb-5 inline-flex flex-wrap gap-1 rounded-xl p-1">{tabs.map((t) => <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className={`focus-ring inline-flex items-center gap-2 rounded-lg px-4 py-2 text-base font-bold uppercase tracking-wide ${tab === t.id ? 'bg-brand text-white' : 'text-slate-600 hover:bg-slate-500/10 dark:text-slate-300'}`}><t.icon size={16} /> {t.label}</button>)}</div>
+      <div role="tablist" className="surface mb-5 inline-flex max-w-full flex-nowrap gap-1 overflow-x-auto rounded-xl p-1 sm:flex-wrap [&>button]:shrink-0 [&>button]:whitespace-nowrap">{tabs.map((t) => <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className={`focus-ring inline-flex items-center gap-2 rounded-lg px-4 py-2 text-base font-bold uppercase tracking-wide ${tab === t.id ? 'bg-brand text-white' : 'text-slate-600 hover:bg-slate-500/10 dark:text-slate-300'}`}><t.icon size={16} /> {t.label}</button>)}</div>
       {tab === 'applications' && <Applications />}
       {tab === 'rules' && <Rules />}
     </div>

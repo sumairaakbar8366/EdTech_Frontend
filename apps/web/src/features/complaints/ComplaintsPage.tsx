@@ -92,7 +92,7 @@ export function ComplaintsPage({ handler }: { handler: boolean }) {
         </div>
       )}
       {(handler || hasReceived) && (
-        <div role="tablist" className="surface mb-4 inline-flex flex-wrap gap-1 rounded-xl p-1">
+        <div role="tablist" className="surface mb-4 inline-flex max-w-full flex-nowrap gap-1 overflow-x-auto rounded-xl p-1 sm:flex-wrap [&>button]:shrink-0 [&>button]:whitespace-nowrap">
           {([...(handler ? [['queue', 'School queue']] : []), ['mine', 'Sent by me'], ...(hasReceived ? [['received', `Sent to me (${received.data!.length})`]] : [])] as [typeof tab, string][]).map(([k, label]) => <button key={k} role="tab" aria-selected={tab === k} onClick={() => { setTab(k); open(null); }} className={`focus-ring rounded-lg px-4 py-2 text-base font-bold uppercase tracking-wide ${tab === k ? 'bg-brand text-white' : 'text-slate-600 hover:bg-slate-500/10 dark:text-slate-300'}`}>{label}</button>)}
         </div>
       )}

@@ -80,7 +80,7 @@ export function SearchSelect({
         </span>
       </div>
       {open && !disabled && (
-        <ul id={listId} role="listbox" className="mt-1 max-h-60 overflow-y-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg dark:border-white/10 dark:bg-[#0e1626]">
+        <ul id={listId} role="listbox" className="mt-1 max-h-60 overflow-y-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg dark:border-white/10 dark:bg-(--surface-raised)">
           {matches.length === 0 && <li className="px-3 py-2 text-sm text-slate-500">{emptyText}</li>}
           {matches.map((o, i) => (
             <li key={o.value} role="option" aria-selected={o.value === value}>

@@ -1,7 +1,8 @@
-import { ArrowDown, ArrowUp, ClipboardList, Pencil, Plus, Save, Sparkles, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, ClipboardList, GripVertical, Pencil, Plus, Save, Sparkles, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Alert, Badge, Button, Card, ConfirmDialog, EmptyState, Field, IconButton, Input, Modal, Select, TextArea } from '@/components/ui';
 import { DynamicFields } from '@/features/forms/components/DynamicFields';
+import { moveItem, useDragReorder } from '@/lib/dragReorder';
 import { emptyField, FIELD_SECTIONS, FIELD_TYPE_LABEL, FIELD_TYPES, type CustomField, type CustomForm, type FieldType } from '@/features/forms/forms';
 
 const MAX_FIELDS = 60;
@@ -100,10 +101,11 @@ function FieldEditor({ field, allowFiles, withSections, onSave, onClose }: { fie
  * of answer, section and whether it is mandatory), an "Add a field" window with every kind of answer
  * (text, number, date, choices, tick box, document upload…), ready-made suggestions, and a live preview.
  */
-export function FormDesigner({ value, onChange, introLabel = 'Shown at the top of the form (optional)', fixedNote, allowFiles = false, withSections = false }: { value: CustomForm; onChange: (next: CustomForm) => void; introLabel?: string; fixedNote?: string; allowFiles?: boolean; withSections?: boolean }) {
+export function FormDesigner({ value, onChange, introLabel = 'Shown at the top of the form (optional)', fixedNote, fixedPreview, allowFiles = false, withSections = false }: { value: CustomForm; onChange: (next: CustomForm) => void; /** The questions the system always asks first, shown in the preview so it is the whole form. */ fixedPreview?: string[]; introLabel?: string; fixedNote?: string; allowFiles?: boolean; withSections?: boolean }) {
   const fields = value.fields;
   const [editing, setEditing] = useState<CustomField | null>(null);
   const [removing, setRemoving] = useState<CustomField | null>(null);
+  const drag = useDragReorder((from, to) => onChange({ ...value, fields: moveItem(fields, from, to) }));
   const move = (i: number, by: -1 | 1) => {
     const next = [...fields];
     [next[i], next[i + by]] = [next[i + by]!, next[i]!];
@@ -124,13 +126,19 @@ export function FormDesigner({ value, onChange, introLabel = 'Shown at the top o
   return (
     <div className="space-y-5">
       {fixedNote && <p className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">{fixedNote}</p>}
-      <div className="grid gap-6 xl:grid-cols-[1fr_1.4fr]">
-        <div className="space-y-6">
+      <div className="grid gap-6 lg:grid-cols-[1fr_1.25fr]">
+        <div className="space-y-6 lg:sticky lg:top-20 lg:self-start">
           <Card title="Instructions" icon={ClipboardList}>
             <Field label={introLabel}><TextArea rows={4} maxLength={3000} value={value.intro ?? ''} onChange={(e) => onChange({ ...value, intro: e.target.value || null })} /></Field>
           </Card>
-          <Card title="Preview" icon={ClipboardList}>
-            {previewForm.fields.length ? <DynamicFields form={previewForm} answers={{}} onChange={() => undefined} /> : <p className="text-sm text-slate-400">Your fields appear here as you add them.</p>}
+          <Card title="Preview: how the form looks" icon={ClipboardList}>
+            {fixedPreview && fixedPreview.length > 0 && (
+              <div className="mb-4 space-y-3 border-b border-dashed border-slate-300 pb-4 dark:border-white/15">
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Always asked first</p>
+                {fixedPreview.map((l) => <div key={l}><div className="mb-1 text-sm font-semibold text-slate-700 dark:text-slate-200">{l} <span className="text-rose-500">*</span></div><div className="h-9 rounded-lg border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-white/5" /></div>)}
+              </div>
+            )}
+            {previewForm.fields.length ? <DynamicFields form={previewForm} answers={{}} onChange={() => undefined} /> : <p className="text-sm text-slate-400">Your own fields appear here as you add them.</p>}
           </Card>
         </div>
 
@@ -144,9 +152,12 @@ export function FormDesigner({ value, onChange, introLabel = 'Shown at the top o
           {fields.length === 0 ? (
             <EmptyState icon={ClipboardList} title="No fields of your own yet" tone="slate">Add what you need to know: a CNIC number, blood group, a document upload, a tick box, anything.</EmptyState>
           ) : (
+            <>
+            {fields.length > 1 && <p className="mb-2 text-xs text-slate-500">Hold the dotted grip and drag a field to a new place, or use the arrows. The preview follows.</p>}
             <ol className="divide-y divide-(--surface-border) rounded-lg border border-(--surface-border)" data-tour="designer-field">
               {fields.map((f, i) => (
-                <li key={f.id} className="flex items-start gap-3 p-3">
+                <li key={f.id} {...drag.row(i)} className={`flex items-start gap-3 p-3 transition ${drag.over === i && drag.from !== null && drag.from !== i ? (drag.from < i ? "border-b-2 border-b-orange-500" : "border-t-2 border-t-orange-500") : ""} ${drag.from === i ? "opacity-50" : ""}`}>
+                  <span {...drag.grip(i)} title="Drag to move" aria-label={`Drag ${f.label} to a new place`} className="mt-0.5 flex shrink-0 cursor-grab touch-none items-center text-slate-400 hover:text-slate-700 active:cursor-grabbing"><GripVertical size={18} /></span>
                   <span className="mt-0.5 w-6 shrink-0 text-right font-mono text-sm text-slate-400">{i + 1}</span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-semibold text-slate-800 dark:text-slate-100">{f.label}</p>
@@ -166,6 +177,7 @@ export function FormDesigner({ value, onChange, introLabel = 'Shown at the top o
                 </li>
               ))}
             </ol>
+            </>
           )}
         </Card>
       </div>

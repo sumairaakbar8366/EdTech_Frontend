@@ -96,14 +96,14 @@ export function MarksheetPage() {
                         disabled={locked || e.isAbsent}
                         value={e.isAbsent ? '' : e.marks}
                         onChange={(ev) => set(r.id, { marks: ev.target.value })}
-                        className={`w-24 rounded-lg border px-3 py-1.5 text-right tabular-nums outline-none focus:ring-4 focus:ring-primary-500/15 dark:bg-[#0e1626] dark:text-white ${bad ? 'border-rose-500' : failing ? 'border-amber-400' : 'border-slate-300 dark:border-white/10'}`}
+                        className={`w-24 rounded-lg border px-3 py-1.5 text-right tabular-nums outline-none focus:ring-4 focus:ring-primary-500/15 dark:bg-(--surface-raised) dark:text-white ${bad ? 'border-rose-500' : failing ? 'border-amber-400' : 'border-slate-300 dark:border-white/10'}`}
                       />
                     </td>
                     <td className="px-5 py-2">
                       <input type="checkbox" aria-label="Absent" className="h-4 w-4 accent-primary-600" disabled={locked} checked={e.isAbsent} onChange={(ev) => set(r.id, { isAbsent: ev.target.checked })} />
                     </td>
                     <td className="px-5 py-2">
-                      <input aria-label="Remarks" maxLength={200} disabled={locked} value={e.remarks} onChange={(ev) => set(r.id, { remarks: ev.target.value })} className="w-full min-w-[10rem] rounded-lg border border-slate-300 px-3 py-1.5 outline-none focus:ring-4 focus:ring-primary-500/15 dark:border-white/10 dark:bg-[#0e1626] dark:text-white" />
+                      <input aria-label="Remarks" maxLength={200} disabled={locked} value={e.remarks} onChange={(ev) => set(r.id, { remarks: ev.target.value })} className="w-full min-w-[10rem] rounded-lg border border-slate-300 px-3 py-1.5 outline-none focus:ring-4 focus:ring-primary-500/15 dark:border-white/10 dark:bg-(--surface-raised) dark:text-white" />
                     </td>
                   </tr>
                 );

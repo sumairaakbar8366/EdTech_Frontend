@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNarrow } from '@/lib/hooks/useNarrow';
 import { createPortal } from 'react-dom';
 import { useArea, useAreaNavigate } from '@/app/router/area';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -65,6 +66,9 @@ export function NotificationWatcher({ unread }: { unread: number | undefined }) 
   const last = useRef<number | undefined>(undefined);
   const seen = useRef(seenStore(userId));
   const [popups, setPopups] = useState<AppNotification[]>([]);
+  // A phone shows one pop-up at a time (the rest wait behind "+N more"); a bigger screen shows up to four.
+  const narrow = useNarrow();
+  const maxVisible = narrow ? 1 : MAX_VISIBLE;
   const [hovered, setHovered] = useState(false);
 
   const close = useCallback((id: string) => setPopups((p) => p.filter((n) => n.id !== id)), []);
@@ -104,7 +108,6 @@ export function NotificationWatcher({ unread }: { unread: number | undefined }) 
     const timers = popups.filter((n) => !URGENT_EVENTS[n.eventType]).map((n) => setTimeout(() => close(n.id), NORMAL_MS));
     return () => timers.forEach(clearTimeout);
   }, [popups, hovered, close]);
-
   const open = (n: AppNotification) => {
     close(n.id);
     void communicationService.markRead(n.id).then(() => queryClient.invalidateQueries({ queryKey: ['notifications'] }));
@@ -112,9 +115,9 @@ export function NotificationWatcher({ unread }: { unread: number | undefined }) 
   };
 
   return createPortal(
-    <div className="pointer-events-none fixed right-4 top-20 z-[120] flex w-[min(24rem,calc(100vw-2rem))] flex-col gap-2" aria-live="assertive" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+    <div className="pointer-events-none fixed inset-x-3 top-16 z-[120] flex flex-col gap-2 sm:inset-x-auto sm:right-4 sm:top-20 sm:w-[min(24rem,calc(100vw-2rem))]" aria-live="assertive" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
       <AnimatePresence initial={false}>
-        {popups.slice(0, MAX_VISIBLE).map((n) => {
+        {popups.slice(0, maxVisible).map((n) => {
           const [Icon, tile] = EVENT_VISUAL[n.eventType] ?? EVENT_VISUAL.default!;
           const urgent = URGENT_EVENTS[n.eventType];
           return (
@@ -144,8 +147,8 @@ export function NotificationWatcher({ unread }: { unread: number | undefined }) 
           );
         })}
       </AnimatePresence>
-      {popups.length > MAX_VISIBLE && (
-        <button onClick={() => setPopups((p) => p.slice(0, MAX_VISIBLE))} className="pointer-events-auto self-end rounded-full bg-slate-800/80 px-3 py-1 text-xs font-semibold text-white">+{popups.length - MAX_VISIBLE} more · open the bell</button>
+      {popups.length > maxVisible && (
+        <button onClick={() => setPopups((p) => p.slice(0, maxVisible))} className="pointer-events-auto self-end rounded-full bg-slate-800/80 px-3 py-1 text-xs font-semibold text-white">+{popups.length - maxVisible} more · open the bell</button>
       )}
     </div>,
     document.body,

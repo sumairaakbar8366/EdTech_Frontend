@@ -35,7 +35,7 @@ export function StaffCheckinTable({ records, showDate, canReview, onReview }: Pr
       cell: (r) =>
         r.reviewStatus === 'pending' && canReview ? (
           <div className="flex flex-wrap items-center gap-2">
-            <input aria-label="Review note" placeholder="Note" value={notes[r.id] ?? ''} onChange={(e) => setNotes({ ...notes, [r.id]: e.target.value })} className="w-36 rounded-lg border border-slate-300 px-2 py-1 text-sm dark:border-white/10 dark:bg-[#0e1626]" />
+            <input aria-label="Review note" placeholder="Note" value={notes[r.id] ?? ''} onChange={(e) => setNotes({ ...notes, [r.id]: e.target.value })} className="w-36 rounded-lg border border-slate-300 px-2 py-1 text-sm dark:border-white/10 dark:bg-(--surface-raised)" />
             <Button className="px-2.5 py-1 text-sm" icon={Check} onClick={() => onReview(r.id, 'approved', notes[r.id] || null)}>Accept</Button>
             <Button variant="danger" className="px-2.5 py-1 text-sm" icon={X} onClick={() => onReview(r.id, 'rejected', notes[r.id] || null)}>Reject</Button>
           </div>

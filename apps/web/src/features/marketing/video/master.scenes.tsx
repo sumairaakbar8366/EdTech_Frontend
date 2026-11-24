@@ -2,9 +2,8 @@ import {
   Award, Banknote, Bell, BookOpen, Building2, CalendarCheck, CalendarDays, Check, ChartColumn, ClipboardCheck, Clock, Crown, Database, EyeOff, FileStack, FileText, Globe, GraduationCap, Heart, History,
   KeyRound, Lock, Mail, MapPin, Moon, Palette, FileSpreadsheet, UserPlus, MessageSquare, Receipt, Search, ShieldCheck, Smartphone, Sparkles, Star, TriangleAlert, UserCheck, UserCog, Users, Wallet, type LucideIcon,
 } from 'lucide-react';
-import type { ReactNode } from 'react';
 import { BRAND_LOGO_SRC } from '@/components/brand/BrandLogo';
-import { appear, Bubble, Browser, Card, Clock as WallClock, clamp, Desk, easeInOut, easeOut, lerp, Papers, PhoneFrame, PhoneRing, Person, pop, rnd, Stage, Sticky, Svg } from '@/features/marketing/video/art';
+import { appear, Browser, Card, Clock as WallClock, clamp, Desk, easeInOut, easeOut, lerp, Papers, PhoneFrame, pop, Stage, Svg } from '@/features/marketing/video/art';
 import type { SceneVideoDef } from '@/features/marketing/video/SceneVideo';
 
 /**
@@ -13,7 +12,7 @@ import type { SceneVideoDef } from '@/features/marketing/video/SceneVideo';
  * behind it, how a school registers, and where to find us. Mostly illustrated, a few real screens.
  */
 
-export const SITE_ADDRESS = 'ed-tech.anetcybersolution.com';
+export const SITE_ADDRESS = 'skooledtech.com';
 const NAVY_BG = 'linear-gradient(180deg,#0b1426 0%,#1f2f46 100%)';
 
 const Chip = ({ icon: Icon, label, o = 1, dy = 0, tone = 'white' }: { icon: LucideIcon; label: string; o?: number; dy?: number; tone?: 'white' | 'red' | 'orange' | 'green' | 'navy' }) => {
@@ -25,7 +24,6 @@ const Chip = ({ icon: Icon, label, o = 1, dy = 0, tone = 'white' }: { icon: Luci
   );
 };
 
-const at = (x: number, y: number, children: ReactNode, w?: number) => <div style={{ position: 'absolute', left: x, top: y, width: w }}>{children}</div>;
 
 /** A real screen in a browser frame, drifting in toward a focus point. */
 function ShotView({ id, t, d, url, focus = [0, 0, 1440, 900], from = 1, x = 130, y = 44, w = 1020 }: { id: string; t: number; d: number; url: string; focus?: [number, number, number, number]; from?: number; x?: number; y?: number; w?: number }) {
@@ -45,98 +43,72 @@ function ShotView({ id, t, d, url, focus = [0, 0, 1440, 900], from = 1, x = 130,
 
 // --- Act 1: the problem -----------------------------------------------------------------------------
 
-const Office = ({ t, d }: { t: number; d: number }) => {
-  const n = clamp(2 + t / 380, 2, 17);
-  const notes: [number, number, string, number][] = [[170, 120, 'Fees?', -6], [300, 95, 'Result?', 5], [430, 150, 'Leave!', -3], [990, 100, 'Forms!', 6], [1070, 205, 'Call!', -5]];
+/** A real photo in a frame (blurred copy fills the stage) with floating text cards: the "before" shots. */
+type PhotoCard = { icon: LucideIcon; text: string; x: number; y: number; at: number; tone?: 'white' | 'red' | 'orange' | 'navy'; w?: number; rot?: number };
+const PhotoScene = ({ t, src, ratio, frame, cards, tint = 'rgb(15 23 42 / .45)', top, bg = '#0f172a' }: { t: number; src: string; ratio: number; frame: { x: number; y: number; w: number }; cards: PhotoCard[]; tint?: string; top?: string; bg?: string }) => {
+  const h = frame.w / ratio;
+  const zoom = 1 + clamp(t / 9000) * 0.07;
+  const tones = { white: 'bg-white text-slate-800', red: 'bg-red-600 text-white', orange: 'bg-orange-500 text-white', navy: 'bg-[#1f2f46] text-white' };
   return (
-    <Stage bg="linear-gradient(180deg,#fef3c7 0%,#fff7ed 60%,#fde68a 100%)">
-      <Svg>
-        <rect x="760" y="60" width="150" height="140" rx="8" fill="#bae6fd" stroke="#94a3b8" strokeWidth="8" /><line x1="835" y1="60" x2="835" y2="200" stroke="#94a3b8" strokeWidth="6" /><line x1="760" y1="130" x2="910" y2="130" stroke="#94a3b8" strokeWidth="6" />
-        <WallClock x={1180} y={120} spin={t / 55} hour={9} />
-        {notes.map(([x, y, tx, r], i) => <g key={tx} opacity={appear(t, 900 + i * 700)} transform={`translate(0 ${(1 - appear(t, 900 + i * 700)) * -40})`}><Sticky x={x} y={y} text={tx} rot={r} s={0.9} /></g>)}
-        <Papers x={330} y={470} n={n} spread={18} /><Papers x={950} y={470} n={n * 0.8} spread={18} /><Papers x={470} y={470} n={n * 0.5} spread={10} />
-        <Person x={640} y={205} s={1} mood="stress" arms="head" t={t} glasses mustache tie />
-        <Desk x={640} y={470} w={760} />
-        <PhoneRing x={190} y={430} t={t} /><PhoneRing x={1090} y={430} t={t + 200} />
-      </Svg>
-      {at(70, 560, <Bubble x={0} y={0} text="Admission forms!" o={appear(t, 1200)} tone="red" />)}
-      {at(830, 580, <Bubble x={0} y={0} text="Fee registers!" o={appear(t, 3200)} tone="red" tail="right" />)}
-      <div style={{ position: 'absolute', left: 0, right: 0, top: 24, textAlign: 'center', opacity: appear(t, 100, 600) * (1 - appear(t, d - 700, 500)) }} className="text-[22px] font-bold uppercase tracking-[0.25em] text-orange-700">Monday, 8:00 AM</div>
-    </Stage>
-  );
-};
-
-const Fees = ({ t }: { t: number }) => (
-  <Stage bg="linear-gradient(180deg,#e0e7ff 0%,#f1f5f9 100%)">
-    <Svg>
-      {[0, 1, 2, 3, 4].map((i) => (
-        <g key={i} transform={`translate(${250 + (i % 2) * 14} ${470 - i * 34}) rotate(${(rnd(i) - 0.5) * 6})`} opacity={appear(t, 200 + i * 350)}>
-          <rect x="-150" y="-17" width="300" height="34" rx="5" fill={['#1e3a8a', '#9f1239', '#065f46', '#92400e', '#4c1d95'][i]} /><rect x="-150" y="-17" width="26" height="34" fill="rgb(255 255 255 / .25)" />
-        </g>
-      ))}
-      <Papers x={960} y={470} n={6 + t / 700} spread={14} />
-      <Person x={640} y={205} s={1} mood="stress" arms="down" t={t} glasses mustache tie />
-      <Desk x={640} y={470} w={760} />
-      <rect x="560" y="440" width="76" height="30" rx="6" fill="#334155" /><rect x="568" y="446" width="60" height="8" rx="2" fill="#86efac" />
-    </Svg>
-    {[['Rs ???', 220, 130, 0], ['Paid?', 960, 170, 1], ['Unpaid?', 1060, 330, 2], ['Rs ???', 130, 330, 3], ['Overdue?', 420, 90, 4]].map(([tx, x, y, i]) => (
-      <div key={String(tx) + String(i)} style={{ position: 'absolute', left: Number(x), top: Number(y) + Math.sin(t / 600 + Number(i)) * 10, opacity: appear(t, 500 + Number(i) * 700) }} className="rounded-xl bg-white px-4 py-2 text-[30px] font-extrabold text-red-600 shadow-lg">{tx}</div>
-    ))}
-  </Stage>
-);
-
-const Lost = ({ t }: { t: number }) => (
-  <Stage bg="linear-gradient(180deg,#fee2e2 0%,#fff7ed 100%)">
-    <Svg>
-      {Array.from({ length: 16 }).map((_, i) => {
-        const sp = 0.05 + rnd(i) * 0.1;
-        const x = ((rnd(i + 3) * 1500 + t * sp) % 1500) - 100;
-        const y = 120 + rnd(i + 7) * 420 + Math.sin(t / 500 + i) * 40;
-        return <g key={i} transform={`translate(${x} ${y}) rotate(${t / 6 * (rnd(i + 1) - 0.5) + i * 20})`}><rect x="-34" y="-44" width="68" height="88" rx="4" fill="#fff" stroke="#cbd5e1" strokeWidth="2" /><line x1="-20" y1="-24" x2="20" y2="-24" stroke="#cbd5e1" strokeWidth="3" /><line x1="-20" y1="-10" x2="20" y2="-10" stroke="#cbd5e1" strokeWidth="3" /></g>;
+    <Stage bg={bg}>
+      <img src={src} alt="" style={{ position: 'absolute', inset: -40, width: 1360, height: 800, objectFit: 'cover', filter: 'blur(26px) brightness(.55)', opacity: appear(t, 0, 500) }} />
+      <div style={{ position: 'absolute', inset: 0, background: tint }} />
+      <div style={{ position: 'absolute', left: frame.x, top: frame.y, width: frame.w, height: h, overflow: 'hidden', borderRadius: 22, boxShadow: '0 40px 80px -30px rgb(0 0 0 / .7)', opacity: appear(t, 100, 600), transform: `translateY(${(1 - appear(t, 100, 700)) * 24}px)` }}>
+        <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', transform: `scale(${zoom})` }} />
+      </div>
+      {top && <div style={{ position: 'absolute', left: 0, right: 0, top: 22, textAlign: 'center', opacity: appear(t, 300) }} className="text-[30px] font-black tracking-[0.3em] text-orange-300">{top}</div>}
+      {cards.map((c, i) => {
+        const o = pop(t, c.at);
+        const Icon = c.icon;
+        return (
+          <div key={i} style={{ position: 'absolute', left: c.x, top: c.y + Math.sin(t / 700 + i * 1.7) * 5, width: c.w, opacity: clamp(o), transform: `scale(${0.85 + 0.15 * clamp(o)}) rotate(${c.rot ?? 0}deg)` }} className={`flex items-center gap-3 rounded-2xl px-5 py-3.5 text-[26px] font-extrabold leading-tight shadow-[0_22px_44px_-18px_rgb(0_0_0/0.6)] ${tones[c.tone ?? 'white']}`}>
+            <Icon size={32} className="shrink-0" /> <span>{c.text}</span>
+          </div>
+        );
       })}
-      <Person x={640} y={235} s={1} mood="angry" arms="up" t={t} glasses mustache tie />
-      <Desk x={640} y={500} w={760} />
-    </Svg>
-    <div style={{ position: 'absolute', left: 520, top: 50, opacity: pop(t, 600), transform: `scale(${pop(t, 600)})` }} className="text-[110px] font-black text-red-600">?!</div>
-    <Bubble x={820} y={170} text="Where is her file?" o={appear(t, 1800)} tone="red" tail="left" />
-    <Bubble x={170} y={190} text="Sir, my leave letter…" o={appear(t, 3800)} tail="right" />
-  </Stage>
-);
-
-const Parents = ({ t }: { t: number }) => {
-  const cols = ['#0ea5e9', '#a855f7', '#10b981'];
-  const says = ['Where is the result?', 'I need a fee receipt!', 'My child’s certificate?'];
-  return (
-    <Stage bg="linear-gradient(180deg,#ecfeff 0%,#f8fafc 100%)">
-      <Svg>
-        <rect x="760" y="380" width="520" height="340" fill="#cbd5e1" /><rect x="760" y="380" width="520" height="22" fill="#94a3b8" />
-        <rect x="800" y="120" width="440" height="270" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="8" rx="10" />
-        <Person x={1020} y={260} s={0.62} mood="stress" arms="desk" t={t} tie glasses mustache shirt="#475569" />
-        <rect x="760" y="372" width="520" height="30" fill="#64748b" />
-        {cols.map((c, i) => <Person key={c} x={170 + i * 210} y={400} s={0.6} mood="angry" arms="up" t={t + i * 90} shirt={c} hair={['#1f2937', '#7c2d12', '#111827'][i]} female={i === 1} skin={['#f1c9a5', '#d9a679', '#f5d5b8'][i]} />)}
-        <rect x="0" y="650" width="760" height="70" fill="#e2e8f0" />
-      </Svg>
-      {says.map((s, i) => at(60 + i * 210, 170 + (i % 2) * 40, <Bubble x={0} y={0} text={s} o={appear(t, 700 + i * 1300)} tone="red" w={200} tail="left" />))}
     </Stage>
   );
 };
 
-const Night = ({ t }: { t: number }) => (
-  <Stage bg={NAVY_BG}>
-    <Svg>
-      {Array.from({ length: 40 }).map((_, i) => <circle key={i} cx={rnd(i) * 1280} cy={rnd(i + 20) * 380} r={1 + rnd(i + 9) * 2} fill="#fff" opacity={0.4 + 0.6 * Math.abs(Math.sin(t / 700 + i))} />)}
-      <circle cx="1080" cy="110" r="52" fill="#fde68a" /><circle cx="1100" cy="98" r="46" fill="#1f2f46" opacity=".35" />
-      <WallClock x={220} y={140} hour={10} minute={5} color="#e2e8f0" />
-      <ellipse cx="640" cy="440" rx="420" ry="200" fill="#fde68a" opacity=".12" />
-      <Papers x={400} y={520} n={12} spread={16} color="#e2e8f0" /><Papers x={900} y={520} n={9} spread={16} color="#e2e8f0" />
-      <Person x={640} y={235} s={1} mood="tired" arms="desk" t={t} shirt="#64748b" />
-      <Desk x={640} y={500} w={760} color="#78350f" />
-      <path d="M 790 500 l 40 -120 l 60 20 l -36 100 z" fill="#fbbf24" /><circle cx="860" cy="396" r="12" fill="#fef08a" />
-    </Svg>
-    {[0, 1, 2].map((i) => <div key={i} style={{ position: 'absolute', left: 700 + i * 36, top: 130 - i * 38 - ((t / 14 + i * 40) % 40), opacity: appear(t, 1800 + i * 500) * 0.8 }} className="text-[40px] font-black text-sky-200">z</div>)}
-    <div style={{ position: 'absolute', left: 0, right: 0, top: 36, textAlign: 'center', opacity: appear(t, 300, 600) }} className="text-[24px] font-bold uppercase tracking-[0.3em] text-sky-200">10:05 PM · still working</div>
-  </Stage>
+const P = '/guide/photos/';
+const Office = ({ t }: { t: number }) => (
+  <PhotoScene t={t} src={`${P}office.jpg`} ratio={390 / 264} frame={{ x: 250, y: 90, w: 780 }} top="MONDAY, 8:00 AM" tint="rgb(120 53 15 / .35)" cards={[
+    { icon: FileStack, text: 'Admission forms in piles', x: 20, y: 150, at: 900, w: 330, tone: 'red', rot: -3 },
+    { icon: Receipt, text: 'Fee registers never match', x: 930, y: 130, at: 2400, w: 330, tone: 'red', rot: 3 },
+    { icon: Smartphone, text: 'Phone ringing from the first bell', x: 20, y: 420, at: 4000, w: 360, tone: 'orange', rot: 2 },
+    { icon: Bell, text: 'Fees?  Result?  Leave?', x: 900, y: 420, at: 5600, w: 340, tone: 'navy', rot: -2 },
+  ]} />
 );
+const Fees = ({ t }: { t: number }) => (
+  <PhotoScene t={t} src={`${P}desk.jpg`} ratio={741 / 414} frame={{ x: 270, y: 110, w: 740 }} bg="#1e293b" cards={[
+    { icon: Wallet, text: 'Who has paid? Nobody is sure', x: 30, y: 150, at: 900, w: 360, tone: 'red', rot: -3 },
+    { icon: TriangleAlert, text: 'One missing page, and the whole month’s accounts are wrong', x: 880, y: 150, at: 2800, w: 370, tone: 'orange', rot: 3 },
+    { icon: FileText, text: 'Registers, slips, receipts…', x: 60, y: 450, at: 4800, w: 330, tone: 'navy', rot: 2 },
+  ]} />
+);
+const Lost = ({ t }: { t: number }) => (
+  <PhotoScene t={t} src={`${P}search.jpg`} ratio={641 / 360} frame={{ x: 260, y: 110, w: 760 }} bg="#0f172a" cards={[
+    { icon: Search, text: 'A student’s file is lost in the piles', x: 20, y: 130, at: 900, w: 380, tone: 'red', rot: -3 },
+    { icon: CalendarCheck, text: 'A teacher is waiting for a leave letter', x: 880, y: 440, at: 3200, w: 380, tone: 'orange', rot: 3 },
+    { icon: Users, text: 'A parent is waiting for an answer', x: 40, y: 450, at: 5200, w: 360, tone: 'navy', rot: 2 },
+  ]} />
+);
+const Parents = ({ t }: { t: number }) => (
+  <PhotoScene t={t} src={`${P}sign.jpg`} ratio={174 / 260} frame={{ x: 450, y: 50, w: 380 }} bg="#0f172a" cards={[
+    { icon: ClipboardCheck, text: 'Where is the result?', x: 70, y: 150, at: 700, w: 330, tone: 'red', rot: -3 },
+    { icon: Receipt, text: 'I need a fee receipt!', x: 900, y: 260, at: 2400, w: 320, tone: 'red', rot: 3 },
+    { icon: Award, text: 'My child’s certificate?', x: 70, y: 400, at: 4000, w: 330, tone: 'orange', rot: 2 },
+    { icon: Clock, text: 'Every question is a queue', x: 880, y: 500, at: 5400, w: 330, tone: 'navy', rot: -2 },
+  ]} />
+);
+const Night = ({ t }: { t: number }) => (
+  <PhotoScene t={t} src={`${P}office.jpg`} ratio={390 / 264} frame={{ x: 250, y: 90, w: 780 }} top="10:05 PM" bg="#0b1426" tint="rgb(11 20 38 / .7)" cards={[
+    { icon: Moon, text: 'The paper work comes home too', x: 20, y: 150, at: 900, w: 340, tone: 'navy', rot: -3 },
+    { icon: TriangleAlert, text: 'Late nights, silly mistakes', x: 930, y: 150, at: 3000, w: 330, tone: 'red', rot: 3 },
+    { icon: GraduationCap, text: 'No time left for the students', x: 40, y: 440, at: 5200, w: 360, tone: 'orange', rot: 2 },
+  ]} />
+);
+
 
 const Problem = ({ t, d }: { t: number; d: number }) => {
   const flip = easeInOut((t - (d - 2600)) / 1200);
@@ -160,7 +132,7 @@ const Problem = ({ t, d }: { t: number; d: number }) => {
 const Intro = ({ t }: { t: number }) => (
   <Stage bg="linear-gradient(135deg,#eef3fb 0%,#f8fafc 50%,#fdf1e6 100%)">
     <div style={{ position: 'absolute', left: 0, right: 0, top: 60, display: 'flex', justifyContent: 'center', opacity: appear(t, 200, 700), transform: `scale(${0.9 + 0.1 * pop(t, 200, 700)})` }}><img src={BRAND_LOGO_SRC} alt="" width={400} style={{ borderRadius: 28, boxShadow: '0 30px 60px -30px rgb(15 23 42 / .5)' }} /></div>
-    <div style={{ position: 'absolute', left: 0, right: 0, top: 545, textAlign: 'center', opacity: appear(t, 1400, 700) }} className="text-[46px] font-extrabold text-slate-800">Your whole school. Digital. Secure. Simple.</div>
+    <div style={{ position: 'absolute', left: 0, right: 0, top: 580, textAlign: 'center', opacity: appear(t, 1400, 700) }} className="text-[42px] font-extrabold text-slate-800">Your whole school. Digital. Secure. Simple.</div>
   </Stage>
 );
 
@@ -224,7 +196,7 @@ const Admissions = ({ t }: { t: number }) => {
   );
 };
 
-const Attendance = ({ t }: { t: number }) => (
+const AttendanceUI = ({ t }: { t: number }) => (
   <Stage bg="linear-gradient(135deg,#ecfdf5 0%,#f8fafc 100%)">
     <PhoneFrame x={120} y={80} w={270} h={540} o={appear(t, 100)} dy={(1 - appear(t, 100)) * 30}>
       <div className="relative h-full bg-[#e8eef5]">
@@ -243,6 +215,21 @@ const Attendance = ({ t }: { t: number }) => (
   </Stage>
 );
 
+/** The old way first (a real photo and its problems), then the product. */
+const Attendance = ({ t }: { t: number }) => {
+  const k = clamp((t - 3000) / 700);
+  return (
+    <>
+      {k < 1 && <div style={{ position: 'absolute', inset: 0, opacity: 1 - k }}><PhotoScene t={t} src={`${P}register.jpg`} ratio={1400 / 1021} frame={{ x: 250, y: 90, w: 780 }} bg="#0f172a" cards={[
+        { icon: ClipboardCheck, text: 'Paper register: signatures and mistakes', x: 20, y: 330, at: 600, w: 360, tone: 'red', rot: -3 },
+        { icon: Clock, text: 'Late entries get missed', x: 920, y: 140, at: 1500, w: 340, tone: 'orange', rot: 3 },
+        { icon: Banknote, text: 'Salary needs a manual count', x: 20, y: 520, at: 2200, w: 340, tone: 'navy', rot: 2 },
+      ]} /></div>}
+      {k > 0 && <div style={{ position: 'absolute', inset: 0, opacity: k }}><AttendanceUI t={Math.max(0, t - 3000)} /></div>}
+    </>
+  );
+};
+
 const FeesScene = ({ t }: { t: number }) => (
   <Stage bg="linear-gradient(135deg,#fff7ed 0%,#f8fafc 100%)">
     {[0, 1, 2, 3, 4].map((i) => <Card key={i} x={90 + i * 22} y={110 + i * 62} w={380} h={74} o={appear(t, 200 + i * 350)} dy={(1 - appear(t, 200 + i * 350)) * -30} className="flex items-center justify-between px-5"><span className="text-[22px] font-bold text-slate-700">INV-2026-00{430 + i}</span><span className="text-[22px] font-extrabold text-slate-900">PKR 6,000</span></Card>)}
@@ -259,7 +246,7 @@ const FeesScene = ({ t }: { t: number }) => (
   </Stage>
 );
 
-const Exams = ({ t }: { t: number }) => (
+const ExamsUI = ({ t }: { t: number }) => (
   <Stage bg="linear-gradient(135deg,#eef2ff 0%,#f8fafc 100%)">
     <Card x={80} y={120} w={540} h={440} o={appear(t, 100)} className="p-6">
       <div className="text-[26px] font-extrabold text-slate-800">Enter marks · Mid-term · Maths</div>
@@ -274,6 +261,20 @@ const Exams = ({ t }: { t: number }) => (
     </Card>
   </Stage>
 );
+
+const Exams = ({ t }: { t: number }) => {
+  const k = clamp((t - 2400) / 700);
+  return (
+    <>
+      {k < 1 && <div style={{ position: 'absolute', inset: 0, opacity: 1 - k }}><PhotoScene t={t} src={`${P}desk.jpg`} ratio={741 / 414} frame={{ x: 300, y: 130, w: 680 }} bg="#1e293b" cards={[
+        { icon: FileSpreadsheet, text: 'Marks copied by hand', x: 30, y: 150, at: 400, w: 330, tone: 'red', rot: -3 },
+        { icon: Clock, text: 'Results take days', x: 920, y: 200, at: 1100, w: 310, tone: 'orange', rot: 3 },
+        { icon: TriangleAlert, text: 'One wrong total, one wrong position', x: 880, y: 460, at: 1700, w: 360, tone: 'red', rot: -2 },
+      ]} /></div>}
+      {k > 0 && <div style={{ position: 'absolute', inset: 0, opacity: k }}><ExamsUI t={Math.max(0, t - 2400)} /></div>}
+    </>
+  );
+};
 
 const Learning = ({ t }: { t: number }) => (
   <Stage bg="linear-gradient(135deg,#f0fdf4 0%,#f8fafc 100%)">
@@ -455,16 +456,18 @@ const Happy = ({ t }: { t: number }) => (
   <Stage bg="linear-gradient(180deg,#fff7ed 0%,#fef3c7 55%,#fde68a 100%)">
     <Svg>
       <circle cx="1130" cy="110" r="60" fill="#fde047" opacity=".9" />
-      <rect x="800" y="70" width="150" height="140" rx="8" fill="#bae6fd" stroke="#94a3b8" strokeWidth="8" />
       <WallClock x={220} y={130} hour={3} minute={0} />
-      <Person x={560} y={215} s={1} mood="happy" arms="up" t={t} tie glasses mustache />
-      <Desk x={560} y={480} w={700} />
-      <rect x="470" y="430" width="150" height="50" rx="6" fill="#334155" /><rect x="480" y="436" width="130" height="38" rx="3" fill="#93c5fd" />
-      <Person x={1010} y={420} s={0.5} mood="happy" arms="up" t={t + 200} shirt="#f97316" female hair="#1f2937" kid />
-      <Person x={1150} y={440} s={0.45} mood="happy" arms="up" t={t + 500} shirt="#10b981" kid />
+      <Desk x={640} y={470} w={760} />
+      <rect x="520" y="404" width="170" height="66" rx="8" fill="#334155" /><rect x="530" y="412" width="150" height="50" rx="4" fill="#93c5fd" />
+      <Papers x={860} y={470} n={2} spread={4} />
     </Svg>
-    <Bubble x={820} y={250} text="Thank you, sir!" o={appear(t, 1800)} w={260} tail="right" />
-    <div style={{ position: 'absolute', left: 60, top: 290, opacity: appear(t, 1000) }} className="rounded-2xl bg-white px-5 py-3 text-[28px] font-extrabold text-emerald-700 shadow-lg">3:00 PM · home on time</div>
+    <div style={{ position: 'absolute', left: 0, right: 0, top: 150, textAlign: 'center', opacity: appear(t, 400) }} className="text-[64px] font-black text-slate-800">Home on time</div>
+    {[[CalendarCheck, 'Desk clear', 160, 300], [Database, 'Records safe', 430, 250], [Heart, 'Time for the students', 800, 300]].map(([Icon, label, x, y], i) => {
+      const I = Icon as LucideIcon;
+      const o = pop(t, 1000 + i * 700);
+      return <div key={String(label)} style={{ position: 'absolute', left: Number(x), top: Number(y) + Math.sin(t / 700 + i) * 5, opacity: clamp(o), transform: `scale(${0.85 + 0.15 * clamp(o)})` }} className="flex items-center gap-3 rounded-2xl bg-white px-5 py-3.5 text-[28px] font-extrabold text-emerald-700 shadow-lg"><I size={32} /> {String(label)}</div>;
+    })}
+    <div style={{ position: 'absolute', left: 0, right: 0, top: 555, textAlign: 'center', opacity: appear(t, 3200) }} className="text-[30px] font-extrabold text-emerald-700">3:00 PM · Mr. Khan goes home</div>
   </Stage>
 );
 

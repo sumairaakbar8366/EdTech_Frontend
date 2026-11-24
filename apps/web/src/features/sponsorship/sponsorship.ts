@@ -16,14 +16,17 @@ export interface Program {
   id: string; title: string; sponsorId: string | null; sponsor: { id: string; name: string } | null; description: string | null; criteria: string | null; awardAmount: number | null; budget: number | null; currency: string; slots: number; deadline: string | null; status: ProgramStatus;
   offersSent: number; offersAnswered: number; students: number; committed: number; disbursed: number; slotsLeft: number;
   targetLevels: number[]; period: 'yearly' | 'semester'; currentPeriod: string | null; continuesToUndergrad: boolean; minAverage: number; minAttendance: number; needRequired: boolean;
+  kind: 'scholarship' | 'prize'; prizes: Prize[];
 }
+export interface Prize { position: string; title: string; amount: number }
+export interface Nomination { position: string; studentName: string; className: string | null }
 export interface Offer { id: string; status: string; sentAt: string; viewedAt: string | null; respondedAt: string | null; expiresAt: string; message: string | null; school: { id: string; name: string }; program: { id: string; title: string }; opportunity: { title: string } | null }
 export interface ReqGrant { id: string; studentName: string; className: string | null; amount: number; status: string }
-export interface ScholarshipRequest { id: string; status: 'submitted' | 'approved' | 'rejected'; studentsRequested: number; contactName: string | null; contactEmail: string | null; answers: Record<string, unknown>; reviewNote: string | null; createdAt: string; school: { id: string; name: string }; program: { id: string; title: string; awardAmount: number | null }; grants: ReqGrant[] }
+export interface ScholarshipRequest { id: string; status: 'submitted' | 'approved' | 'rejected'; studentsRequested: number; contactName: string | null; contactEmail: string | null; answers: Record<string, unknown>; reviewNote: string | null; createdAt: string; school: { id: string; name: string }; program: { id: string; title: string; awardAmount: number | null; kind: 'scholarship' | 'prize'; prizes: Prize[] }; nominations: Nomination[]; grants: ReqGrant[] }
 export interface Grant { id: string; studentName: string; className: string | null; amount: number; status: 'pledged' | 'disbursed' | 'cancelled'; awardedOn: string; disbursedOn: string | null; school: { id: string; name: string }; program: { id: string; title: string; currency: string } }
 export interface SchoolRow { id: string; name: string; slug: string; city: string | null; province: string | null; plan: string; students: number; newStudents: number; teachers: number; staff: number; attendancePercent: number | null; collected: number; billed: number; outstanding: number; salaries: number; surplus: number; admissions: number; scholarshipChildren: number; scholarshipAmount: number; offers: number }
 export type SponsorInput = { name: string; kind?: string; contactName?: string; email?: string; phone?: string; notes?: string; isActive?: boolean };
-export type ProgramInput = { targetLevels?: number[]; period?: 'yearly' | 'semester'; currentPeriod?: string | null; continuesToUndergrad?: boolean; minAverage?: number; minAttendance?: number; needRequired?: boolean; title: string; sponsorId?: string | null; description?: string; criteria?: string; awardAmount?: number | null; budget?: number | null; slots?: number; deadline?: string | null; status?: ProgramStatus };
+export type ProgramInput = { kind?: 'scholarship' | 'prize'; prizes?: Prize[]; targetLevels?: number[]; period?: 'yearly' | 'semester'; currentPeriod?: string | null; continuesToUndergrad?: boolean; minAverage?: number; minAttendance?: number; needRequired?: boolean; title: string; sponsorId?: string | null; description?: string; criteria?: string; awardAmount?: number | null; budget?: number | null; slots?: number; deadline?: string | null; status?: ProgramStatus };
 
 export interface CandidateRow { id: string; periodLabel: string; studentName: string; className: string; level: number; average: number; attendance: number; meritScore: number; needScore: number; rankScore: number; reasons: string[]; needNote: string; status: 'confirmed' | 'selected' | 'rejected' | 'awarded'; school: { id: string; name: string } }
 export interface CandidateList { period: string; periods: string[]; program: { id: string; title: string; slots: number; targetLevels: number[]; continuesToUndergrad: boolean }; items: CandidateRow[] }
@@ -43,9 +46,9 @@ export const sponsorshipService = {
   overview: () => api<Overview>(`${B}/overview`),
   schools: () => api<SchoolRow[]>(`${B}/schools`),
   opportunities: (status?: string) => api<Opportunity[]>(`${B}/opportunities${status ? `?status=${status}` : ''}`),
-  offerFromOpportunity: (id: string, b: { programId?: string; message?: string }) => api<{ school: string; program: string; emailedTo: number }>(`${B}/opportunities/${id}/offer`, { method: 'POST', body: b }),
+  offerFromOpportunity: (id: string, b: { programId?: string; message?: string }) => api<{ school: string; program: string; notified: number }>(`${B}/opportunities/${id}/offer`, { method: 'POST', body: b }),
   dismiss: (id: string) => api(`${B}/opportunities/${id}/dismiss`, { method: 'POST' }),
-  sendOffer: (b: { schoolId: string; programId?: string; message?: string }) => api<{ school: string; program: string; emailedTo: number }>(`${B}/offers`, { method: 'POST', body: b }),
+  sendOffer: (b: { schoolId: string; programId?: string; message?: string }) => api<{ school: string; program: string; notified: number }>(`${B}/offers`, { method: 'POST', body: b }),
   offers: () => api<Offer[]>(`${B}/offers`),
   withdraw: (id: string) => api(`${B}/offers/${id}/withdraw`, { method: 'POST' }),
   sponsors: () => api<Sponsor[]>(`${B}/sponsors`),
@@ -69,13 +72,23 @@ export const sponsorshipService = {
 // --- The school's private page (public, by link) ---
 export interface OfferPage {
   school: string; status: string; open: boolean; message: string | null; expiresAt: string;
-  program: { title: string; description: string | null; criteria: string | null; sponsor: string | null; awardAmount: number | null; currency: string; deadline: string | null };
+  program: { title: string; description: string | null; criteria: string | null; sponsor: string | null; awardAmount: number | null; currency: string; deadline: string | null; kind: 'scholarship' | 'prize'; prizes: Prize[] };
   form: CustomForm | null;
 }
 export const offerPageService = {
   get: (token: string) => api<OfferPage>(`/public/scholarship-offers/${encodeURIComponent(token)}`),
-  submit: (token: string, b: { contactName: string; contactEmail: string; studentsRequested: number; answers: Record<string, unknown> }) => api<{ message: string }>(`/public/scholarship-offers/${encodeURIComponent(token)}`, { method: 'POST', body: b }),
+  submit: (token: string, b: { contactName: string; contactEmail: string; studentsRequested: number; answers: Record<string, unknown>; nominations?: { position: string; studentName: string; className?: string }[] }) => api<{ message: string }>(`/public/scholarship-offers/${encodeURIComponent(token)}`, { method: 'POST', body: b }),
   decline: (token: string) => api<{ message: string }>(`/public/scholarship-offers/${encodeURIComponent(token)}/decline`, { method: 'POST' }),
+};
+
+/** The school administrator's side: offers waiting on the dashboard, answered in the app. */
+export interface SchoolOfferRow { id: string; status: string; sentAt: string; expiresAt: string; message: string | null; program: { title: string; kind: 'scholarship' | 'prize'; sponsor: string | null; awardAmount: number | null; currency: string } }
+type OfferBody = { contactName: string; contactEmail: string; studentsRequested: number; answers: Record<string, unknown>; nominations?: { position: string; studentName: string; className?: string }[] };
+export const schoolOffersService = {
+  list: () => api<SchoolOfferRow[]>('/scholarship-offers'),
+  get: (id: string) => api<OfferPage>(`/scholarship-offers/${id}`),
+  submit: (id: string, b: OfferBody) => api<{ message: string }>(`/scholarship-offers/${id}`, { method: 'POST', body: b }),
+  decline: (id: string) => api<{ message: string }>(`/scholarship-offers/${id}/decline`, { method: 'POST' }),
 };
 
 export const pkr = (v: number, cur = 'PKR') => `${cur} ${Math.round(v).toLocaleString('en-PK')}`;
