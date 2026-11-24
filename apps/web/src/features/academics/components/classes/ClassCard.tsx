@@ -1,4 +1,4 @@
-import { BookOpen, Layers, MapPin, Pencil, Plus, Trash2, Users, X } from 'lucide-react';
+import { BookOpen, Copy, Layers, MapPin, Pencil, Plus, Trash2, Users, X } from 'lucide-react';
 import { Badge, Button, Card, IconButton } from '@/components/ui';
 import type { SchoolClass, Section } from '@/features/academics/types/academics.types';
 
@@ -11,10 +11,11 @@ interface ClassCardProps {
   onEditSection: (s: Section) => void;
   onDeleteSection: (s: Section) => void;
   onManageSubjects: () => void;
+  onCopySetup: () => void;
 }
 
 /** A class with its sections (per campus) and the subjects taught in it. */
-export function ClassCard({ schoolClass: c, readOnly, onEdit, onDelete, onAddSection, onEditSection, onDeleteSection, onManageSubjects }: ClassCardProps) {
+export function ClassCard({ schoolClass: c, readOnly, onEdit, onDelete, onAddSection, onEditSection, onDeleteSection, onManageSubjects, onCopySetup }: ClassCardProps) {
   return (
     <Card
       title={c.name}
@@ -25,6 +26,7 @@ export function ClassCard({ schoolClass: c, readOnly, onEdit, onDelete, onAddSec
           <Badge tone="magenta">Level {c.level}</Badge>
           {!readOnly && (
             <>
+              <IconButton icon={Copy} label="Copy sections and subjects to other classes" onClick={onCopySetup} />
               <IconButton icon={Pencil} label="Edit class" onClick={onEdit} />
               <IconButton icon={Trash2} label="Delete class" tone="danger" onClick={onDelete} />
             </>

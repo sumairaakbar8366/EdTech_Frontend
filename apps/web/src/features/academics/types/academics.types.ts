@@ -65,3 +65,20 @@ export interface AcademicsSummary {
   currentYear: AcademicYear | null;
   counts: { classes: number; sections: number; subjects: number; rooms: number; campuses: number };
 }
+
+// --- Quick setup -------------------------------------------------------------------
+
+export interface QuickSetupBody {
+  classes?: { name: string; level: number }[];
+  sectionNames?: string[];
+  sectionCapacity?: number;
+  subjects?: { name: string }[];
+  linkSubjects?: boolean;
+  roomNames?: string[];
+  roomCapacity?: number;
+  campusIds?: string[];
+  includeExistingClasses?: boolean;
+}
+
+type Tally = { created: number; skipped: number };
+export interface QuickSetupResult { classes: Tally; sections: Tally; subjects: Tally; links: Tally; rooms: Tally }

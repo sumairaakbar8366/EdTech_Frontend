@@ -33,6 +33,13 @@ export function ClassSubjectsModal({ schoolClass, onClose }: { schoolClass: Scho
       }
     >
       {subjects.data?.length ? (
+        <>
+        <div className="mb-2 flex items-center justify-between text-sm text-slate-500">
+          <span>{selected.size} of {subjects.data.length} selected</span>
+          <button type="button" className="text-xs font-semibold text-primary-600 hover:underline" onClick={() => setSelected(selected.size === subjects.data.length ? new Set() : new Set(subjects.data.map((s) => s.id)))}>
+            {selected.size === subjects.data.length ? 'Clear all' : 'Select all'}
+          </button>
+        </div>
         <div className="grid max-h-80 grid-cols-2 gap-2 overflow-y-auto">
           {subjects.data.map((s) => {
             const checked = selected.has(s.id);
@@ -48,6 +55,7 @@ export function ClassSubjectsModal({ schoolClass, onClose }: { schoolClass: Scho
             );
           })}
         </div>
+        </>
       ) : (
         <p className="text-sm text-slate-500">Create subjects in the Subjects tab first.</p>
       )}

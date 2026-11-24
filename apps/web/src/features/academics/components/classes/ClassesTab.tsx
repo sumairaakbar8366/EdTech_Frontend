@@ -4,6 +4,7 @@ import { Button, Card, ConfirmDialog, EmptyState, Spinner } from '@/components/u
 import { SheetActions } from '@/components/shared/SheetActions';
 import { CLASS_EXPORT, CLASS_IMPORT, classRows } from '@/features/academics/utils/academicsSheet';
 import { ClassCard } from '@/features/academics/components/classes/ClassCard';
+import { CopySetupModal } from '@/features/academics/components/classes/CopySetupModal';
 import { ClassFormModal } from '@/features/academics/components/classes/ClassFormModal';
 import { ClassSubjectsModal } from '@/features/academics/components/classes/ClassSubjectsModal';
 import { SectionFormModal } from '@/features/academics/components/classes/SectionFormModal';
@@ -18,6 +19,7 @@ export function ClassesTab({ readOnly }: { readOnly: boolean }) {
   const [editingClass, setEditingClass] = useState<SchoolClass | 'new' | null>(null);
   const [sectionTarget, setSectionTarget] = useState<{ schoolClass: SchoolClass; section?: Section } | null>(null);
   const [subjectsFor, setSubjectsFor] = useState<SchoolClass | null>(null);
+  const [copyFor, setCopyFor] = useState<SchoolClass | null>(null);
   const [deleting, setDeleting] = useState<Deleting | null>(null);
   const remove = useAcademicsAction((d: Deleting) => (d.kind === 'class' ? academicsService.deleteClass(d.id) : academicsService.deleteSection(d.id)), 'Deleted', () => setDeleting(null));
 
@@ -45,6 +47,7 @@ export function ClassesTab({ readOnly }: { readOnly: boolean }) {
             onEditSection={(section) => setSectionTarget({ schoolClass: c, section })}
             onDeleteSection={(s) => setDeleting({ kind: 'section', id: s.id, name: `${c.name} ${s.name}` })}
             onManageSubjects={() => setSubjectsFor(c)}
+            onCopySetup={() => setCopyFor(c)}
           />
         ))}
       </div>
@@ -53,6 +56,7 @@ export function ClassesTab({ readOnly }: { readOnly: boolean }) {
           <ClassFormModal target={editingClass} nextLevel={(classes.data?.at(-1)?.level ?? 0) + 1} onClose={() => setEditingClass(null)} />
           <SectionFormModal target={sectionTarget} onClose={() => setSectionTarget(null)} />
           <ClassSubjectsModal schoolClass={subjectsFor} onClose={() => setSubjectsFor(null)} />
+          <CopySetupModal source={copyFor} onClose={() => setCopyFor(null)} />
         </>
       )}
       <ConfirmDialog

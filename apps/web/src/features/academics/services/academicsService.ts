@@ -1,4 +1,4 @@
-import type { AcademicsSummary, AcademicYear, Room, SchoolClass, Subject } from '@/features/academics/types/academics.types';
+import type { AcademicsSummary, AcademicYear, QuickSetupBody, QuickSetupResult, Room, SchoolClass, Subject } from '@/features/academics/types/academics.types';
 import { api } from '@/services/api/http';
 
 type Dates = { name: string; startDate: string; endDate: string };
@@ -6,6 +6,11 @@ type Dates = { name: string; startDate: string; endDate: string };
 /** Academic structure API (page 10): years, terms, classes, sections, subjects, rooms. */
 export const academicsService = {
   summary: () => api<AcademicsSummary>('/academics/summary'),
+
+  /** Many classes, sections, subjects and rooms at once; existing ones are skipped. */
+  quickSetup: (body: QuickSetupBody) => api<QuickSetupResult>('/academics/quick-setup', { method: 'POST', body }),
+  copyClassSetup: (classId: string, body: { targetClassIds: string[]; sections: boolean; subjects: boolean }) =>
+    api<{ classes: number; sectionsAdded: number; subjectsAdded: number }>(`/academics/classes/${classId}/copy-setup`, { method: 'POST', body }),
 
   years: () => api<AcademicYear[]>('/academics/years'),
   createYear: (body: Dates & { makeCurrent: boolean }) => api('/academics/years', { method: 'POST', body }),
